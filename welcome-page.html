@@ -1,0 +1,64 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="su-header.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="welcome-page">
+  <template>
+    <style include="oficio-styles"></style>
+    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <app-header-layout>
+      <su-header drawer-opened="{{drawerOpened}}" full-width$="[[!user]]" slot="header" user="[[user]]" user-name="[[userName]]" page="{{page}}"></su-header>
+      <main role="main">
+        <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="inicio" role="main">
+          <su-inicio name="inicio"></su-inicio>
+          <su-ingresar name="ingresar"></su-ingresar>
+          <su-registracion route="[[subroute]]" name="registracion" page="{{page}}"></su-registracion>
+          <su-como-funciona name="como-funciona"></su-como-funciona>
+          <su-no-encontrado name="no-encontrado"></su-no-encontrado>
+          <su-categoria route="[[subroute]]" name="categoria"></su-categoria>
+        </iron-pages>
+      </main>
+    </app-header-layout>
+  </template>
+  <script>
+    class WelcomePage extends Polymer.Element {
+      static get is() { return 'welcome-page'; }
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            reflectToAttribute: true,
+            notify: true,
+            observer: '_pageChanged'
+          },
+          userType: Number,
+          route: Object,
+          user: Object
+        };
+      }
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)'
+        ]
+      }
+      constructor() {
+        super();
+        window.performance && performance.mark && performance.mark('welcome-page.created');
+      }
+      _routePageChanged(page) {
+        this.page = page || 'inicio';
+      }
+      _pageChanged(page) {
+        var resolvedPageUrl = this.resolveUrl('su-' + page + '.html');
+        Polymer.importHref(resolvedPageUrl, null, this._showPage404.bind(this), true);
+      }
+      _showPage404() {
+        this.page = 'no-encontrado';
+      }
+    }
+    customElements.define(WelcomePage.is, WelcomePage);
+  </script>
+</dom-module>

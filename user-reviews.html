@@ -1,0 +1,92 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="review-item.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="user-reviews">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin-top:28px;
+    }
+    .header {
+      @apply --layout-vertical;
+      @apply --layout-flex;
+      border-bottom:1px solid var(--app-little-grey);
+      padding-bottom: 24px;
+    }
+    .main-wrap {
+      padding: 36px;
+      @apply --common-borders;
+    }
+    .content{
+    }
+    .title {
+      @apply --su-font-header-big;
+    }
+    review-item:not(:last-of-type) {
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    @media (max-width: 767px) {
+      .main-wrap {
+        padding: 0px;
+        margin-bottom: 14px;
+      }
+      .header {
+        background-color: #f9f9f9;
+        padding: 16px 12px;
+      }
+      .title{
+        margin-bottom: 0px;
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: 500;
+        border-bottom: 0px solid var(--app-little-grey);
+      }
+      .content{
+        border: none;
+        padding: 0 12px;
+        margin-top: -1px;
+        border-top: 1px solid var(--app-little-grey);
+        /* box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28); */
+      }
+    }
+    </style>
+    <firebase-query id="getreviews" path="/reviews/[[uid]]" data="{{userReviews}}">
+    </firebase-query>
+    <div class="main-wrap">
+      <div class="header">
+        <div class="title">{{title}}&nbsp;([[userReviews.length]])</div>
+      </div>
+      <div class="content">
+        <dom-repeat items="[[userReviews]]">
+          <template>
+            <review-item review="[[item]]"></review-item>
+          </template>
+        </dom-repeat>
+      </div>
+    </div>
+  </template>
+  <script>
+  class UserReviews extends Polymer.Element {
+    static get is() {
+      return 'user-reviews';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        title: String,
+        jobName: String
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('user-reviews.created');
+    }
+  }
+  window.customElements.define(UserReviews.is, UserReviews);
+  </script>
+</dom-module>

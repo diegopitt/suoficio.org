@@ -1,0 +1,144 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="how-works">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 80px 0px 20px 0px;
+      color: var(--app-font-color);
+    }
+    
+    .wrap {
+      width: 100%;
+      padding: 20px 0px;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    
+    .steps {
+      @apply --layout-horizontal;
+      @apply --layout-flex-auto;
+      @apply --layout-center-center;
+      padding: 20px;
+    }
+    
+    .childSteps > * {
+      @apply --layout-flex;
+    }
+    
+    .center {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    
+    .number {
+      padding: 0px 0px 10px 0px;
+      text-align: center;
+    }
+    
+    .text {
+      line-height: 28px;
+      color: var(--app-font-color-light);
+      font-weight: 400;
+      font-size: 16px;
+    }
+    
+    .title {
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 32px;
+    }
+    
+    .header {
+      @apply --layout-flex-auto;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      color: var(--app-font-color);
+      padding: 20px 0px;
+      font-family: 'Gotham Bold';
+      font-size: 40px;
+      font-weight: 700;
+    }
+    
+    .divider {
+      text-align: center
+    }
+    
+    .divider:after {
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      content: '';
+      border-bottom: 3px solid var(--app-accent-green);
+      padding-top: 30px;
+      width: 100px;
+    }
+    
+    .icon {
+      width: 64px;
+      height: 64px;
+    }
+    @media (max-width: 900px) {
+      .header {
+        font-size: 30px;
+        padding: 20px 10px;
+      }
+    }
+    @media (max-width: 767px) {
+      .wrap {
+        @apply --layout-vertical;
+      }
+      .header {
+        font-size: 30px;
+      }
+    }
+    
+    @media (max-width: 480px) {}
+
+    </style>
+    <div class="header">
+      <div class="divider">Como funciona nuestro servicio</div>
+    </div>
+    <div class="wrap">
+      <div class="steps">
+        <div class="childSteps">
+          <div class="number"><img class="icon" src="../../images/usuariocompu.svg" /></div>
+          <div class="title">Publica un trabajo</div>
+          <div class="text">Dinos que necesitas</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="childSteps">
+          <div class="number"><img class="icon" src="../../images/propuestas.svg" /></div>
+          <div class="title">Recibe presupuestos</div>
+          <div class="text">Discute con expertos</div>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="childSteps">
+          <div class="number"><img class="icon" src="../../images/comentario.svg" /></div>
+          <div class="title">Evalúa y Comenta</div>
+          <div class="text">Concreta tu proyecto</div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class HowWorks extends Polymer.Element {
+    static get is() {
+      return 'how-works';
+    }
+    static get properties() {
+      return {};
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('how-works.created');
+    }
+  }
+  window.customElements.define(HowWorks.is, HowWorks);
+  </script>
+</dom-module>

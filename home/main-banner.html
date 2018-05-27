@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../oficio-styles.html">
+<link rel="import" href="banner-content.html">
+<dom-module id="main-banner">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    header {
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      min-height: calc(100vh - 48px);
+      padding: 0 16px;
+      backgrond-repeat: no-repeat;
+      background-size: cover;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../../images/casa_deco.jpg);
+      background-color: #00D7C5;
+      color: #fff;
+      text-align: center;
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    </style>
+    <header>
+      <banner-content></banner-content>
+    </header>
+  </template>
+  <script>
+  class MainBanner extends Polymer.Element {
+    static get is() {
+      return 'main-banner';
+    }
+    static get properties() {
+      return {};
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('main-banner.created');
+    }
+  }
+  window.customElements.define(MainBanner.is, MainBanner);
+  </script>
+</dom-module>

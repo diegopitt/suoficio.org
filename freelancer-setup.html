@@ -1,0 +1,63 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="su-editar-perfil.html">
+<link rel="import" href="su-header.html">
+<dom-module id="freelancer-setup">
+  <template>
+    <style>
+    :host {
+      display: block;
+      margin-top: 24px;
+    }
+    footer{
+      background-color: #222222;
+      margin-top: 24px;
+      height: 30vh;
+    }
+    main{
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      main {
+        margin: 0px 48px;
+      }
+    }
+    @media (max-width: 767px) {
+      main {
+        margin: 0px;
+      }
+      :host {
+        display: block;
+        margin-top: 0px;
+      }
+    }
+    </style>
+    <app-header-layout>
+      <su-header freelancer full-width slot="header" user="[[user]]"></su-header>
+      <main role="main">
+        <su-editar-perfil uid="[[uid]]"></su-editar-perfil>
+      </main>
+      <footer></footer>
+    </app-header-layout>
+  </template>
+  <script>
+  class FreelancerSetup extends Polymer.Element {
+    static get is() {
+      return 'freelancer-setup';
+    }
+    static get properties() {
+      return {
+        uid: String
+      };
+    }
+    static get observers() {
+      return []
+    }
+  }
+  window.customElements.define(FreelancerSetup.is, FreelancerSetup);
+  </script>
+</dom-module>

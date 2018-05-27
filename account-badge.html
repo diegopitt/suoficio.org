@@ -1,0 +1,278 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/google-map/google-map.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="data/app-locations-data.html">
+<link rel="import" href="display-rating.html">
+<dom-module id="account-badge">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    .client-label {
+      color: #222;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .main-wrap {
+      border-top: 1px solid var(--app-little-grey);
+      padding-top: 32px;
+    }
+    .row {
+      @apply --su-font-medium;
+      margin: 20px 0;
+    }
+    .row-small{
+      @apply --su-font-medium;
+      line-height: 26px;
+    }
+    .center {
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
+    .location-value {
+      @apply --su-font-medium;
+      color: var(--app-font-color);
+    }
+    .amount-worth{
+      margin-right: 6px;
+    }
+    .user-score {
+      @apply --su-font-xsmall-bold;
+      border-radius: 3px;
+      padding: 2px 6px;
+      min-width: 26px;
+      text-align: center;
+      margin-right: 4px;
+      background-color: #74DACE;
+      color: #fff;
+    }
+    display-rating{
+      --display-rating:{
+
+      };
+    }
+    .member-since {
+      @apply --su-font-small;
+      color: var(--app-font-color-light);
+      border-top: 1px solid var(--app-little-grey);
+      padding-top: 24px;
+      margin-top: 24px;
+    }
+    iron-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      color: var(--app-font-color-light);
+    }
+    .date {
+      text-transform: capitalize;
+    }
+    .location-title {
+      color: #222;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      border-top: 1px solid var(--app-little-grey);
+      padding-top:24px;
+      margin-top:24px;
+    }
+    .location-copy {
+      color: var(--app-font-color-light);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+    .location-map{
+      @apply --layout-flex;
+    }
+    google-map {
+      @apply --layout-flex;
+      padding: 0px;
+      margin: 0px;
+      height: 280px;
+    }
+    </style>
+    <firebase-document path="/users/[[userKey]]" data="{{user}}"></firebase-document>
+    <app-locations-data location-value="[[user.account.location]]" location="{{location}}"></app-locations-data>
+    <div class="main-wrap">
+      <dom-if if="[[!isProfile]]">
+        <template>
+          <div class="client-label">Detalles del Cliente</div>
+        </template>
+      </dom-if>
+      <dom-if if="[[isProfile]]">
+        <template>
+          <div class="client-label">Calificacion y Trabajos</div>
+        </template>
+      </dom-if>
+      <div class="row">
+        <span class="user-score">[[_formateScore(user.account.sc)]]</span>
+        <display-rating value="[[user.account.sc]]"></display-rating>
+      </div>
+      <div class="row-small">Calificaciones:&nbsp;[[user.account.rc]]</div>
+      <div class="row-small">Contrataciones:&nbsp;[[user.account.jc]]</div>
+      <dom-if if="[[!isProfile]]">
+        <template>
+          <div class="row-small center">
+            <span class="amount-worth">$ [[_formatAmount(user.account.wo)]]</span>gastado
+          </div>
+        </template>
+      </dom-if>
+      <dom-if if="[[isProfile]]">
+        <template>
+          <div class="row">
+            <div class="location-title">Visibilidad</div>
+            <dom-if if="[[!_isVisible]]">
+              <template>
+                <div class="location-value"><iron-icon icon="myicons:visible-off"></iron-icon><span>Perfil no Visible</span></div>
+              </template>
+            </dom-if>
+            <dom-if if="[[_isVisible]]">
+              <template>
+                <div class="location-value"><iron-icon icon="myicons:visible"></iron-icon><span>Perfil Visible</span></div>
+              </template>
+            </dom-if>
+          </div>
+        </template>
+      </dom-if>
+      <div class="row">
+        <div class="location-title">Area de Trabajo</div>
+        <!-- <div class="location-copy">[[user.account.l.name]]</div>  disable-zoom="true" disable-map-type-control="true" -->
+        <dom-if if="[[hasLocation]]">
+          <template>
+            <div class="location-map">
+              <google-map id="map" map="{{map}}" latitude="[[user.account.l.lat]]" longitude="[[user.account.l.lng]]" api-key="AIzaSyCHfAt0PUEBqmYvcGbTEhLNGuRAjs-M1Sk" zoom="14" disable-street-view-control="true"></google-map>
+            </div>
+          </template>
+        </dom-if>
+        <dom-if if="[[!hasLocation]]">
+          <template>
+            <div class="location-value">[[location]]</div>
+          </template>
+        </dom-if>
+      </div>
+      <div class="member-since">Miembro&nbsp;desde&nbsp;<span class="date">[[_getCreateTime(user.account.si)]]</span></div>
+    </div>
+  </template>
+  <script>
+  class AccountBadge extends Polymer.Element {
+    static get is() {
+      return 'account-badge';
+    }
+    static get properties() {
+      return {
+        userKey: String,
+        firstname: {
+          type: String,
+          notify: true,
+          computed: '_getUsername(user.account.fn)'
+        },
+        _isVisible: {
+          type: Boolean,
+          computed: '_ComputeisVisible(user.account.vi)'
+        },
+        _isMapReady: {
+          type: Boolean,
+          notify: null
+        },
+        circle: {
+          type: Object,
+          value: null
+        },
+        lastname: {
+          type: String,
+          notify: true,
+          computed: '_getUserLastname(user.account.ln)'
+        },
+        hasLocation:{
+          type: Boolean,
+          value: null,
+          computed: '_computeHasLocation(user.account.l.lat, user.account.l.lng)'
+        },
+        isProfile: {
+          type: Boolean,
+          value: false,
+          notify: true
+        }
+      };
+    }
+    static get observers() {
+      return [
+        '_positionCircle(_isMapReady)'
+      ]
+    }
+    _ComputeisVisible(data){
+      if (data === 'true'){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    ready() {
+      super.ready();
+      this.addEventListener('google-map-ready', (e)=>this._mapReady(e));
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('account-badge.created');
+    }
+    _computeHasLocation(lat, lng){
+      if(lat && lng){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _positionCircle(_isMapReady){
+      if(_isMapReady === undefined || !_isMapReady) return;
+      if (_isMapReady === true){
+        this._changeSectionDebouncer = Polymer.Debouncer.debounce(this._changeSectionDebouncer,
+          Polymer.Async.microTask, () => {
+            this.circle.setCenter(new google.maps.LatLng(this.user.account.l.lat, this.user.account.l.lng));
+           }
+        );
+      }
+    }
+    _mapReady(e){
+      this.circle = new google.maps.Circle({
+        strokeColor: "#14bff4",
+        strokeOpacity: 1,
+        strokeWeight: 1,
+        fillColor: "#14bff4",
+        fillOpacity: 0.20,
+        map: this.map,
+        radius:  700
+      });
+      this.map.setOptions({zoomControl: false, mapTypeControl: false});
+      this._isMapReady = true;
+
+    }
+    _getUsername(userName) {
+      if (userName === undefined) return;
+      return userName;
+    }
+    _getUserLastname(userLast) {
+      if (userLast === undefined) return;
+      return userLast;
+    }
+    _formateScore(score) {
+      if (score === 0) return '0.0';
+      if (score) {
+        return score.toFixed(1);
+      }
+    }
+    _formatAmount(amount) {
+      if (amount === undefined) return 0;
+      if (amount < 1000) {
+        return amount;
+      }else{
+        return amount > 999 ? (amount/1000).toFixed(0) + 'MIL+' : amount
+      }
+    }
+    _getCreateTime(timestamp) {
+      return moment(timestamp).format('MMMM  [de] YYYY');
+    }
+  }
+  window.customElements.define(AccountBadge.is, AccountBadge);
+  </script>
+</dom-module>

@@ -1,0 +1,238 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="su-avatar.html">
+<link rel="import" href="redux/redux-mixin.html">
+<link rel="import" href="widgets/nearby-jobs-item.html">
+<link rel="import" href="display-rating.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="home-side">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+    }
+    .title {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 14px;
+      color: var(--app-font-color);
+    }
+    .main-title {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 14px;
+      color: var(--app-font-color);
+    }
+    paper-icon-button{
+      display: inline-block;
+      margin-left: 14px;
+      margin-top: -8px;
+      --paper-icon-button-ink-color: transparent;
+      width: 16px;
+      height: 16px;
+      padding: 0px;
+      color: var(--app-aqua-font);
+    }
+    .item{
+      @apply --su-font-header-normal;
+      display: block;
+      margin-bottom: 14px;
+      font-size: 14px;
+      line-height: 1.42857;
+      color: var(--app-aqua-font) !important;
+    }
+    .avatar{
+      margin-bottom: 0px;
+    }
+    .view-profile{
+      @apply --layout-horizontal;
+      margin: 8px 0;
+    }
+    iron-icon {
+      height: 18px;
+      width: 18px;
+      padding: 0px;
+      margin-top: -2px;
+      margin-right: 8px;
+      color: var(--app-aqua-font);
+    }
+    .side-head {
+      padding: 0px;
+      border-bottom: 1px solid var(--app-little-grey);
+      padding-bottom: 20px;
+    }
+    .account-wrap{
+      @apply --layout-horizontal;
+      margin-bottom:24px;
+    }
+    .user-details{
+      @apply --layout-flex;
+      padding-left: 14px;
+    }
+    .account-name{
+      text-transform: capitalize;
+      @apply --su-review-title;
+      line-height: 24px;
+      color: var(--app-font-color);
+    }
+    .account-welcome{
+      font-size: 13px;
+      line-height: 18px;
+      color: var(--app-font-color-light);
+    }
+    .rating{
+      color: var(--app-font-color);
+    }
+    .view-profile a, span{
+      color: var(--app-font-color-light);
+      cursor: default;
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .view-profile a:hover{
+      color: var(--app-font-color);
+    }
+    .review-count{
+      font-size: 11px;
+      font-weight: 400;
+      padding-left: 4px;
+      color: var(--app-font-color-light);
+    }
+    .main-wrap {
+      margin-bottom: 32px;
+      max-width: 260px;
+    }
+    </style>
+    <firebase-query id="nearbyjobs" path="/users/[[uid]]/nearbyjobs" data="{{nearbyjobs}}"></firebase-query>
+    <div class="main-wrap">
+      <div class="side-head">
+        <div class="account-wrap">
+          <su-avatar class="avatar" sizing="medium" src="[[profile_picture]]"></su-avatar>
+          <div class="user-details">
+            <div class="account-welcome">Bienvenido</div>
+            <div class="account-name">[[user_name]] [[user_last]]</div>
+            <div class="rating"><display-rating tiny value="[[user_score]]"></display-rating><span class="review-count">([[review_count]])</span></div>
+          </div>
+        </div>
+        <div class="title">Visibilidad</div>
+        <div class="view-profile">
+          <dom-if if="[[!_isVisible]]">
+            <template>
+              <iron-icon icon="myicons:visible-off"></iron-icon><span>Perfil no Visible</span><paper-icon-button noink on-tap="_updateVisibility" icon="myicons:edit"></paper-icon-button>
+            </template>
+          </dom-if>
+          <dom-if if="[[_isVisible]]">
+            <template>
+              <iron-icon icon="myicons:visible"></iron-icon><span>Perfil Visible</span><paper-icon-button noink on-tap="_updateVisibility" icon="myicons:edit"></paper-icon-button>
+            </template>
+          </dom-if>
+        </div>
+        <div class="title">Ubicacion</div>
+        <div class="view-profile">
+          <iron-icon icon="myicons:location"></iron-icon><span>[[user_location.name]]</span><paper-icon-button noink on-tap="_updateLocation" icon="myicons:edit"></paper-icon-button>
+        </div>
+      </div>
+    </div>
+    <div class="main-wrap">
+      <div class="main-title">Trabajos Cerca Tuyo</div>
+      <dom-repeat items="[[nearbyjobs]]" as="job">
+        <template>
+          <nearby-jobs-item jobkey="[[job.$key]]" distance="[[job.d]]"></nearby-jobs-item>
+        </template>
+      </dom-repeat>
+    </div>
+  </template>
+  <script>
+  class HomeSide extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'home-side';
+    }
+    static get properties() {
+      return {
+        nearbyjobs: {
+          type:Object,
+          reflectToAttribute:true,
+          notify:true
+        },
+        _isVisible: {
+          type: Boolean,
+          computed: '_ComputeisVisible(user_visibility)'
+        },
+        uid: String,
+        all_proposals: {
+          type: Number,
+          statePath: 'all_proposals.count'
+        },
+        user_location: {
+          type: Object,
+          statePath: 'user_location'
+        },
+        user_visibility: {
+          type: String,
+          statePath: 'user_visibility'
+        },
+        review_count: {
+          type: Number,
+          statePath: 'review_count'
+        },
+        user_score: {
+          type: Number,
+          statePath: 'user_score'
+        },
+        user_name: {
+          type: String,
+          statePath: 'user_name'
+        },
+        user_last: {
+          type: String,
+          statePath: 'user_last'
+        },
+        profile_picture: {
+          type: String,
+          statePath: 'profile_picture'
+        },
+        sent_proposals: {
+          type: Number,
+          statePath: 'sent_proposals.count'
+        },
+        received_proposals: {
+          type: Number,
+          statePath: 'received_proposals.count'
+        },
+        active_contracts: {
+          type: Number,
+          statePath: 'active_contracts.count'
+        },
+        inactive_contracts: {
+          type: Number,
+          statePath: 'inactive_contracts.count'
+        },
+        all_contracts: {
+          type: Number,
+          statePath: 'all_contracts.count'
+        }
+      };
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('home-side.created');
+    }
+    _ComputeisVisible(data){
+      if (data === 'true'){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _updateVisibility(){
+      this.dispatchEvent(new CustomEvent('open-dialog', {bubbles: true, composed: true, detail: {status: 'open', action: 'update-visibility', title: 'Visibilidad de tu Perfil', full: false}}));
+    }
+    _updateLocation(){
+      this.dispatchEvent(new CustomEvent('open-dialog', {bubbles: true, composed: true, detail: {status: 'open', action: 'update-location', title: 'Tu Ubicacion', full: false}}));
+    }
+  }
+  window.customElements.define(HomeSide.is, HomeSide);
+  </script>
+</dom-module>

@@ -1,0 +1,187 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="redux/popup-mixin.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-dialog">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+      width: 600px;
+      color: #222222;
+      @apply --layout-vertical;
+      background-color: #fff;
+    }
+     :host([is-full]) {
+      height: 100vh !important;
+    }
+     :host(:not([is-full])) {
+      min-height: 200px !important;
+    }
+     :host(:not([is-full])) .content{
+      @apply --layout-self-stretch;
+      @apply --layout-center-center;
+    }
+    paper-icon-button {
+      --paper-icon-button-ink-color: transparent;
+      padding: 0px;
+    }
+    .header {
+      padding: 14px 24px 14px 24px;
+      @apply --layout-horizontal;
+      border-bottom: 1px solid var(--app-little-grey);
+      background-color: #f9f9f9;
+    }
+    .title {
+      margin-top: 6px;
+      @apply --layout-flex;
+      line-height: 30px;
+      font-size: 24px;
+      font-weight: 400;
+    }
+    .content {
+      height: 100%;
+      margin: 24px 8px;
+      @apply --layout-horizontal;
+    }
+    .footer {
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+      padding: 34px 14px 24px 20px
+    }
+    .close {
+      color: var(--app-green-color);
+    }
+    iron-pages {
+      @apply --layout-flex;
+    }
+    @media (max-width: 767px) {
+      .title {
+        font-size: 18px;
+        font-weight: 500;
+      }
+    }
+    </style>
+    <div class="header">
+      <div class="title">[[popup_state.title]]</div>
+      <paper-icon-button noink on-tap="_onCloseDialog" class="close" icon="myicons:close"></paper-icon-button>
+    </div>
+    <div class="content">
+      <iron-pages selected="[[action]]" selected-attribute="visible" attr-for-selected="name">
+        <update-photo save-data="{{saveData}}" no-wrapper name="update-photo" uid="[[uid]]"></update-photo>
+        <update-slogan autofocus tabindex="-1" save-data="{{saveData}}" no-wrapper name="update-slogan" uid="[[uid]]"></update-slogan>
+        <update-visibility save-data="{{saveData}}" no-wrapper name="update-visibility" uid="[[uid]]"></update-visibility>
+        <account-widget save-data="{{saveData}}" name="account-widget" uid="[[uid]]"></account-widget>
+        <update-categories save-data="{{saveData}}" no-wrapper name="update-categories" uid="[[uid]]"></update-categories>
+        <update-details save-data="{{saveData}}" no-wrapper name="update-details" uid="[[uid]]"></update-details>
+        <update-description save-data="{{saveData}}" no-wrapper name="update-description" uid="[[uid]]"></update-description>
+        <update-location save-data="{{saveData}}" no-wrapper name="update-location" uid="[[uid]]"></update-location>
+        <update-pictures save-data="{{saveData}}" no-wrapper name="update-pictures" uid="[[uid]]"></update-pictures>
+      </iron-pages>
+    </div>
+    <div class="footer">
+      <paper-button class="green" disabled$="[[saveData]]" on-tap="_saveData">Guardar</paper-button>
+    </div>
+  </template>
+  <script>
+  class SuDialog extends PopupMixin(Polymer.mixinBehaviors([Polymer.IronOverlayBehavior], Polymer.Element)) {
+    static get is() {
+      return 'su-dialog';
+    }
+    static get properties() {
+      return {
+        action: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          observer: '_actionChanged'
+        },
+        saveData: {
+          type: Boolean,
+          value: false
+        },
+        noCancelOnOutsideClick: {
+          type: Boolean,
+          value: true
+        },
+        noCancelOnEscKey: {
+          type: Boolean,
+          value: false
+        },
+        modal: {
+          type: Boolean,
+          value: true
+        },
+        withBackdrop: {
+          type: Boolean,
+          value: true
+        },
+        user_account: {
+          type: Object,
+          statePath: 'user_account'
+        },
+        popup_state: {
+          type: Object,
+          statePath: 'popup_state'
+        },
+        uid: String
+      };
+    }
+    static get observers() {
+      return [
+        '_popupState(popup_state.status)',
+        '_popupType(popup_state.full)',
+        '_popupAction(popup_state.action)'
+      ]
+    }
+    _saveData() {
+      console.log('saving...');
+      this.saveData = true;
+    }
+    _popupType(full){
+      if (full === undefined) return;
+      if (full === true){
+        this.setAttribute('is-full', 'true');
+      }else if (full === false){
+        this.removeAttribute('is-full');
+      }
+    }
+    _actionChanged(action) {
+      if (action === undefined) return;
+      this._changeSectionDebouncer = Polymer.Debouncer.debounce(this._changeSectionDebouncer,
+        Polymer.Async.microTask, () => {
+          var resolvedPageUrl = this.resolveUrl('widgets/' + action + '.html');
+          Polymer.importHref(resolvedPageUrl, () => {
+            this.opened = true;
+          });
+        }
+      );
+    }
+    _onCloseDialog(e) {
+      this.dispatch('togglePopup', null);
+      this.saveData = false;
+      console.log('just closed dialog');
+    }
+    _popupAction(action) {
+      this.action = action;
+    }
+    ready() {
+      super.ready();
+      this.addEventListener('iron-overlay-canceled', (e) => this._onCloseDialog(e));
+      this.addEventListener('close-dialog', (e) => this._onCloseDialog(e));
+      this.setAttribute('role', 'dialog');
+      this.setAttribute('aria-modal', 'true');
+      this.setAttribute('tabindex', -1);
+    }
+    _popupState(state) {
+      if (state === 'closed' || !state) {
+        this.opened = false;
+      }
+    }
+  }
+  window.customElements.define(SuDialog.is, SuDialog);
+  </script>
+</dom-module>

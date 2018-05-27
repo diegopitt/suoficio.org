@@ -1,0 +1,70 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="talent-item.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="candidate-list">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+    }
+    talent-item:not(:last-of-type){
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    @media (max-width: 767px) {
+      talent-item{
+        border-bottom: 0px !important;
+      }
+    }
+    </style>
+    <div class="candidate-wrap">
+      <dom-repeat items="[[data]]" as="proposal">
+        <template>
+          <talent-item key="[[key]]" is-invited="[[proposal.i]]" job-ended$="[[jobEnded]]" proposal-hired="[[proposal.hired]]" is-hired="[[isHired]]" is-candidate="[[isCandidate]]" talent-id="[[proposal.$key]]" proposal="[[proposal]]" invited$="[[_computeIsInvtation(page)]]"></talent-item>
+        </template>
+      </dom-repeat>
+    </div>
+  </template>
+  <script>
+  class CandidateList extends Polymer.Element {
+    static get is() {
+      return 'candidate-list';
+    }
+    static get properties() {
+      return {
+        data: Object,
+        page: String,
+        key: String,
+        isCandidate: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        },
+        isHired: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        },
+        jobEnded: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        }
+      };
+    }
+    _computeIsInvtation(page){
+      return (page === "invitaciones");
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('candidate-list.created');
+    }
+  }
+  window.customElements.define(CandidateList.is, CandidateList);
+  </script>
+</dom-module>

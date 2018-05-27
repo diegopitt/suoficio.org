@@ -1,0 +1,106 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="su-chip">
+  <template>
+    <style>
+    .chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      color: #fff;
+      line-height: 32px;
+      padding: 0 2px 0 8px;
+      border-radius: 16px;
+      background-color: var(--app-aqua-font);
+      margin-top: 5px;
+      margin-bottom: 5px;
+      margin-right: 5px;
+    }
+    .chip:active {
+      background: var(--app-green-color);
+    }
+    .chip .closeIcon {
+      margin-left: 4px;
+      cursor: pointer;
+      float: right;
+      width: 12px;
+    }
+    .chip .inline {
+      display: -webkit-inline-box;
+    }
+    .hoverEffect:hover {
+      @apply --shadow-elevation-2dp;
+      cursor: default;
+    }
+    .unselectable {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    .close {
+      top: -1px;
+    }
+    iron-icon {
+      --iron-icon-height: 16px;
+      --iron-icon-width: 16px;
+      position: relative;
+      right: 8px;
+      color: var(--app-aqua-font);
+      background-color: #74DACE;
+      border-radius: 50%;
+    }
+    .label {
+      margin-right: 12px;
+    }
+    [hidden] {
+      display: none;
+    }
+    </style>
+    <div class$="[[_computeChipClass(noHover)]]">
+      <span class="label">[[title]]</span>
+      <div hidden$="[[!closable]]" class="closeIcon" on-tap="_remove">
+        <iron-icon class="close" icon="myicons:close"></iron-icon>
+      </div>
+    </div>
+  </template>
+  <script>
+  class SuChip extends Polymer.Element {
+    static get is() {
+      return 'su-chip';
+    }
+    static get properties() {
+      return {
+        item: Number,
+        title: String,
+        closable: {
+          type: Boolean,
+          value: true
+        },
+        noHover: {
+          type: Boolean,
+          value: false
+        }
+      };
+    }
+    _computeChipClass(noHover) {
+      if (noHover == true) {
+        return 'chip unselectable';
+      } else {
+        return 'chip unselectable hoverEffect';
+      }
+    }
+    _remove(event) {
+      this.dispatchEvent(new CustomEvent('chip-removed', {
+        detail: {
+          'value': this.item
+        },
+        composed: true,
+        bubbles: true
+      }));
+    }
+  }
+  window.customElements.define(SuChip.is, SuChip);
+  </script>
+</dom-module>

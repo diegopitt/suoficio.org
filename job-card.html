@@ -1,0 +1,195 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="job-activity.html">
+<link rel="import" href="job-details-bar.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="job-card">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .header {
+      padding: 0px 8px;
+    }
+    :host(:not([is-post])) .job-details{
+      @apply --common-borders;
+      margin-top: 28px;
+      margin-bottom: 28px;
+      @apply --layout-flex;
+      padding: 36px;
+    }
+    :host([is-post]) .job-details{
+      margin-bottom: 28px;
+      @apply --layout-flex;
+      padding: 24px 14px 14px 14px;
+    }
+    :host(:not([is-post])) .header{
+      margin: 28px 0;
+    }
+    .job-name{
+      @apply --su-job-title;
+      color: var(--app-font-color);
+    }
+    .details{
+      @apply --su-font-header-big;
+      margin-bottom: 24px;
+      var(--app-font-color);
+    }
+    .post-date{
+      @apply --su-font-small;
+      @apply --su-oficio-font-nowrap;
+      color: var(--app-font-color-light);
+    }
+    .view-post{
+      @apply --su-font-small;
+      font-weight: 500;
+    }
+    .chip.green{
+      font-weight: 500;
+      color: #008329;
+      background-color: #EAF5E9;
+    }
+    .detail-wrap > div {
+      display: inline-block;
+      margin: 24px 24px 0 0;
+    }
+    .detail-wrap{
+      @apply --layout-horizontal;
+      @apply --layout-wrap;
+      @apply --layout-center;
+    }
+    .job-head{
+      padding: 0px;
+    }
+    .job-description{
+      @apply --su-font-medium;
+      white-space: pre-line;
+      margin: 24px 0px 0px 0px;
+      color: var(--app-font-color);
+    }
+    .chip.blue{
+      color: var(--app-font-color);
+      background-color: var(--app-little-grey);
+      font-weight: 500;
+    }
+    .workers-wrap{
+      margin:12px 0;
+    }
+    @media (max-width: 767px) {
+      .job-head{
+        padding: 0px;
+      }
+      .header{
+        padding: 0px 16px;
+      }
+      .job-details{
+        padding: 20px 14px !important;
+      }
+      :host([is-post]) .job-details{
+        padding: 24px 14px 0px 14px !important;
+      }
+      .job-description{
+        @apply --su-font-medium;
+        margin: 18px 0px 0px 0px;
+        color: var(--app-font-color);
+      }
+      .details{
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: 500;
+        margin-bottom: 0px;
+      }
+      .job-name{
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 22px;
+      }
+      .detail-wrap > div {
+        margin: 24px 24px 0 0;
+      }
+    }
+    </style>
+    <div class="job-head">
+      <div class="header">
+        <div class="job-name">
+          <dom-if if="[[!isPost]]">
+            <template>
+              [[job.name]]
+            </template>
+          </dom-if>
+        </div>
+        <div class="detail-wrap">
+          <div class="chip green">$ [[_formatAmount(job.budget)]] Pesos</div>
+          <div class="post-date">Postedo [[_getPostTime(job.date)]]</div>
+          <dom-if if="[[isProposal]]">
+            <template>
+              <div><a class="view-post" href="buscar-trabajo/[[jobKey]]">Ver Publicacion</a></div>
+            </template>
+          </dom-if>
+        </div>
+      </div>
+      <dom-if if="[[!isPost]]">
+        <template>
+          <job-details-bar ishired-value="[[job.ishired]]" maxprop-value="[[job.maxprop]]" category-value="[[job.category]]" timing-value="[[job.timing]]"></job-details-bar>
+        </template>
+      </dom-if>
+    </div>
+    <div class="job-details">
+      <div class="details">Detalles</div>
+      <dom-if if="[[_shouldShowWorkers(job.workers)]]">
+        <template>
+          <div class="workers-wrap">
+            <span class="chip blue">[[job.workers]] Trabajadores</span>
+          </div>
+        </template>
+      </dom-if>
+      <div class="job-description">[[job.description]]</div>
+    </div>
+    <dom-if if="[[!isPost]]">
+      <template>
+        <job-activity job-key="[[jobKey]]" job="[[job]]"></job-activity>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class JobCard extends Polymer.Element {
+    static get is() {
+      return 'job-card';
+    }
+    static get properties() {
+      return {
+        job: Object,
+        jobKey: String,
+        isPost: {
+          type: Boolean,
+          value: false
+        },
+        isProposal: {
+          type: Boolean,
+          value: false,
+          notify: true,
+          reflectToAttribute: true
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-contratos.created');
+    }
+    _shouldShowWorkers(num){
+      if (num === undefined || num === 1) return false;
+      if (num > 1) return true;
+    }
+    _formatAmount(amount) {
+      return Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+    }
+    _getPostTime(timestamp) {
+      return moment(timestamp).format('ll');;
+    }
+  }
+  window.customElements.define(JobCard.is, JobCard);
+  </script>
+</dom-module>

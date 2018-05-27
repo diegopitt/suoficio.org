@@ -1,0 +1,89 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="redux/contract-mixin.html">
+<link rel="import" href="two-columns.html">
+<link rel="import" href="contract-details.html">
+<link rel="import" href="contract-card.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="my-contract">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin-top: 20px;
+    }
+    @media (max-width: 767px) {
+      :host {
+        margin-top: 0px;
+        margin-bottom: 120px;
+      }
+    }
+    </style>
+    <firebase-document path="/contracts/[[contractKey]]" data="{{contract}}"></firebase-document>
+    <firebase-document path="/users/[[destination]]/account" data="{{destination_user}}"></firebase-document>
+    <firebase-document path="/jobs/[[contract.jobkey]]" data="{{job}}"></firebase-document>
+    <app-route active="{{isActive}}" route="{{route}}" pattern="/:type" data="{{routeData}}"></app-route>
+    <two-columns narrow-layout="{{narrowLayout}}" reverse content-width="710" side-width="250" gutter="20">
+      <contract-card type="[[routeData.type]]" route="[[route]]" show-dts$="[[_showDts]]" show-Msg$="[[_showMsg]]" end-contract="{{endContract}}" destination="{{destination}}" uid="[[uid]]" contract="{{contract}}" job="[[job]]" end-contract="{{endContract}}" slot="content"></contract-card>
+      <contract-details hide-btn$="[[_shouldHideBtn]]" is-responsive$="[[narrowLayout]]" end-contract="{{endContract}}" slot="[[_slot]]" uid="[[uid]]" contract="{{contract}}" destination="[[destination_user]]" key="[[contractKey]]"></contract-details>
+    </two-columns>
+  </template>
+  <script>
+  class MyContract extends ContractMixin(Polymer.Element) {
+    static get is() {
+      return 'my-contract';
+    }
+    static get properties() {
+      return {
+        _shouldHideBtn : {
+          type: Boolean,
+          value: false
+        },
+        contractKey: {
+          type: String,
+          observer: 'syncKey'
+        },
+        route: Object,
+        endContract: Boolean,
+        uid: String,
+        _slot:{
+          type: String,
+          computed: '_computeSlot(narrowLayout)'
+        },
+      };
+    }
+    static get observers() {
+      return [
+      '_computeType(routeData.type)'
+      ]
+    }
+    _computeType(type){
+      if (type === 'd'){
+        this._showDts = true;
+        this._showMsg = false;
+        this._shouldHideBtn = false;
+      }
+      if (type === 'm'){
+        this._showDts = false;
+        this._showMsg = true;
+        this._shouldHideBtn = true;
+      }
+    }
+    _computeSlot(isNarrow){
+      if (isNarrow){
+        return 'content';
+      } else{
+        return 'sidebar';
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('my-contract.created');
+    }
+    syncKey(key){
+      this.dispatch('selectContract', key);
+    }
+  }
+  window.customElements.define(MyContract.is, MyContract);
+  </script>
+</dom-module>

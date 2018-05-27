@@ -1,0 +1,172 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="contractor-mixin.html">
+<dom-module id="contractor-bindings">
+  <template>
+    <style>
+    :host {
+      display: none;
+    }
+    </style>
+  </template>
+  <script>
+  class ContractorBindings extends ContractorMixin(Polymer.Element) {
+    static get is() {
+      return 'contractor-bindings';
+    }
+    static get properties() {
+      return {
+        uid: String
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _syncchats(chats){
+      let C_chats = {};
+      if (chats.hasChildren()) {
+        Object.keys(chats.val()).forEach(key => {
+          C_chats[key] = true;
+        })
+      }
+      C_chats['count'] = Object.keys(C_chats).length;
+      this.dispatch('userchats', [C_chats]);
+      console.log('Chats Synced');
+    }
+    _syncjobpost(posts){
+      let P_all = {};
+      let P_active = {};
+      let P_inactive = {};
+      if (posts.child("a").exists()){
+        let actives = posts.child("a").val();
+        for (var key of Object.keys(actives)) {
+          P_active[key] = true;
+          P_all[key] = true;
+        }
+      }
+      if (posts.child("i").exists()){
+        let inactives = posts.child("i").val();
+        for (var key of Object.keys(inactives)) {
+          P_inactive[key] = true;
+          P_all[key] = true;
+        }
+      }
+      P_active['count'] = Object.keys(P_active).length;
+      P_inactive['count'] = Object.keys(P_inactive).length;
+      P_all['count'] = Object.keys(P_all).length;
+      this.dispatch('jobpost', [P_all, P_active, P_inactive]);
+      console.log('Job Posts Synced');
+    }
+    _synccontracts(contracts) {
+      let C_all = {};
+      let C_active = {};
+      let C_inactive = {};
+      if (contracts.child("a").exists()){
+        let actives = contracts.child("a").val();
+        for (var key of Object.keys(actives)) {
+          C_active[actives[key].jobkey] = key;
+          C_all[actives[key].jobkey] = key;
+        }
+      }
+      if (contracts.child("i").exists()){
+        let inactives = contracts.child("i").val();
+        for (var key of Object.keys(inactives)) {
+          C_inactive[inactives[key].jobkey] = key;
+          C_all[inactives[key].jobkey] = key;
+        }
+      }
+      C_active['count'] = Object.keys(C_active).length;
+      C_inactive['count'] = Object.keys(C_inactive).length;
+      C_all['count'] = Object.keys(C_all).length;
+      this.dispatch('Contracts', [C_all, C_active, C_inactive]);
+      console.log('Contracts Synced');
+    }
+    _syncname(name){
+      this.dispatch('username', name);
+      console.log('name Synced');
+    }
+    _synclast(last){
+      this.dispatch('userlast', last);
+      console.log('lastname Synced');
+    }
+    _syncjobcount(jcount){
+      this.dispatch('jobcount', jcount);
+      console.log('jobs count Synced');
+    }
+    _syncreviewcount(rcount){
+      this.dispatch('reviewcount', rcount);
+      console.log('reviews count Synced');
+    }
+    _syncscore(score){
+      this.dispatch('userscore', score);
+      console.log('score Synced');
+    }
+    _syncworth(worth){
+      this.dispatch('userworth', worth);
+      console.log('worth Synced');
+    }
+    _syncaccouttype(atype){
+      this.dispatch('accounttype', atype);
+      console.log('account type Synced');
+    }
+    _synchasreview(hreview){
+      this.dispatch('hasreview', hreview);
+      console.log('has review Synced');
+    }
+    _synchasnotification(hnotification){
+      this.dispatch('hasnotification', hnotification);
+      console.log('has notification Synced');
+    }
+    _synchasmessage(hmessage){
+      this.dispatch('hasmessage', hmessage);
+      console.log('has message Synced');
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('contractor-bindings.created');
+    }
+    ready() {
+      super.ready();
+      firebase.app().database().ref(`/users/${this.uid}/j`).on('value', function(snapshot){
+        this._syncjobpost(snapshot);
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/contracts`).on('value', function(snapshot){
+        this._synccontracts(snapshot);
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/fn`).on('value', function(snapshot){
+        this._syncname(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/ln`).on('value', function(snapshot){
+        this._synclast(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/chats`).on('value', function(snapshot){
+        this._syncchats(snapshot);
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/jc`).on('value', function(snapshot){
+        this._syncjobcount(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/rc`).on('value', function(snapshot){
+        this._syncreviewcount(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/sc`).on('value', function(snapshot){
+        this._syncscore(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/wo`).on('value', function(snapshot){
+        this._syncworth(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/a/t`).on('value', function(snapshot){
+        this._syncaccouttype(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/hr`).on('value', function(snapshot){
+        this._synchasreview(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/hm`).on('value', function(snapshot){
+        this._synchasmessage(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/hn`).on('value', function(snapshot){
+        this._synchasnotification(snapshot.val());
+      }.bind(this));
+    }
+  }
+  window.customElements.define(ContractorBindings.is, ContractorBindings);
+  </script>
+</dom-module>

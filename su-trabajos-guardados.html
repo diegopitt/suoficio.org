@@ -1,0 +1,87 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="oficio-styles.html">
+<link rel="import" href="job-item.html">
+<link rel="import" href="redux/redux-mixin.html">
+<dom-module id="su-trabajos-guardados">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin-top:20px;
+    }
+    .sub_title{
+      @apply --su-font-medium;
+      font-weight: 400;
+      margin-bottom: 24px;
+      padding: 0px 10px;
+      color: var(--app-font-color-light);
+    }
+    .page_title {
+      padding-left: 0px;
+    }
+    .header {
+      /* padding:0px 8px 12px 8px; */
+    }
+    .wrap{
+      @apply --layout-vertical-reverse;
+    }
+    @media (max-width: 767px) {
+      :host {
+        margin: 0px;
+      }
+      .sub_title{
+        margin: 24px 0px 24px 0px;
+      }
+      .page_title{
+        padding-left: 10px;
+      }
+    }
+    </style>
+    <firebase-query path="/users/[[uid]]/favs" data="{{favorites}}"></firebase-query>
+    <div class="header">
+      <div class="page_title">Trabajos Guardados</div>
+      <div class="sub_title">Lleve un registro de los trabajos que le interesan. Una vez que se cierra un trabajo, se eliminará automáticamente de esta lista.</div>
+    </div>
+    <div class="wrap">
+      <dom-repeat items="{{favorites}}" as="favorite">
+        <template>
+          <job-item is-favorite$="{{_isFav(user_favorites, favorite.$key)}}" is-saved job-key="[[favorite.$key]]" uid="[[uid]]"></job-item>
+        </template>
+      </dom-repeat>
+    </div>
+  </template>
+  <script>
+  class SuTrabajosGuardados extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'su-trabajos-guardados';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        favorites: {
+          type: Object,
+          value: null,
+          notify: true
+        },
+        user_favorites: {
+          type: Array,
+          statePath: 'user_favorites'
+        },
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-trabajos-guardados.created');
+    }
+    _isFav(favorites, key) {
+      if (favorites === undefined || key === undefined) return;
+      return favorites[key];
+    }
+  }
+  window.customElements.define(SuTrabajosGuardados.is, SuTrabajosGuardados);
+  </script>
+</dom-module>

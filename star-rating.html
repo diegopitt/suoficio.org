@@ -1,0 +1,98 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="my-icons.html">
+<dom-module id="star-rating">
+  <template>
+    <style>
+    :host {
+      display: block;
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
+    
+    paper-icon-button {
+      width: 28px;
+      height: 28px;
+      padding: 0px;
+      margin-right: 6px;
+    }
+    
+    .star-rating-wrapper > span {
+      float: right;
+      cursor: pointer;
+      color: var(--app-accent-color);
+      opacity: 0.3;
+    }
+    
+    .star-rating-wrapper > span.active,
+    .star-rating-wrapper > span.active ~ span {
+      opacity: 1;
+    }
+    
+    .star-rating-wrapper:hover > span.active,
+    .star-rating-wrapper:hover > span.active ~ span {
+      opacity: 0.3;
+    }
+    
+    .star-rating-wrapper > span:hover,
+    .star-rating-wrapper > span:hover ~ span,
+    .star-rating-wrapper > span.active:hover ~ span {
+      opacity: 0.8 !important;
+    }
+    
+    .star-rating-wrapper > span:hover {
+      opacity: 0.9 !important;
+    }
+    </style>
+    <div class="star-rating-wrapper">
+      <dom-repeat items="[[currentStars]]">
+        <template>
+          <span index$="{{index}}">
+            <paper-icon-button on-tap="_setRate" icon="myicons:star"></paper-icon-button>
+          </span>
+        </template>
+      </dom-repeat>
+    </div>
+  </template>
+  <script>
+  class StarRating extends Polymer.Element {
+    static get is() {
+      return 'star-rating';
+    }
+    static get properties() {
+      return {
+        stars: {
+          type: Number,
+          value: 5
+        },
+        rate: {
+          type: Number,
+          value: 0,
+          reflectToAttribute: true,
+          notify: true
+        },
+        currentStars: {
+          type: Object,
+          value: [1, 2, 3, 4, 5]
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _setRate(e) {
+      let index = e.model.index;
+      let indexOld = (this.rate * -1) + this.stars;
+      this.rate = (index - this.stars) * -1;
+      if (indexOld < this.stars) {
+        Polymer.dom(this.root).querySelector('[index="' + indexOld + '"]').classList.remove("active");
+      }
+      Polymer.dom(this.root).querySelector('[index="' + index + '"]').classList.add("active");
+    }
+    constructor() {
+      super();
+    }
+  }
+  window.customElements.define(StarRating.is, StarRating);
+  </script>
+</dom-module>

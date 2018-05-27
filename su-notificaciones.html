@@ -1,0 +1,107 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-messaging.html">
+<link rel="import" href="notification-item.html">
+<link rel="import" href="redux/redux-mixin.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-notificaciones">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin-top:30px;
+    }
+    .wrap{
+      @apply --layout-vertical;
+      @apply --layout-vertical-reverse;
+    }
+    @media (max-width: 767px) {
+      :host {
+        margin-top: 24px;
+      }
+    }
+    </style>
+    <firebase-messaging id="messaging"
+      active="{{active}}"
+      token="{{token}}"
+      status-known="{{statusKnown}}"
+      last-message="{{lastMessage}}">
+    </firebase-messaging>
+    <div class="page_title">Notificaciones</div>
+    <div class="wrap">
+      <dom-repeat items="[[notifications]]" as="notification">
+        <template>
+          <notification-item item="[[notification]]"></notification-item>
+        </template>
+      </dom-repeat>
+    </div>
+  </template>
+  <script>
+  class SuNotificaciones extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'su-notificaciones';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        token: String,
+        notifications: Object,
+        recentNotifications: Object,
+        visible: Boolean,
+        has_notification: {
+          type: String,
+          statePath: 'has_notification'
+        },
+      };
+    }
+    static get observers() {
+      return [
+        '_removeNotFlag(has_notification, visible)',
+        '_storeToken(token)'
+      ]
+    }
+    requestMessaging() {
+      return this.$.messaging.requestPermission();
+    }
+    _removeNotFlag(hasnotification, visible){
+      if (hasnotification === undefined || !hasnotification || visible === false) return;
+      this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
+        Polymer.Async.timeOut.after(5250), () => { 
+          firebase.app().database().ref(`/users/${this.uid}/account/hn`).set(false);
+          console.log('removed hasnotification flag');
+       }
+      );
+    }
+    _storeToken(token){
+      if (token === undefined || !token) return;
+      if (token){
+        this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
+          Polymer.Async.timeOut.after(1250), () => { 
+            firebase.app().database().ref(`/users/${this.uid}/account/t/${token}`).set(true);
+         }
+        );
+      }
+    }
+    ready(){
+      super.ready();
+      firebase.app().database().ref(`/users/${this.uid}/notifications`).on('value', function(snapshot){
+        this.notifications = Object.values(snapshot.val());
+      }.bind(this));
+      this.$.messaging.requestPermission()
+      .then(function() {
+        console.log('Notification permission granted.');
+      })
+      .catch(function(err) {});
+    }
+    _computeOneDay() {
+      const currentTime = new Date().getTime();
+      const oneDay = currentTime - 86400000;
+      return oneDay;
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-notificaciones.created');
+    }
+  }
+  window.customElements.define(SuNotificaciones.is, SuNotificaciones);
+  </script>
+</dom-module>

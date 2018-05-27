@@ -1,0 +1,90 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="redux/job-mixin.html">
+<link rel="import" href="two-columns.html">
+<link rel="import" href="job-buttons.html">
+<link rel="import" href="job-card.html">
+<link rel="import" href="account-badge.html">
+<dom-module id="su-trabajo">
+  <template>
+    <style>
+    :host {
+      display: block;
+      padding-top:20px;
+    }
+    @media (max-width: 767px) {
+      :host {
+        padding-top:0px;
+        margin-bottom: 120px;
+      }
+    }
+    </style>
+    <firebase-document path="/jobs/[[jobKey]]" data="{{job}}"></firebase-document>
+    <firebase-document path="/users/[[job.owner]]/account/hr" data="{{hasreview}}"></firebase-document>
+    <two-columns narrow-layout="{{narrowLayout}}" reverse content-width="710" side-width="250" gutter="20">
+      <job-card slot="content" job-key="[[jobKey]]" job="[[job]]"></job-card>
+      <dom-if if="[[hasreview]]">
+        <template>
+          <user-reviews slot="content" title="Calificaciones del Cliente" uid="[[job.owner]]"></user-reviews>
+        </template>
+      </dom-if>
+      <job-buttons is-responsive$="{{narrowLayout}}" slot="[[_slot]]" uid="[[uid]]" max-limit="[[job.maxprop]]" is-hired="[[job.ishired]]"></job-buttons>
+      <account-badge slot="sidebar" user-key="[[job.owner]]" location="[[job.l.name]]"></account-badge>
+    </two-columns>
+  </template>
+  <script>
+  class SuTrabajo extends JobMixin(Polymer.Element) {
+    static get is() {
+      return 'su-trabajo';
+    }
+    static get properties() {
+      return {
+        jobKey: {
+          type: String,
+          observer: 'syncKey'
+        },
+        narrowLayout: Boolean,
+        _slot:{
+          type: String,
+          computed: '_computeSlot(narrowLayout)'
+        },
+        hasreview: Boolean,
+        uid: String
+      };
+    }
+    static get observers() {
+      return [
+        '_lazyReviews(hasreview)',
+      ]
+    }
+    _lazyReviews(hasreview){
+      if (hasreview === undefined || hasreview === false || this._reviewsLoaded) return;
+      this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+        Polymer.Async.microTask, () => {
+          Polymer.RenderStatus.afterNextRender(this, () => {
+            Polymer.importHref(this.resolveUrl('user-reviews.html'), () => {
+              console.log('reviews loaded!');
+              this._reviewsLoaded = true;
+            });
+          });
+        }
+      );
+    }
+    _computeSlot(isNarrow){
+      if (isNarrow){
+        return 'content';
+      } else{
+        return 'sidebar';
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-trabajo.created');
+    }
+    syncKey(key){
+      this.dispatch('selectJob', key);
+    }
+  }
+  window.customElements.define(SuTrabajo.is, SuTrabajo);
+  </script>
+</dom-module>

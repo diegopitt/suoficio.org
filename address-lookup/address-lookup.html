@@ -1,0 +1,213 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../redux/redux-mixin.html">
+<dom-module id="address-lookup">
+  <template>
+    <style>
+     :host {
+      display: block;
+      @apply --layout-flex;
+      margin: 8px 0px 0px 0px;
+      outline: none;
+    }
+    ::-webkit-input-placeholder {
+      color: #848D95;
+      font-size: 12px;
+    }
+    ::-moz-placeholder {
+      color: #848D95;
+      font-size: 12px;
+    }
+    :-ms-input-placeholder {
+      color: #848D95;
+      font-size: 12px;
+    }
+    :-moz-placeholder {
+      color: #848D95;
+      font-size: 12px;
+    }
+    .wrapper {
+      @apply --layout-vertical;
+    }
+    .drop-wrap{
+      margin-top:-4px;
+    }
+    .input {
+      @apply --su-oficio-font-base;
+      width: 100%;
+      background-color: #fff !important;
+      box-sizing: border-box;
+      text-rendering: auto;
+      letter-spacing: normal;
+      word-spacing: normal;
+      text-transform: none;
+      text-indent: 0px;
+      text-shadow: none;
+      text-align: start;
+      padding: 14px 10px 14px 48px;
+      text-overflow: ellipsis;
+      border: none;
+      font-size: 13px;
+      line-height: 1.30769231;
+      outline: none;
+      border-radius: 0px;
+      margin: 0px;
+      color: #848D95;
+      -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      -webkit-box-shadow: 0 1px 6px rgba(57,73,76,0.35); 
+      box-shadow: 0 1px 6px rgba(57,73,76,0.35);
+    }
+    :host(:not([no-borders])) .input{
+      border: 1px solid var(--app-little-grey) !important;
+    }
+    :host([error]) .input{
+      border-color:var(--app-red-color) !important;
+    }
+    .input:hover {
+      border-color: var(--app-accent-color);
+    }
+    .location {
+      background: url(../../images/locations.svg) no-repeat scroll 16px 16px;
+    }
+    .copy{
+      @apply --layout-flex;
+      @apply --su-oficio-font-nowrap;
+      color: #848D95;
+      font-size: 11px;
+    }
+    iron-icon {
+      width: 24px;
+      padding: 0px;
+      margin: 0px;
+      height: 24px;
+      color: var(--app-little-grey);
+    }
+    .icon{
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      width:42px;
+      height:36px;
+    }
+    .item:hover {
+      color: var(--app-blue-font);
+      border-color: var(--app-accent-color);
+    }
+    @media (max-width: 767px) {
+      .input {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+      }
+    }
+    </style>
+    <div class="wrapper">
+      <input value="{{_inputValue::input}}" on-change="_checkIfEmpty" class="input location" id="locationInput" placeholder="Ingresa direccion, ciudad, colonia o delegación" type="text" name="locationInput">
+      <google-map id="map" 
+        map="{{map}}" 
+        latitude="20.3440989" 
+        longitude="-100.1140308" 
+        api-key="AIzaSyCHfAt0PUEBqmYvcGbTEhLNGuRAjs-M1Sk" 
+        zoom="6.1" 
+        disable-zoom="true" 
+        disable-map-type-control="true" 
+        disable-default-ui="true" 
+        disable-street-view-control="true" 
+        single-info-window>
+      </google-map>
+    </div>
+  </template>
+  <script>
+  class AddressLookup extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'address-lookup';
+    }
+    static get properties() {
+      return {
+        latitude: {
+          type: Number,
+          notify: true,
+          reflectToAttribute: true,
+        },
+        longitude: {
+          type: Number,
+          notify: true,
+          reflectToAttribute: true,
+        },
+        locationName: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          value: ''
+        },
+        input: {
+          type: Object
+        },
+        map: {
+          type: Object,
+          value: null
+        },
+        user_account: {
+          type: Object,
+          statePath: 'user_account'
+        },
+      };
+    }
+    ready() {
+      super.ready();
+      this.addEventListener('google-map-ready', (e) => this._mapReady(e));
+      this.input = this.$.locationInput;
+    }
+    _mapReady(event) {
+      this.autoComplete = new google.maps.places.Autocomplete(this.input, {types: ['geocode']});
+      this.geocoder = new google.maps.Geocoder;
+      this.autoComplete.setOptions({strictBounds: true, language: 'es'});
+      this.autoComplete.setComponentRestrictions({'country': ['mx']});
+      this.autoComplete.addListener('place_changed', this._setLocation.bind(this));
+    }
+    _checkIfEmpty(){
+      if (this._inputValue == ''){
+        this.latitude = null;
+        this.longitude = null;
+        this.locationName = '';
+        console.log('cleared location values');
+        return;
+      }
+    }
+    _setLocation(){
+      let place = this.autoComplete.getPlace();
+      if (!place.geometry) {
+        this.latitude = null;
+        this.longitude = null;
+        this.locationName = '';
+        // User entered the name of a Place that was not suggested and
+        // pressed the Enter key, or the Place Details request failed.
+        return;
+      }
+      let me = this;
+      this.geocoder.geocode({'location': {lat: parseFloat(place.geometry.location.lat()), lng: parseFloat(place.geometry.location.lng())}}, function(results, status) {
+        if (status === 'OK') {
+          if (results[0]) {
+            console.log(results[0]);
+            results[0].address_components.forEach(function(element) {
+              if (element.types[0] == 'locality'){
+                me.locationName = element.long_name;
+              }
+            });
+          } else {
+            console.log('No results found');
+          }
+        }
+      });
+      this.latitude = place.geometry.location.lat();
+      this.longitude = place.geometry.location.lng();
+      //this.locationName = place.formatted_address;
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('address-lookup.created');
+    }
+  }
+  window.customElements.define(AddressLookup.is, AddressLookup);
+  </script>
+</dom-module>

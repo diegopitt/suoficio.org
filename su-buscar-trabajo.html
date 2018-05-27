@@ -1,0 +1,119 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="job-list.html">
+<dom-module id="su-buscar-trabajo">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+    <firebase-query id="livejobs" path="/jobs" order-by-child="ishired" equal-to="false" data="{{jobs}}"></firebase-query>
+    <firebase-query path="/users/[[uid]]/search/results/text/hits" data="{{searchresults}}"></firebase-query>
+    <firebase-document path="/users/[[uid]]/search/results/text" data="{{searchData}}"></firebase-document>
+    <app-route active="{{isActive}}" route="{{route}}" pattern="/:jobKey" data="{{routeData}}"></app-route>
+    <dom-if if="[[!isActive]]">
+      <template>
+        <job-list query="[[searchData.query]]" query-params="[[queryParams]]" show-search="[[_showResults]]" search-results="{{searchresults}}" jobs="[[jobs]]" uid="[[uid]]"></job-list>
+      </template>
+    </dom-if>
+    <dom-if if="[[_shouldShowJob]]">
+      <template>
+        <su-trabajo uid="[[uid]]" job-key="[[routeData.jobKey]]"></su-trabajo>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class SuBuscarTrabajo extends Polymer.Element {
+    static get is() {
+      return 'su-buscar-trabajo';
+    }
+    static get properties() {
+      return {
+        queryParams: {
+          type: Object,
+          observer: '_queryChanged'
+        },
+        jobs: {
+          type: Object,
+          notify: true
+        },
+        searchresults: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: true
+        },
+        searchData:{
+          type: Object
+        },
+        _shouldShowJob:{
+          type: Boolean,
+          computed: '_computeShouldShowJob(isActive, visible)'
+        },
+        _showResults:{
+          type: Boolean,
+          computed: '_computeShowResults(searchData.nbHits, queryParams)'
+        },
+        visible: {
+          type: Boolean,
+          value: false
+        },
+        uid: String
+      };
+    }
+    static get observers() {
+      return [
+        '_loadLazyResources(isActive, visible)'
+      ]
+    }
+    _computeShowResults(numberHits, queryParams){
+      if (queryParams === undefined || queryParams === '') return false;
+      if (numberHits === undefined) return false;
+      if (numberHits === 0) {
+        return true;
+      } else if (numberHits > 0) {
+        return true;
+      }
+    }
+    _computeShouldShowJob(isActive, visible){
+      return (isActive && visible);
+    }
+    _queryChanged(value){
+      if (value === undefined) return;
+      this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+        Polymer.Async.microTask, () => {
+          let promise = firebase.app().database().ref(`/users/${this.uid}/search/query`).set({text: value});
+          promise.then( () => {
+            console.log('new search triggered');
+          });
+        }
+      );
+    }
+    _loadLazyResources(isActive, visible) {
+      if (isActive === true && visible === true) {
+        this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+          Polymer.Async.microTask, () => {
+            if (!this.loadComplete) {
+              Polymer.RenderStatus.afterNextRender(this, () => {
+                Polymer.importHref(this.resolveUrl('su-trabajo.html'), () => {
+                  this.loadComplete = true;
+                  console.log('su-trabajo loaded!');
+                });
+              });
+            }
+          }
+        );
+      }
+    }
+    _shouldShowJob(isActive, visible){
+      return (isActive && visible);
+    }
+    ready(){
+      super.ready();
+    }
+  }
+  window.customElements.define(SuBuscarTrabajo.is, SuBuscarTrabajo);
+  </script>
+</dom-module>

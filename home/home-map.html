@@ -1,0 +1,183 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="home-map">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+      width: 100%;
+      margin: 0 auto;
+      max-width: 1200px;
+      color: var(--app-font-color);
+    }
+
+    .container {
+      @apply --layout-flex;
+      @apply --layout-horizontal;
+      margin: 0 auto;
+      padding-bottom: 24px;
+    }
+
+    .fancy-line {
+      @apply --layout-flex;
+      margin-top: 40px;
+      border-top: 1px solid var(--app-little-grey);
+    }
+
+    .container>* {
+      @apply --layout-flex;
+      @apply --layout-center-center;
+      margin: 0px 10px;
+      padding: 20px;
+    }
+
+    .container img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .container h3 {
+      font-size: 22px;
+      display: inline-block;
+      font-weight: 500;
+      margin: 8px 0px;
+    }
+
+    .container p {
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    .logo {
+      font-family: 'Gotham Bold';
+      font-size: 24px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #161F2B;
+    }
+    .o {
+      color: var(--app-accent-color);
+    }
+    .map {
+      padding: 20px;
+    }
+
+    .footer {
+      line-height: 36px!important;
+      color: var(--paper-grey-600);
+      white-space: nowrap;
+    }
+
+    .green {
+      padding: 7px 40px 5px 20px;
+      color: var(--app-buble-color);
+      position: relative;
+      font-size: 15px;
+      font-weight: 300;
+      background-color: var(--app-green-color);
+    }
+
+    .footer:after {
+      content: " ";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-top: 15px solid transparent;
+      border-bottom: 15px solid transparent;
+      border-right: 15px solid #fff;
+    }
+
+    paper-button {
+      @apply --layout-horizontal;
+      @apply --layout-flex;
+      @apply --su-font-header;
+      color: #fff;
+    }
+
+    .mship {
+      @apply --layout-flex;
+      margin-bottom: 26px;
+    }
+
+    .buttomWrap {
+      @apply --layout-horizontal;
+    }
+
+    .buttomWrap>.btn {
+      @apply --layout-flex;
+      padding-top: 50px;
+    }
+
+    .spacer {
+      width: 20px !important;
+    }
+
+    @media (max-width: 800px) {
+      .container>* {
+        margin: 5px;
+        padding: 10px;
+      }
+      .map {
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        @apply --layout-vertical;
+      }
+      .container>* {
+        margin: 10px;
+      }
+      .map {
+        padding: 10px;
+      }
+      .buttomWrap {
+        @apply --layout-vertical;
+      }
+    }
+    </style>
+    <div class="container">
+      <div class="map">
+        <img alt="" src="../images/mexicomap.svg" />
+      </div>
+      <div class="wrap">
+        <div class="mship">
+          <span class="footer green">MEMBRESIA GRATIS</span>
+        </div>
+        <div class="logo"><span class="o">SU</span>OfICIO</div>
+        <h3>CDMX</h3>
+        <p>suoficio es una plataforma web diseñada para encontrar un servicio de oficio fácilmente y en tu localidad y a la vez genera oportunidades laborales en todo el país.</p>
+        <p>Diseñada para ti que estas en búsqueda del mejor servicio en tu localidad regístrate gratuitamente y encuentra alguien perfecto para lo que necesites!</p>
+        <div class="fancy-line">
+          <div class="buttomWrap">
+            <div class="btn">
+              <a href="/registracion" tabindex="-1"><paper-button class="blue">CREA UN TRABAJO</paper-button></a>
+            </div>
+            <div class="spacer"></div>
+            <div class="btn">
+              <a href="/registracion" tabindex="-1"><paper-button class="orange">ENCUENTRA TRABAJO</paper-button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class HomeMap extends Polymer.Element {
+    static get is() {
+      return 'home-map';
+    }
+    static get properties() {
+      return {};
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('home-map.created');
+    }
+  }
+  window.customElements.define(HomeMap.is, HomeMap);
+  </script>
+</dom-module>

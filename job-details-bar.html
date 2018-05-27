@@ -1,0 +1,147 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="data/app-locations-data.html">
+<link rel="import" href="data/app-timing-data.html">
+<link rel="import" href="data/app-category-data.html">
+<dom-module id="job-details-bar">
+  <template>
+    <style>
+    :host {
+      display: block;
+      @apply --common-borders;
+    }
+    .details-bar{
+      @apply --layout-horizontal;
+
+    }
+    .details-bar > div{
+      @apply --layout-horizontal;
+      @apply --layout-flex;
+      padding: 18px 14px;
+    }
+    .last {
+      @apply --layout-end-justified;
+      padding-right: 0px !important;
+    }
+    .copy {
+      line-height: 20px;
+    }
+    .chip{
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+    .chip.red{
+      background-color: var(--app-red-color);
+      color: #fff;
+    }
+    .chip.green{
+      background-color: var(--app-green-color);
+      color: #fff;
+    }
+    .chip.yellow{
+      background-color: var(--app-orange-color-light);
+      color: #fff;
+    }
+    .strong{
+      @apply --su-font-medium-bold;
+      @apply --paper-font-common-nowrap;
+      color: var(--app-font-color);
+      margin-top:2px;
+      margin-bottom: 10px;
+    }
+    .item {
+      font-size: 12px;
+      padding-top: 2px;
+      color: var(--app-font-color-light);
+    }
+    iron-icon {
+      height: 18px;
+      width: 18px;
+      padding: 0px;
+      margin-right: 10px;
+      color: var(--app-font-color);
+    }
+    @media (max-width: 767px) {
+      iron-icon {
+        display: none;
+      }
+    }
+    </style>
+    <app-category-data category-value="[[categoryValue]]" category="{{category}}"></app-category-data>
+    <app-locations-data location-value="[[locationValue]]" location="{{location}}"></app-locations-data>
+    <app-timing-data time-value="[[timingValue]]" time="{{time}}"></app-timing-data>
+    <div class="details-bar">
+      <div>
+        <div class="icon">
+          <iron-icon icon="myicons:traffic"></iron-icon>
+        </div>
+        <div class="item">
+          <div class="strong">Estado</div>
+          <dom-if if="[[ishiredValue]]">
+            <template>
+              <div class="chip red">Finalizado</div>
+            </template>
+          </dom-if>
+          <dom-if if="[[!ishiredValue]]">
+            <template>
+              <dom-if if="[[!maxpropValue]]">
+                <template>
+                  <div class="chip green">Activo</div>
+                </template>
+              </dom-if>
+              <dom-if if="[[maxpropValue]]">
+                <template>
+                  <div class="chip yellow">Pendiente</div>
+                </template>
+              </dom-if>
+            </template>
+          </dom-if>
+        </div>
+      </div>
+      <div>
+        <div class="icon">
+          <iron-icon icon="myicons:time"></iron-icon>
+        </div>
+        <div class="item">
+          <div class="strong">Plazo</div>
+          <div class="copy">[[time.title]]</div>
+        </div>
+      </div>
+      <div>
+        <div class="icon">
+          <iron-icon icon="myicons:build"></iron-icon>
+        </div>
+        <div class="item">
+          <div class="strong">Oficio</div>
+          <div class="copy">[[category.title]]</div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class JobDetailsBar extends Polymer.Element {
+    static get is() {
+      return 'job-details-bar';
+    }
+    static get properties() {
+      return {
+        category: Object,
+        location: Object,
+        time: Object,
+        categoryValue: Number,
+        ishiredValue: Boolean,
+        timingValue: Number,
+        maxpropValue: Boolean,
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-details-bar.created');
+    }
+  }
+  window.customElements.define(JobDetailsBar.is, JobDetailsBar);
+  </script>
+</dom-module>

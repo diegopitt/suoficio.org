@@ -1,0 +1,99 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="nearby-jobs-item.html">
+<link rel="import" href="../redux/redux-mixin.html">
+<dom-module id="nearby-jobs">
+  <template>
+    <style>
+    :host {
+      display: block;
+      color:#000;
+      background-color: #fff;
+      border-radius: 10px;
+      @apply --layout-flex;
+    }
+    .footer{
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+      background-color: #F5F5F5;
+      border-top: 1px solid #CCCCCC;
+      @apply --layout-center;
+    }
+    .job{
+      margin: 20px 0;
+      @apply --layout-flex;
+      @apply --su-oficio-font-nowrap;
+      padding:0px 20px;
+    }
+    .job > div{
+      line-height: 1.42857;
+    }
+    .no-job-title{
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      line-height: 1.42857;
+      padding:14px;
+      font-size: 13px;
+    }
+    nearby-jobs-item:not(:last-of-type) {
+      border-bottom: 1px solid #CFCFCF;
+    }
+    paper-button.white {
+      @apply --su-font-xsmall;
+      margin: 5px 14px;
+      border-radius: 0px;
+      background-color: #fff;
+      padding: 2px 14px;
+      border: 1px solid #CCCCCC;
+      color: var(--app-aqua-font);
+    }
+    </style>
+    <firebase-query id="nearbyjobs" path="/users/[[uid]]/nearbyjobs" data="{{nearbyjobs}}"></firebase-query>
+    <div></div>
+    <dom-if if="[[!nearbyjobs.length]]">
+      <template>
+        <div class="no-job">
+          <div class="no-job-title">No hay trabajos cerca tuyo</div>
+        </div>
+      </template>
+    </dom-if>
+    <dom-repeat items="[[nearbyjobs]]" as="job">
+      <template>
+        <nearby-jobs-item is-widget jobkey="[[job.$key]]" distance="[[job.d]]"></nearby-jobs-item>
+      </template>
+    </dom-repeat>
+  </template>
+  <script>
+  class NearbyJobs extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'nearby-jobs';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        nearbyjobs: {
+          type:Object,
+          reflectToAttribute:true,
+          notify:true
+        },
+        user_favorites: {
+          type: Array,
+          statePath: 'user_favorites'
+        },
+      };
+    }
+    static get observers() {
+      return []
+    }
+    ready() {
+      super.ready();
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('nearby-jobs.created');
+    }
+  }
+  window.customElements.define(NearbyJobs.is, NearbyJobs);
+  </script>
+</dom-module>

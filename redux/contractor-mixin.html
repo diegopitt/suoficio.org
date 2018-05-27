@@ -1,0 +1,90 @@
+<link rel="import" href="redux-mixin.html">
+<script>
+  ContractorMixin = Parent => class ContractorMixin extends ReduxMixin(Parent) {
+    static get properties() {
+      return {};
+    }
+    static get actions() {
+      return {
+        jobpost(jposts) {
+          return {
+            type: 'ALL_JOBPOSTS',
+            jposts
+          };
+        },
+        accounttype(atype) {
+          return {
+            type: 'ACCOUNT_TYPE',
+            atype
+          };
+        },
+        Contracts(contracts) {
+          return {
+            type: 'ALL_CONTRACTS',
+            contracts
+          };
+        },
+        userchats(chats) {
+          return {
+            type: 'ACTIVE_CHATS',
+            chats
+          };
+        },
+        username(name) {
+          return {
+            type: 'USER_NAME',
+            name
+          };
+        },
+        userlast(last) {
+          return {
+            type: 'USER_LAST',
+            last
+          };
+        },
+        userscore(score) {
+          return {
+            type: 'USER_SCORE',
+            score
+          };
+        },
+        userworth(worth) {
+          return {
+            type: 'USER_WORTH',
+            worth
+          };
+        },
+        reviewcount(rcount) {
+          return {
+            type: 'REVIEW_COUNT',
+            rcount
+          };
+        },
+        jobcount(jcount) {
+          return {
+            type: 'JOB_COUNT',
+            jcount
+          };
+        },
+        hasnotification(hnotification) {
+          return {
+            type: 'HAS_NOTIFICATION',
+            hnotification
+          };
+        },
+        hasmessage(hmessage) {
+          return {
+            type: 'HAS_MESSAGE',
+            hmessage
+          };
+        },
+        hasreview(hreview) {
+          return {
+            type: 'HAS_REVIEW',
+            hreview
+          };
+        },
+      }
+    }
+  }
+</script>

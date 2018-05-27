@@ -1,0 +1,324 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../../bower_components/iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../su-listbox.html">
+<link rel="import" href="su-chip.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="chip-select">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+      apply --layout-vertical;
+      margin: 24px 0px 8px 0px;
+      border: 1px solid var(--app-muted-color);
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    }
+    :host([error]) {
+      border-color:var(--app-red-color) !important;
+    }
+     :host(:hover) {
+      border-color: var(--app-aqua-font);
+    }
+
+    su-listbox {
+      box-sizing: border-box;
+      background-color: #fff;
+      min-width: 320px;
+      z-index: 10000;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+      padding: 0px;
+      margin-top: 1px;
+    }
+
+    iron-dropdown {
+      min-height: 280px;
+    }
+
+    input {
+      @apply --su-oficio-font-base;
+      width: calc(100% - 24px);
+      background-color: #fff !important;
+      box-sizing: border-box;
+      text-rendering: auto;
+      letter-spacing: normal;
+      word-spacing: normal;
+      text-transform: none;
+      text-indent: 0px;
+      border: none;
+      text-shadow: none;
+      text-align: start;
+      font-size: 13px;
+      line-height: 1.30769231;
+      outline: none;
+      border-radius: 0px;
+      margin: 11px;
+      padding: 0px;
+      color: #848D95;
+    }
+
+    iron-icon {
+      width: 24px;
+      padding: 0px;
+      margin: 0px;
+      height: 24px;
+      color: var(--app-aqua-font);
+    }
+
+    .icon {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      width: 42px;
+      height: 36px;
+    }
+
+    .item {
+      @apply --layout-horizontal;
+      @apply --layout-center;
+      outline: none;
+      box-sizing: border-box;
+      padding: 8px 14px 8px 0px;
+      margin: 0px;
+      border-left: 4px solid transparent;
+      cursor: pointer;
+    }
+
+    .copy {
+      @apply --layout-flex;
+      @apply --su-oficio-font-nowrap;
+      color: #848D95;
+      font-size: 11px;
+    }
+
+    .item:hover {
+      color: var(--app-blue-font);
+      border-color: var(--app-accent-color);
+    }
+
+    .chip-container {
+      margin: 8px;
+    }
+    
+    @media (max-width: 767px) {
+       :host {
+        background-color: #fff;
+      }
+    }
+    </style>
+    <iron-a11y-keys target="[[input]]" keys="backspace" on-keys-pressed="_onKeyBackspace"></iron-a11y-keys>
+    <iron-a11y-keys target="[[input]]" keys="esc" on-keys-pressed="_onKeyEsc"></iron-a11y-keys>
+    <dom-if if="[[items.length]]">
+      <template>
+        <div id="container" class="chip-container">
+          <dom-repeat items="[[items]]">
+            <template>
+              <su-chip item="[[item]]" title="[[_computeTitle(item)]]" on-chip-removed="_removeChip"></su-chip>
+            </template>
+          </dom-repeat>
+        </div>
+      </template>
+    </dom-if>
+    <dom-if if="[[!_MaxReached(items.length)]]">
+      <template>
+        <input id="suInput" tabindex="-1" autofocus placeholder="Ejemplo: Electrisista, Pintor, Carpintero, Plomeria" on-keyup="_findItems" value="{{_inputValue::input}}">
+      </template>
+    </dom-if>
+    <div>
+      <iron-dropdown 
+      id="dropdown" 
+      no-animations="true" 
+      focus-target="[[input]]" 
+      no-auto-focus="false">
+        <su-listbox selected="-1" slot="dropdown-content">
+          <dom-repeat items="[[_filteredSource]]">
+            <template>
+              <div role="option" class="item" on-tap="_selectChip" item="[[item]]">
+                <div class="icon">
+                  <iron-icon icon="myicons:work"></iron-icon>
+                </div>
+                <div class="copy">[[item.title]]</div>
+              </div>
+            </template>
+          </dom-repeat>
+        </su-listbox>
+      </iron-dropdown>
+    </div>
+  </template>
+  <script>
+  class ChipSelect extends Polymer.Element {
+    static get is() {
+      return 'chip-select';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        input: {
+          type: Object
+        },
+        minSearchStringLength: {
+          type: Number,
+          value: 3
+        },
+        items: {
+          type: Array,
+          value: () => []
+        },
+        categories: {
+          type: Array,
+          value: () => [],
+          notify: true
+        },
+        required: {
+          type: Boolean,
+          value: false
+        },
+        autoValidate: {
+          type: Boolean,
+          value: false
+        },
+        _autoValidate: {
+          type: Boolean,
+          value: false
+        },
+        _required: {
+          type: Boolean,
+          value: false
+        },
+        restoreFocusOnClose: {
+          type: Boolean,
+          value: true
+        },
+        _filteredSource: {
+          type: Array,
+          value: () => [],
+          notify: true
+        },
+        selectedValues: {
+          type: Array,
+          value: () => [],
+          notify: true
+        },
+        _inputValue: {
+          type: String,
+          value: ""
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    connectedCallback() {
+      super.connectedCallback();
+      this._autoValidate = this.autoValidate;
+      this._required = this.required;
+    }
+    _computeTitle(value){
+      for (let i = 0, c; c = this.categories[i]; ++i) {
+        if (c.value === value) {
+          return c.title;
+        }
+      }
+    }
+    _MaxReached(item) {
+      return item === 3;
+    }
+    _onKeyBackspace(event) {
+      if (this.items.length != 0 && (this._inputValue == '' || this._inputValue == undefined)) {
+        this._removeLastItem();
+      }
+      if (this.items.length == 0) {
+        this.autoValidate = this._autoValidate;
+        this.required = this._required;
+      }
+    }
+    _onKeyEsc(event) {
+      this._inputValue = '';
+      this.$.dropdown.close();
+      this.$.suInput.focus;
+    }
+    _removeLastItem() {
+      if (this.items.length != 0) {
+        let lastItemIndex = this.items.length - 1;
+        let lastItemvalue = this.items[lastItemIndex].value;
+        this.splice('items', -1, 1);
+        this.splice('selectedValues', -1, 1);
+      }
+    }
+    _findItems(event) {
+      if (this._inputValue.length == 0) {
+        this.$.dropdown.close();
+      }
+      if (this._inputValue.length >= this.minSearchStringLength) {
+        this._filterItems();
+      }
+    }
+    _filterItems() {
+      let filteredByString = this.categories.filter(element => this._filterBySearchString(element));
+      if (filteredByString.length > 0 && this.items.length) {
+        this._filteredSource = filteredByString.filter(element => this._filterByExistingChip(element));
+      } else {
+        this._filteredSource = filteredByString;
+      }
+      if (this._filteredSource.length > 0) {
+        this.$.dropdown.open();
+      }else{
+        this.$.dropdown.close();
+      }
+    }
+    _filterByExistingChip(element) {
+      return this.items.indexOf(element.text) == -1;
+    }
+    _filterBySearchString(element) {
+      return element.title.toLowerCase().indexOf(this._inputValue.toLowerCase()) >= 0;
+    }
+    _selectChip(event) {
+      this._saveTag(event.model.item.value);
+      this.required = false;
+      this.autoValidate = false;
+      this._inputValue = '';
+      this.$.dropdown.close();
+    }
+    _saveTag(item) {
+      if (this.items.indexOf(item) == -1) {
+        this.push('items', item);
+        this.push('selectedValues', item);
+      }
+    }
+    _removeChip(event) {
+      let i = this._indexOfChip(event.detail.value);
+      if (i != -1) {
+        this.splice('items', i, 1);
+        this.splice('selectedValues', i, 1);
+        //this.$.suInput.autofocus = true;
+      }
+    }
+    _indexOfChip(value) {
+      if (this.items) {
+        for (let i = 0; i < this.items.length; ++i) {
+          if (this.items[i] === value) {
+            return i;
+          }
+        }
+      }
+      return -1;
+    }
+    _bindCategories(){
+      if (this.items) {
+        for (let i = 0; i < this.items.length; ++i) {
+          this.push('selectedValues', this.items[i]);
+        }
+      }
+    }
+    ready() {
+      super.ready();
+      this._bindCategories();
+      this.input = this.$.suInput;
+      //this.input.focus();
+    }
+  }
+  window.customElements.define(ChipSelect.is, ChipSelect);
+  </script>
+</dom-module>

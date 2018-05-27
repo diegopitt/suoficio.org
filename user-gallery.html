@@ -1,0 +1,119 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="justified-gallery.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="user-gallery">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin: 24px 0;
+    }
+    .user-click{
+      margin-left: 14px;
+    }
+    iron-icon{
+      width:24px;
+      height:24px;
+      cursor:pointer;
+      color: var(--app-aqua-font);
+    }
+    .main-wrap {
+      padding: 36px;
+      @apply --common-borders;
+    }
+    .edit{
+      display:none;
+    }
+    .title {
+      @apply --su-font-header-big;
+    }
+    .gallery-wrapper{
+      padding-top: 24px;
+    }
+    review-item:not(:last-of-type) {
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    .edit-wrap {
+      @apply --layout-horizontal;
+      padding-bottom: 24px;
+      border-bottom:1px solid var(--app-little-grey);
+    }
+    @media (max-width: 767px) {
+      .title{
+        @apply --layout-flex;
+      }
+      .main-wrap {
+        padding: 0px;
+      }
+      .edit-wrap {
+        @apply --layout-center-center;
+        background-color: #f9f9f9;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        padding: 16px 12px;
+      }
+      .title{
+        margin-bottom: 0px;
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: 500;
+        border-bottom: 0px solid var(--app-little-grey);
+      }
+      .content{
+        border: none;
+        padding: 0 12px;
+        margin-top: -1px;
+        border-top: 1px solid var(--app-little-grey);
+        /* box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28); */
+      }
+    }
+    </style>
+    <firebase-document path="/users/[[uid]]/photos" data="{{photos}}"></firebase-document>
+    <div class="main-wrap">
+      <div class="edit-wrap">
+        <div class="title">Imagenes de Trabajos</div>
+        <div  class="user-click">
+          <iron-icon icon="myicons:edit2" on-tap="editPictures"></iron-icon>
+        </div>
+      </div>
+      <div class="gallery-wrapper">
+        <justified-gallery images="[[_arrayify(photos)]]" row-height="250"></justified-gallery>
+      </div>
+    </div>
+  </template>
+  <script>
+  class UserGallery extends Polymer.Element {
+    static get is() {
+      return 'user-gallery';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        profileData: Object
+      };
+    }
+    static get observers() {
+      return []
+    }
+    editPictures(){
+      this.dispatchEvent(new CustomEvent('open-dialog', {bubbles: true, composed: true, detail: {status: 'open', action: 'update-pictures', title: 'Imagenes de tus trabajos realizado'}}));
+    }
+    _arrayify(obj) { 
+      if (!obj) return;
+      return Object.keys(obj).map(function(k) { 
+        return { 
+          url: obj[k].url, 
+          width: obj[k].width
+        }; 
+      }) 
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('user-gallery.created');
+    }
+  }
+  window.customElements.define(UserGallery.is, UserGallery);
+  </script>
+</dom-module>

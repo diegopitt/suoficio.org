@@ -1,0 +1,202 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="redux/contractor-bindings.html">
+<link rel="import" href="su-no-encontrado.html">
+<link rel="import" href="moment-js.html">
+<link rel="import" href="su-header.html">
+<dom-module id="contractor-app">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    paper-tabs {
+      @apply --layout-flex;
+      --paper-tabs-selection-bar: {
+        border-bottom-width: 0px;
+      };
+    }
+    paper-tab {
+      @apply --layout-flex-none;
+      --paper-tab-ink: transparent;
+      --paper-tab-content-unselected: {
+        opacity: 1;
+      }
+    }
+    paper-tab[link] a {
+      @apply --layout-horizontal;
+      outline: none;
+      margin: 0 8px;
+      font-weight: 500;
+      font-size: 11px;
+      color: #666;
+      text-decoration: none;
+    }
+    paper-tab.iron-selected a {
+      color: #00D7C5;
+    }
+   .link {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    .drawer-list {
+      margin: 0 24px;
+    }
+    .page-width {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    app-drawer {
+      z-index: 2;
+      --app-drawer-content-container: {
+        margin-top: 64px;
+        background-color: #000;
+      };
+    }
+    .drawer-list a {
+      display: block;
+      padding: 0 16px;
+      line-height: 40px;
+      text-decoration: none;
+      font-weight: 300;
+      font-size: 14px;
+      color: #fff;
+    }
+    .drawer-list a.iron-selected {
+      color: var(--app-accent-green);
+    }
+    iron-pages {
+      min-height: calc(100vh - 60px);
+      margin-bottom: 80px !important;
+    }
+    footer{
+      margin-top: 24px;
+      background-color: #222222;
+      height: 30vh;
+    }
+    @media (max-width: 900px) {
+      paper-tab[link] a {
+        font-size: 12px;
+      }
+    }
+    </style>
+    <iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
+    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <app-header-layout>
+      <su-header drawer-opened="{{drawerOpened}}" full-width$="[[!user]]" slot="header" user="[[user]]" page="{{page}}">
+       <dom-if if="[[!_shouldRenderDrawer]]">
+          <template>
+            <div slot="navigation">
+              <paper-tabs noink autoselect selected="[[page]]" attr-for-selected="name">
+                <paper-tab name="trabajos" link><a class="link" href="/trabajos/activos" tabindex="-1">TRABAJOS</a></paper-tab>
+                <paper-tab name="contratos" link><a class="link" href="/contratos" tabindex="-1">CONTRATOS</a></paper-tab>
+              </paper-tabs>
+            </div>
+          </template>
+        </dom-if>
+      </su-header>
+      <main role="main">
+        <iron-pages class$="[[_width]]" selected="[[page]]" attr-for-selected="name" selected-attribute="visible" fallback-selection="no-encontrado">
+          <su-trabajos small-screen="[[smallScreen]]" uid="[[user.uid]]" route="{{subroute}}" name="trabajos"></su-trabajos>
+          <su-crear-trabajo uid="[[user.uid]]" route="{{subroute}}" name="crear-trabajo"></su-crear-trabajo>
+          <su-contratos uid="[[user.uid]]" route="[[subroute]]" name="contratos"></su-contratos>
+          <su-candidatos small-screen="[[smallScreen]]" uid="[[user.uid]]" route="[[subroute]]" name="candidatos"></su-candidatos>
+          <su-notificaciones uid="[[user.uid]]" name="notificaciones"></su-notificaciones>
+          <su-mensajes uid="[[user.uid]]" small-screen="[[smallScreen]]" name="mensajes"></su-mensajes>
+          <su-no-encontrado name="no-encontrado"></su-no-encontrado>
+        </iron-pages>
+        <dom-if if="[[_shouldRenderDrawer]]">
+          <template>
+            <app-drawer opened="{{drawerOpened}}" swipe-open tabindex="0">
+              <iron-selector role="navigation" class="drawer-list" selected="[[page]]" attr-for-selected="name">
+                <a name="trabajos" class="link" href="/trabajos/activos" tabindex="-1">Trabajos</a>
+                <a name="contratos" class="link" href="/contratos" tabindex="-1">Contratos</a>
+              </iron-selector>
+            </app-drawer>
+          </template>
+        </dom-if>
+      </main>
+      <dom-if if="[[_shouldRenderFooter(page, smallScreen)]]">
+        <template>
+          <footer></footer>
+        </template>
+      </dom-if>
+    </app-header-layout>
+  </template>
+  <script>
+  class ContractorApp extends Polymer.Element {
+    static get is() {
+      return 'contractor-app';
+    }
+    static get properties() {
+      return {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        },
+        route: Object,
+        drawerOpened: Boolean,
+        user: Object,
+        _width: String,
+        smallScreen: Boolean,
+        _shouldRenderDrawer: {
+          computed: '_computeShouldRenderDrawer(smallScreen)'
+        }
+      };
+    }
+    static get observers() {
+      return [
+        '_routePageChanged(routeData.page)',
+        '_setWidth(page)'
+      ]
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('contractor-app.created');
+    }
+    _setWidth(page) {
+      this._width = (page !== 'mensajes') ?  'page-width' : '';
+    }
+    _shouldRenderFooter(page, smallScreen){
+      if (smallScreen) return false;
+      if (page === 'mensajes') return false;
+      return true;
+    }
+    _computeShouldRenderDrawer(smallScreen) {
+      return smallScreen;
+    }
+    _routePageChanged(page) {
+      this.page = page || 'trabajos';
+      Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+    }
+    _pageChanged(page) {
+      var resolvedPageUrl = this.resolveUrl('su-' + page + '.html');
+      Polymer.importHref(
+          resolvedPageUrl,
+          null,
+          this._showPage404.bind(this),
+          true);
+      this.drawerOpened = false;
+    }
+    _showPage404() {
+      this.page = 'no-encontrado';
+    }
+    ready() {
+      super.ready();
+      this.addEventListener('change-route', e => this._changeRoute(e));
+    }
+    _changeRoute(e) {
+      this.set('route.path', e.detail.location);
+    }
+  }
+  window.customElements.define(ContractorApp.is, ContractorApp);
+  </script>
+</dom-module>

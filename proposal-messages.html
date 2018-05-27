@@ -1,0 +1,116 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="chat/chat-input.html">
+<link rel="import" href="chat/chat-messages.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="proposal-messages">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .main-wrap{
+      @apply --su-font-medium;
+      @apply --common-borders;
+      padding: 36px;
+    }
+     :host([no-top-border]) .main-wrap {
+      border-top-width: 0px !important;
+      border-top-left-radius: 0px !important;
+      border-top-right-radius: 0px !important;
+    }
+    .header {
+      @apply --layout-vertical;
+      @apply --layout-flex;
+    }
+    .title{
+      @apply --su-font-header-big;
+    }
+    .sub-title{
+      @apply --su-font-medium;
+      color: var(--app-font-color-light);
+      padding-bottom: 8px;
+    }
+    .chat-content{
+      border: 1px solid var(--app-little-grey);
+    }
+    @media (max-width: 767px) {
+      .header {
+        background-color: #f9f9f9;
+        padding: 14px 12px;
+      }
+      .title{
+        margin-bottom: 3px;
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: 500;
+      }
+      .sub-title{
+        font-size: 10px;
+        line-height: 12px;
+        font-weight: 400;
+        padding-bottom: 0px;
+
+      }
+      .main-wrap {
+        padding: 0px;
+      }
+      .chat-content{
+        border: none;
+        border-top: 1px solid var(--app-little-grey);
+        /* box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28); */
+      }
+    }
+    </style>
+    <firebase-document path="/users/[[receiver]]/account" data="{{receiverData}}"></firebase-document>
+    <div class="main-wrap">
+      <div class="header">
+        <div class="title">Mensajes</div>
+        <div class="sub-title">Con [[receiverData.fn]]</div>
+      </div>
+      <div class="chat-content">
+        <chat-messages fixed-height uid="[[uid]]" room-key="[[roomKey]]"></chat-messages>
+        <chat-input small receiver="[[receiver]]" uid="[[uid]]" room-key="[[roomKey]]"></chat-input>
+      </div>
+    </div>
+  </template>
+  <script>
+  class ProposalMessages extends Polymer.Element {
+    static get is() {
+      return 'proposal-messages';
+    }
+    static get properties() {
+      return {
+        job: Object,
+        uid: String,
+        job: Object,
+        receiver: String,
+        roomKey: String,
+        jobKey: String,
+        jobOpen: {
+          type: Boolean,
+          computed:'_computeJobOpen(job.ishired, job.maxprop)'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('proposal-messages.created');
+    }
+    _sendproposal(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: '/enviar-propuesta/' + this.jobKey } }));
+    }
+    _computeJobOpen(isHired, maxLimit){
+      if(isHired === undefined || maxLimit === undefined) return;
+      return (isHired || maxLimit);
+    }
+    _getLastSeen(timestamp) {
+      return moment(timestamp).format('MMMM DD YYYY');
+    }
+  }
+  window.customElements.define(ProposalMessages.is, ProposalMessages);
+  </script>
+</dom-module>

@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="rooms-header">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .header-wrap{
+      @apply --layout-flex;
+      position: relative;
+      box-sizing: border-box;
+      height: 75px;
+      text-align: center;
+      font-weight: 400;
+      font-size: 22px;
+      padding: 22.5px 15px;
+      border-bottom: solid 1px var(--app-little-grey);
+      background-color: #f9f9f9;
+    }
+    </style>
+    <div class="header-wrap">
+      Mensajes
+    </div>
+  </template>
+  <script>
+  class RoomsHeader extends Polymer.Element {
+    static get is() {
+      return 'rooms-header';
+    }
+    static get properties() {
+      return {};
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('rooms-header.created');
+    }
+  }
+  window.customElements.define(RoomsHeader.is, RoomsHeader);
+  </script>
+</dom-module>

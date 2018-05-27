@@ -1,0 +1,88 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+
+<dom-module id="su-avatar">
+  <template>
+    <style>
+     :host {
+      @apply --layout-horizontal;
+    }
+    .large {
+      width: 108px;
+      height: 108px;
+      overflow: hidden;
+    }
+    .medium {
+      width: 58px;
+      height: 58px;
+      overflow: hidden;
+      overflow: hidden;
+    }
+    .small {
+      width: 48px;
+      height: 48px;
+      overflow: hidden;
+    }
+    .userThumbnail {
+        background: url(/images/user2.svg) no-repeat center/cover;
+        margin: 0 auto;
+        position: relative;
+    }
+    .tiny {
+      width: 30px;
+      height: 30px;
+      overflow: hidden;
+    }
+    iron-image {
+      padding:0px;
+      margin:0px;
+      /* @apply --common-shadow-hover; */
+      border-radius: 3px;
+      transition: transform 300ms ease-in-out;
+      will-change: transform;
+    }
+    </style>
+    <iron-image placeholder="[[placeholder]]" class$="[[_updateSizing(sizing)]] userThumbnail" src="[[src]]" preload sizing="cover" fade></iron-image>
+  </template>
+  <script>
+  class SuAvatar extends Polymer.Element {
+    static get is() {
+      return 'su-avatar';
+    }
+    static get properties() {
+      return {
+        src: {
+          type: String
+        },
+        sizing: {
+          type: String,
+          value: 'large' / 'medium' / 'small' / 'tiny'
+        },
+        placeholder: {
+          type: String
+        }
+      };
+    }
+    _updateSizing(size) {
+      switch (size) {
+        case 'large':
+          return 'large';
+          break;
+        case 'medium':
+          return 'medium';
+          break;
+        case 'small':
+          return 'small';
+          break;
+        case 'tiny':
+          return 'tiny';
+          break;
+        default:
+          return 'small';
+          break;
+      }
+    }
+  }
+  window.customElements.define(SuAvatar.is, SuAvatar);
+  </script>
+</dom-module>

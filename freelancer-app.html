@@ -1,0 +1,216 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/helpers/helpers.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="su-no-encontrado.html">
+<link rel="import" href="moment-js.html">
+<link rel="import" href="su-header.html">
+<dom-module id="freelancer-app">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    .link {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    app-drawer {
+      z-index: 2;
+      --app-drawer-scrim-background: rgba(0, 0, 0, 0.8);
+      --app-drawer-content-container: {
+        margin-top: 64px;
+        background-color: #ffffff;
+      };
+    }
+    .drawer-list {
+      margin: 0 20px;
+    }
+    .drawer-list a {
+      display: block;
+      padding: 0 16px;
+      line-height: 66px;
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 14px;
+      border-bottom: 1px solid var(--app-little-grey);
+      color: var(--app-font-color-light);
+    }
+    .drawer-list a.iron-selected {
+      color: var(--app-aqua-font);
+    }
+    iron-pages {
+      min-height: calc(100vh - 68px);
+    }
+    footer{
+      background-color: #222222;
+      margin-top: 24px;
+      height: 30vh;
+    }
+    paper-tabs {
+      @apply --layout-flex;
+      --paper-tabs-selection-bar: {
+        border-bottom-width: 0px;
+      };
+    }
+    paper-tab {
+      @apply --layout-flex-none;
+      --paper-tab-ink: none;
+      --paper-tab-content-unselected: {
+        opacity: 1;
+      }
+    }
+    paper-tab[link] a {
+      @apply --layout-horizontal;
+      outline: none;
+      margin: 0 8px;
+      font-weight: 500;
+      font-size: 11px;
+      color: #666;
+      text-decoration: none;
+    }
+    paper-tab.iron-selected a {
+      color: #00D7C5;
+    }
+    .page-width {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      main {
+        margin: 0px 48px;
+      }
+      paper-tab[link] a {
+        font-size: 12px;
+      }
+    }
+    @media (max-width: 767px) {
+      main {
+        margin: 0px;
+      }
+    }
+    </style>
+    <iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
+    <app-route id="route" route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <app-header-layout>
+      <su-header freelancer drawer-opened="{{drawerOpened}}" full-width$="[[!user]]" slot="header" user="[[user]]" page="{{page}}">
+       <dom-if if="[[!_shouldRenderDrawer]]">
+          <template>
+            <div slot="navigation">
+              <paper-tabs noink autoselect selected="[[page]]" attr-for-selected="name">
+                <paper-tab name="buscar-trabajo" link><a class="link" href="/buscar-trabajo" tabindex="-1">TRABAJOS</a></paper-tab>
+                <paper-tab name="perfil" link><a class="link" href="/perfil" tabindex="-1">PERFIL</a></paper-tab>
+                <paper-tab name="trabajos-guardados" link><a class="link" href="/trabajos-guardados" tabindex="-1">FAVORITOS</a></paper-tab>
+                <paper-tab name="propuestas" link><a class="link" href="/propuestas" tabindex="-1">PROPUESTAS</a></paper-tab>
+                <paper-tab name="contratos" link><a class="link" href="/contratos" tabindex="-1">CONTRATOS</a></paper-tab>
+              </paper-tabs>
+            </div>
+          </template>
+        </dom-if>
+      </su-header>
+      <main role="main" class$="[[_width]]">
+        <iron-pages role="main" selected="[[page]]" selected-attribute="visible" attr-for-selected="name" fallback-selection="no-encontrado">
+          <su-buscar-trabajo query-params="[[route.queryParams]]" uid="[[user.uid]]" route="[[subroute]]" name="buscar-trabajo"></su-buscar-trabajo>
+          <su-trabajos-guardados uid="[[user.uid]]" name="trabajos-guardados"></su-trabajos-guardados>
+          <su-crear-trabajo name="crear-trabajo"></su-crear-trabajo>
+          <su-perfil small-screen="[[smallScreen]]" uid="[[user.uid]]" name="perfil"></su-perfil>
+          <su-notificaciones uid="[[user.uid]]" name="notificaciones"></su-notificaciones>
+          <su-mensajes uid="[[user.uid]]" small-screen="[[smallScreen]]" name="mensajes"></su-mensajes>
+          <su-enviar-propuesta uid="[[user.uid]]" route="[[subroute]]" name="enviar-propuesta"></su-enviar-propuesta>
+          <su-contratos uid="[[user.uid]]" route="[[subroute]]" name="contratos"></su-contratos>
+          <su-propuestas uid="[[user.uid]]" route="[[subroute]]" name="propuestas"></su-propuestas>
+          <su-no-encontrado name="no-encontrado"></su-no-encontrado>
+          <su-editar-perfil name="editar-perfil" uid="[[user.uid]]"></su-editar-perfil>
+        </iron-pages>
+        <dom-if if="[[_shouldRenderDrawer]]">
+          <template>
+            <app-drawer opened="{{drawerOpened}}" swipe-open tabindex="0">
+              <iron-selector role="navigation" class="drawer-list" selected="[[page]]" attr-for-selected="name">
+                <a name="buscar-trabajo" class="link" href="/buscar-trabajo" tabindex="-1">Buscar Trabajo</a>
+                <a name="trabajos-guardados" class="link" href="/trabajos-guardados" tabindex="-1">Favoritos</a>
+                <a name="propuestas" class="link" href="/propuestas" tabindex="-1">Propuestas</a>
+                <a name="perfil" class="link" href="/perfil" tabindex="-1">Perfil</a>
+                <a name="contratos" class="link" href="/contratos" tabindex="-1">Contratos</a>
+              </iron-selector>
+            </app-drawer>
+          </template>
+        </dom-if>
+      </main>
+      <dom-if if="[[_shouldRenderFooter(page, smallScreen)]]">
+        <template>
+          <footer></footer>
+        </template>
+      </dom-if>
+    </app-header-layout>
+  </template>
+  <script>
+  class FreelancerApp extends Polymer.Element {
+    static get is() {
+      return 'freelancer-app';
+    }
+    static get properties() {
+      return {
+        route: Object,
+        page: {
+          type: String,
+          notify: true,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        },
+        user: Object,
+        smallScreen: Boolean,
+        _shouldRenderDrawer: {
+          computed: '_computeShouldRenderDrawer(smallScreen)'
+        }
+      };
+    }
+    static get observers() {
+      return [
+        '_routePageChanged(routeData.page)'
+      ]
+    }
+    _shouldRenderFooter(page, smallScreen){
+      if (smallScreen) return false;
+      if (page === 'mensajes') return false;
+      return true;
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('freelancer-app.created');
+    }
+    _routePageChanged(page) {
+      this.page = page || 'buscar-trabajo';
+      Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+    }
+    _computeShouldRenderDrawer(smallScreen) {
+      return smallScreen;
+    }
+    _pageChanged(page) {
+      var resolvedPageUrl = this.resolveUrl('su-' + page + '.html');
+      Polymer.importHref(resolvedPageUrl, null, this._showPage404.bind(this), true);
+      this.drawerOpened = false;
+      this._width = (page === 'buscar-trabajo') || (page === 'mensajes') ? '' : 'page-width';
+    }
+    _showPage404() {
+      this.page = 'no-encontrado';
+    }
+    ready() {
+      super.ready();
+      this.addEventListener('change-route', e => this._changeRoute(e));
+      this.addEventListener('query-params', e => this._changeQueryParams(e));
+    }
+    _changeRoute(e) {
+      this.set('route.path', e.detail.location);
+    }
+    _changeQueryParams(e) {
+      this.set('route.queryParams', e.detail.query);
+    }
+  }
+  window.customElements.define(FreelancerApp.is, FreelancerApp);
+  </script>
+</dom-module>

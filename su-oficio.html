@@ -1,0 +1,228 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../font/font-style.html">
+<link rel="import" href="my-icons.html">
+<link rel="import" href="notify-snackbar.html">
+<link rel="import" href="redux/popup-mixin.html">
+<dom-module id="su-oficio">
+  <template>
+    <style>
+    :host {
+      display: block;
+      background-color: #fff;
+      @apply --su-oficio-font-base;
+      --app-primary-color: #1f2836; /* grey 212121 */
+      --app-accent-color: #29B2FE;/* 14bff4 */
+      --app-accent-green: #00c670;
+      --app-background-container: #ffffff;
+      --app-disabled-color: #f2f2f2;
+      --app-little-grey: #dce0e0;
+      --app-little-orange: #f2cc9d;
+      --app-buble-color: #f5f5f5;
+      --app-muted-color: #dddddd;
+      --app-buble-color-light: #f2efed;
+      --app-font-color: #292929; /* 000a12 */
+      --app-font-color-light: #848D95;/* 9199a1 */
+      --app-red-color: #d50000;
+      --app-aqua-font: #1db7b7;/* 2da56a 00A680 1db7b7 769D28 5dc26a lavander 8040ff old green 37a000*/
+      --app-blue-font: #0087e0;
+      --app-orange-color: #eb6420;/* orange 7e3794*/
+      --app-bottle-color: #606b48;
+      --app-bottle-color-light: #99ab72;
+      --app-orange-color-light: #EF6945;/*ffac45 orange light e282ff*/
+      --app-purple-color: #8c3cd6;
+      --app-green-color: #37A000;
+      --app-grey-color: #666; /* nice for links on white bg*/
+      --app-green-font: #008a00;
+      --app-red-badge: #ff0000;
+      color: var(--app-font-color);
+    }
+    @media (max-width: 767px) {
+      :host {
+        background-color: #fff;
+      }
+    }
+    </style>
+    <app-location route="{{route}}"></app-location>
+    <app-route route="{{route}}" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <dom-if if="[[statusKnown]]">
+      <template>
+        <dom-if if="[[!user]]">
+          <template>
+            <welcome-page route="{{route}}" user="{{user}}"></welcome-page>
+          </template>
+        </dom-if>
+        <dom-if if="[[user]]">
+          <template>
+            <dom-if if="[[isFreelancer]]">
+              <template>
+                <dom-if if="[[!_completeProfile]]">
+                  <template>
+                    <freelancer-setup uid="[[user.uid]]"></freelancer-setup>
+                  </template>
+                </dom-if>
+                <dom-if if="[[_completeProfile]]">
+                  <template>
+                    <freelancer-app route="{{route}}" user="{{user}}"></freelancer-app>
+                  </template>
+                </dom-if>
+              </template>
+            </dom-if>
+            <dom-if if="[[!isFreelancer]]">
+              <template>
+                <contractor-app route="{{route}}" user="{{user}}"></contractor-app>
+              </template>
+            </dom-if>
+          </template>
+        </dom-if>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  Polymer.setPassiveTouchGestures(true);
+  class SuOficio extends PopupMixin(Polymer.Element) {
+    static get is() {
+      return 'su-oficio';
+    }
+    static get properties() {
+      return {
+        user: {
+          type: Object,
+          value: null
+        },
+        routeData: Object,
+        isFreelancer: {
+          type: Boolean
+        },
+        subroute: Object,
+        userType: {
+          type: Number,
+          value: null
+        },
+        statusKnown: Boolean
+      };
+    }
+    static get observers() {
+      return [
+        '_lazyLoadApp(statusKnown, user)',
+      ]
+    }
+    _lazyLoadApp(statusKnown, user) {
+      if(statusKnown && !user){
+        Polymer.RenderStatus.afterNextRender(this, () => {
+          Polymer.importHref(this.resolveUrl('welcome-page.html'), () => {});
+        });
+      }else if(statusKnown && user){
+        firebase.app().database().ref(`/users/${this.user.uid}/account/a`).on('value', function(a){
+          this._completeProfile = a.child('pc').val();
+          this.isFreelancer = a.child('t').val() === 2;
+          this._continueLoadingApp(this._completeProfile, this.isFreelancer);
+        }.bind(this));
+      }
+    }
+    _continueLoadingApp(pc, f) {
+      if (!f) {
+        Polymer.importHref(this.resolveUrl('contractor-app.html'), () => {
+          console.log('loaded contractor-app');
+        }, () => {}, true);
+      }
+      if (f) {
+        if (!pc){
+          Polymer.importHref(this.resolveUrl('freelancer-setup.html'), () => {
+            console.log('loaded freelancer-setup');
+          });
+        }else{
+          Polymer.importHref(this.resolveUrl('freelancer-app.html'), () => {
+            console.log('loaded freelancer-app');
+          }, () => {}, true);
+        }
+      }
+    }
+    _login(e) {
+      let me = this;
+      firebase.auth().signInWithEmailAndPassword(e.detail.email, e.detail.pass).then(function(response) {
+          me.set('route.path', '');
+      })
+      .catch(function(error) {});
+    }
+    ready() {
+      super.ready();
+      Polymer.RenderStatus.afterNextRender(this, () => {
+        this.removeAttribute('unresolved');
+      });
+      this.addEventListener('do-login', e => this._login(e));
+      this.addEventListener('open-dialog', e => this._loadDialogPopUp(e));
+      window.addEventListener('notify-user', (e)=>this._notifyUser(e));
+      window.addEventListener('register-user', (e)=>this._registerUser(e));
+      window.addEventListener('navigate-user', (e)=>this._navigate(e));
+      window.addEventListener('log-out', (e)=>this._logout(e));
+    }
+    _registerUser(e){
+      let me = this;
+      firebase.auth().createUserWithEmailAndPassword(e.detail.email, e.detail.pass).then(function(user) {
+        const promise = firebase.app().database().ref(`/users/${user.uid}/account`).set({
+          fn: e.detail.name,
+          hr: false,
+          jc: 0,
+          ln: e.detail.last,
+          si: firebase.database.ServerValue.TIMESTAMP,
+          rc: 0,
+          sc: 0,
+          a: {
+            pc: false,
+            t: e.detail.account
+          },
+          hm: false,
+          vi: 'true',
+          wo: 0
+        });
+        promise.then(() => {
+          me.set('route.path', '/');
+        });
+      }, function(error) {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          console.log(errorMessage);
+      });
+    }
+    _navigate(e){
+      this.set('route.path', e.detail.path);
+    }
+    _logout(){
+      let me = this;
+      firebase.auth().signOut().then(function() {
+        me.set('route.path', '');
+      }, function(error) {});
+    }
+    _loadDialogPopUp(e) {
+      if (!this._dialogPopUp) {
+        this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+          Polymer.Async.microTask, () => {
+            Polymer.RenderStatus.afterNextRender(this, () => {
+              Polymer.importHref(this.resolveUrl('su-dialog.html'), () => {
+                this._dialogPopUp = document.createElement('su-dialog');
+                this._dialogPopUp.setAttribute('uid', this.user.uid);
+                this.root.appendChild(this._dialogPopUp);
+                console.log('ATTACHED POPUP');
+                this.dispatch('togglePopup', e.detail);
+              });
+            });
+          }
+        );
+      }else{
+        this.dispatch('togglePopup', e.detail);
+      }
+    }
+    _notifyUser(e) {
+      if (!this._notifySnackbar) {
+        this._notifySnackbar = document.createElement('notify-snackbar');
+        this.root.appendChild(this._notifySnackbar);
+      }
+      this._notifySnackbar.innerHTML = e.detail.message;
+      this._notifySnackbar.open();
+    }
+  }
+  window.customElements.define(SuOficio.is, SuOficio);
+  </script>
+</dom-module>

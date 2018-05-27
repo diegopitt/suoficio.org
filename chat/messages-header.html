@@ -1,0 +1,144 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="messages-header">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .btn-wrap{
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+    }
+    paper-button.nav {
+      padding: 11px 16px !important;
+      display: block;
+    }
+    .head-wrap{
+      @apply --layout-horizontal;
+      position: relative;
+      height: 75px;
+      box-sizing: border-box;
+      padding: 14px 15px;
+      border-bottom: solid 1px var(--app-little-grey);
+      background-color: #f9f9f9;
+    }
+    .receiver-name{
+      @apply --su-oficio-font-nowrap;
+      font-size: 21px;
+      font-weight: 400;
+      line-height: 1.42857;
+      color: #222;
+    }
+    .job-name{
+      @apply --layout-flex;
+      @apply --su-oficio-font-nowrap;
+      font-size: 13px;
+      line-height: 1.42857;
+      color: #656565;
+    }
+    .detail-wrapper{
+      @apply --layout-flex;
+      @apply --su-oficio-font-nowrap;
+      padding-left: 6px;
+    }
+    paper-button.round {
+      color: #fff;
+      border-radius: 36px;
+      min-width: 36px;
+      height: 36px;
+      padding: 0px;
+      margin-right: 14px;
+    }
+    iron-icon {
+      height: 22px;
+      padding: 3px;
+    }
+    @media (max-width: 767px) {
+    .detail-wrapper{
+        padding-left: 0px;
+      }
+      .receiver-name{
+        font-size:16px;
+        padding-top:3px;
+        font-weight: 500;
+      }
+      .job-name{
+        font-size:12px;
+      }
+    }
+    </style>
+    <div class="head-wrap">
+      <div class="detail-wrapper">
+        <div class="receiver-name">[[receiverData.fn]] [[receiverData.ln]]</div>
+        <div class="job-name">[[jobData.name]]</div>
+      </div>
+      <dom-if if="[[selectedRoom.j]]">
+        <template>
+          <div class="btn-wrap">
+            <paper-button noink class="round blue" on-tap="_back">
+              <iron-icon icon="myicons:reply"></iron-icon>
+            </paper-button>
+          </div>
+        </template>
+      </dom-if>
+      <dom-if if="[[_isContract(selectedRoom.t)]]">
+        <template>
+          <div class="btn-wrap"><paper-button class="blue nav" on-tap="_goToContract">Ver Contrato</paper-button></div>
+        </template>
+      </dom-if>
+      <dom-if if="[[_isProposal(selectedRoom.t)]]">
+        <template>
+          <div class="btn-wrap"><paper-button class="blue nav" on-tap="_goToProposal">Ver Propuesta</paper-button></div>
+        </template>
+      </dom-if>
+    </div>
+  </template>
+  <script>
+  class MessagesHeader extends Polymer.Element {
+    static get is() {
+      return 'messages-header';
+    }
+    static get properties() {
+      return {
+        jobData: Object,
+        receiverData: Object,
+        selectedRoom: Object
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _isContract(status){
+      if(status == 1){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _back(){
+      this.dispatchEvent(new CustomEvent('reset-rooms', {bubbles: true, composed: true}));
+    }
+    _isProposal(status){
+      if(status == 0){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _goToContract(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: 'contratos/' + this.selectedRoom.c + '/d' } }));
+    }
+    _goToProposal(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: 'propuestas/' + this.selectedRoom.j } }));
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('messages-header.created');
+    }
+  }
+  window.customElements.define(MessagesHeader.is, MessagesHeader);
+  </script>
+</dom-module>

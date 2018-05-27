@@ -1,0 +1,286 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="data/app-timing-data.html">
+<link rel="import" href="redux/redux-mixin.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="proposal-details">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+      margin-top: 24px;
+    }
+
+    .copy>div {
+      margin: 14px 0;
+    }
+
+     :host([is-responsive]) {
+      @apply --layout-horizontal;
+      @apply --layout-fixed-bottom;
+      border-top: 1px solid #DBDBDB;
+      background-color: #fdfdfd !important;
+      box-sizing: border-box;
+      z-index: 1;
+    }
+     :host([is-responsive]) .copy > div {
+      margin: 0px;
+      padding-right: 14px;
+    }
+
+     :host([is-responsive]) .copy {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+
+     :host([is-responsive])>div {
+      @apply --layout-flex;
+      /* margin: 4px 0; */
+    }
+
+     :host([is-responsive]) paper-button {
+      border-radius: 0px;
+      @apply --layout-flex;
+      margin: 0px;
+      height: 74px;
+      font-size: 12px;
+    }
+
+     :host([is-responsive]) .xwhite {
+      font-size: 11px;
+      margin-top: 14px !important;
+    }
+
+     :host([is-responsive]) .proposal-budget {
+      font-size: 12px;
+    }
+
+    :host([is-responsive]) .time {
+      display: inline-block;
+      padding-top: 0px;
+      font-size: 12px;
+    }
+
+    paper-button {
+      @apply --layout;
+      margin: 20px 0px 0px 0px;
+    }
+    .big {
+      padding: 23px 50px !important;
+    }
+
+    .proposal-title {
+      color: #222;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .proposal-budget {
+      @apply --su-font-medium;
+    }
+
+    .proposal-timing {
+      @apply --su-font-medium;
+    }
+
+    .client-title {
+      @apply --su-font-medium;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+
+    .budget {
+      color: var(--app-green-font);
+      font-weight: 600;
+    }
+
+    iron-icon {
+      width: 16px;
+      height: 16px;
+      padding-right: 3px;
+    }
+
+    .time {
+      color:var(--app-aqua-font);
+      padding-top: 8px;
+    }
+
+    .strong {
+      font-weight: 500;
+    }
+
+    .xwhite {
+      color: var(--app-font-color-light);
+      font-size: 12px;
+      margin-top: 16px !important;
+    }
+
+    @media (max-width: 767px) {
+      .proposal-budget {
+        @apply --su-font-small;
+        line-height: 14px;
+        font-weight: 500;
+      }
+       :host([is-invite]){
+        margin: 0px;
+        padding: 0px;
+      }
+      :host([is-invite]) paper-button{
+        margin: 0px;
+        height:64px;
+        border-radius: 0px;
+      }
+      :host([is-responsive]) {}
+        .xwhite {
+          box-shadow: none;
+          padding: 0px !important;
+        }
+      }
+       :host([is-responsive]) .copy > div {
+        margin: 0px;
+        padding: 0px 4px;
+      }
+    }
+    </style>
+    <app-timing-data time-value="[[proposal.timing]]" time="{{time}}"></app-timing-data>
+    <dom-if if="[[!isInvite]]">
+      <template>
+        <dom-if if="[[!_hasContract]]">
+          <template>
+            <div class="copy">
+              <dom-if if="[[!isResponsive]]">
+                <template>
+                  <div class="client-title">Cliente: [[clientName]] [[clientLast]]</div>
+                </template>
+              </dom-if>
+              <div>
+                <div class="proposal-budget">Recibiras <span class="budget">$[[proposal.budget]]</span> Pesos</div>
+                <dom-if if="[[isResponsive]]">
+                  <template>
+                    <span class="time">[[time.title]]</span>
+                  </template>
+                </dom-if>
+              </div>
+              <dom-if if="[[!isResponsive]]">
+                <template>
+                  <div class="proposal-timing"><span class="strong">Tiempo aproximado</span> para llevar a cabo el trabajo&nbsp;<span class="time">[[time.title]]</span></div>
+                </template>
+              </dom-if>
+            </div>
+          </template>
+        </dom-if>
+        <div class="actions">
+          <dom-if if="[[_hasContract]]">
+            <template>
+              <paper-button class="blue" on-tap="_showContract">Ver Contrato</paper-button>
+            </template>
+          </dom-if>
+          <dom-if if="[[!_hasContract]]">
+            <template>
+              <paper-button class="green" disabled$="[[jobOpen]]">Modificar Propuesta</paper-button>
+              <dom-if if="[[!isResponsive]]">
+                <template>
+                  <div class="cancel-proposal">
+                    <paper-button class="xwhite" hidden$="[[jobOpen]]" on-tap="_showContract"><iron-icon icon="myicons:close"></iron-icon>Cancela tu propuesta</paper-button>
+                  </div>
+                </template>
+              </dom-if>
+            </template>
+          </dom-if>
+        </div>
+      </template>
+    </dom-if>
+    <dom-if if="[[isInvite]]">
+      <template>
+        <dom-if if="[[!isResponsive]]">
+          <template>
+            <div class="client-title">Te interesa esta propuesta?</div>
+          </template>
+        </dom-if>
+        <paper-button class="green" on-tap="_acceptInvite">Aceptar Invitacion</paper-button>
+        <dom-if if="[[isResponsive]]">
+          <template>
+            <paper-button class="white" on-tap="_rejectInvite">Rechazar Invitacion</paper-button>
+          </template>
+        </dom-if>
+        <dom-if if="[[!isResponsive]]">
+          <template>
+            <paper-button class="xwhite" on-tap="_rejectInvite"><iron-icon icon="myicons:close"></iron-icon>Rechazar Invitacion</paper-button>
+          </template>
+        </dom-if>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class ProposalDetails extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'proposal-details';
+    }
+    static get properties() {
+      return {
+        clientName: String,
+        clientLast: String,
+        uid: String,
+        jobKey: String,
+        client: Object,
+        jobOpen: Boolean,
+        isResponsive: {
+          type: Boolean,
+          value: false
+        },
+        isInvite: {
+          type: Boolean,
+          value: false
+        },
+        proposalInvitation: Boolean,
+        contracts: {
+          type: Array,
+          statePath: 'all_contracts'
+        },
+        selected_proposal: {
+          type: String,
+          statePath: 'selected_proposal'
+        },
+        _contractKey: {
+          type: String,
+          computed: '_computeContractKey(contracts, selected_proposal)'
+        },
+        _hasContract: {
+          type: Boolean,
+          computed: '_computeHasContract(contracts, selected_proposal)'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _acceptInvite(){
+      firebase.app().database().ref(`/users/${this.uid}/invitations/${this.jobKey}/a`).set(true).then(() => {
+        this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: '/propuestas/' + this.jobKey } }));
+      });
+    }
+    _computeHasContract(contracts, proposal) {
+      if (contracts === undefined) return;
+      return contracts[proposal] ? true : false;
+    }
+    _computeContractKey(contracts, proposal) {
+      return contracts[proposal];
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('proposal-details.created');
+    }
+    _showContract() {
+      this.dispatchEvent(new CustomEvent('change-route', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          location: '/contratos/' + this._contractKey
+        }
+      }));
+    }
+  }
+  window.customElements.define(ProposalDetails.is, ProposalDetails);
+  </script>
+</dom-module>

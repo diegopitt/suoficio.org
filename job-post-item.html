@@ -1,0 +1,227 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="job-post-item">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .item {
+      @apply --layout;
+      @apply --layout-center;
+      padding: 14px 0px;
+      width: 100%;
+    }
+    .item > .circle-w {
+      width: 50px;
+    }
+    .item > .post-date {
+      width: 126px;
+    }
+    .item > .job-title {
+      @apply --paper-font-common-nowrap;
+      @apply --layout-flex;
+      padding-right: 20px;
+    }
+    .item > .job-title a {
+      @apply --su-review-title;
+    }
+    .item > .job-proposals {
+      @apply --su-font-subtitle;
+      font-weight: 400 !important;
+      color:#222 !important;
+      width: 130px;
+    }
+    .item > .job-proposals a {
+      color:#222 !important;
+    }
+    .item > .job-status {
+      width: 76px;
+      @apply --paper-font-common-nowrap;
+      color: var(--app-green-color);
+      @apply --su-font-subtitle;
+    }
+    .chip{
+      @apply --layout-flex-none;
+    }
+    .chip.grey{
+      background-color: var(--app-little-grey);
+      margin-right: 10px;
+      border-radius: 0px;
+      color: var(--app-font-color);
+    }
+    .green {
+      background-color: var(--app-green-color);
+    }
+    .muted {
+      background-color: var(--app-muted-color);
+    }
+    .time {
+      color: var(--app-font-color);
+      @apply --paper-font-common-nowrap;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+    }
+    .days {
+      color: var(--app-font-color-light);
+      @apply --paper-font-common-nowrap;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+    }
+    .props {
+      display: none;
+    }
+    .title{
+      padding-left: 0;
+      font-size: 11px;
+      font-weight: 600;
+      color: #494949;
+      border: none;
+    }
+    .header{
+    }
+    @media (max-width: 767px) {
+      .job-proposals{
+        display:none;
+      }
+      .props {
+        display: block;
+        color: var(--app-font-color-light);
+        @apply --paper-font-common-nowrap;
+        font-size: 10px;
+        font-weight: 400;
+        line-height: 16px;
+      }
+      .time {
+        font-size: 12px;
+      }
+      .days {
+        font-size: 10px;
+      }
+      .item{
+        padding: 8px 0px;
+      }
+      .item > .job-title a {
+        @apply --su-font-medium-bold;
+      }
+      .item > .post-date {
+        width: 106px;
+      }
+      .item > .circle-w {
+        width: 30px;
+      }
+      .circle{
+        margin-left:8px;
+      }
+    }
+    </style>
+    <firebase-document path="/jobs/[[jobKey]]" data="{{job}}"></firebase-document>
+    <dom-if if="[[_shouldShowHeader(index)]]">
+      <template>
+        <div class="header">
+          <div class="item">
+            <div class="circle-w">
+              <div class="title"></div>
+            </div>
+            <div class="post-date">
+              <div class="title">FECHA</div>
+            </div>
+            <div class="job-title">
+              <div class="title">TRABAJO</div>
+            </div>
+            <div class="job-proposals">
+              <dom-if if="[[_isActive(status)]]">
+                <template>
+                  <div class="title">PROPUESTAS</div>
+                </template>
+              </dom-if>
+              <dom-if if="[[!_isActive(status)]]">
+                <template>
+                  <div class="title">CONTRATACIONES</div>
+                </template>
+              </dom-if>
+            </div>
+          </div>
+        </div>
+      </template>
+    </dom-if>
+    <div class="item">
+      <div class="circle-w">
+        <div class$="circle [[_computeColor(job.ishired)]]"></div>
+      </div>
+      <div class="post-date">
+        <div class="time">[[_getPostTime(job.date)]]</div>
+        <div class="days">[[_getPostDays(job.date)]]</div>
+      </div>
+      <div class="job-title">
+        <a href="/candidatos/[[jobKey]]/trabajo">[[job.name]]</a>
+        <dom-if if="[[_isActive(status)]]">
+          <template>
+            <div class="props">[[job.proposals]] Propuestas</div>
+          </template>
+        </dom-if>
+        <dom-if if="[[!_isActive(status)]]">
+          <template>
+            <div class="props">[[job.hires]] Contrataciones</div>
+          </template>
+        </dom-if>
+      </div>
+      <div class="job-proposals">
+        <div>
+          <dom-if if="[[_isActive(status)]]">
+            <template>
+              <a href="/candidatos/[[jobKey]]/propuestas">[[job.proposals]] Propuestas</a>
+            </template>
+          </dom-if>
+          <dom-if if="[[!_isActive(status)]]">
+            <template>
+              <a href="/candidatos/[[jobKey]]/contrataciones">[[job.hires]] Contrataciones</a>
+            </template>
+          </dom-if>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class JobPostItem extends Polymer.Element {
+    static get is() {
+      return 'job-post-item';
+    }
+    static get properties() {
+      return {
+        status: String,
+        jobKey: String,
+        job: Object,
+        index: Number
+      };
+    }
+    _shouldShowHeader(index) {
+      return (index === 0);
+    }
+    _isActive(status){
+      if (status === 'a'){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _computeColor(isActive) {
+      return (isActive) ? 'muted' : 'green';
+    }
+    _getPostTime(timestamp) {
+      return moment(timestamp).format('L');
+    }
+    _getPostDays(timestamp) {
+      return moment(timestamp).fromNow();
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-post-item.created');
+    }
+  }
+  window.customElements.define(JobPostItem.is, JobPostItem);
+  </script>
+</dom-module>

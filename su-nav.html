@@ -1,0 +1,115 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-nav">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+      @apply --layout-flex;
+    }
+    .SwitchButtons{
+      width: 100%;
+      font-size: 14px;
+      clear: both;
+    }
+    .SwitchButtons-options{
+      @apply --layout-horizontal;
+    }
+    .SwitchButtons-option {
+      border: 1px solid var(--app-little-grey);
+      @apply --layout-flex;
+      height: 34px;
+      line-height: 34px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: top;
+      position: relative;
+      padding: 12px 8px;
+      background-color: #F3F6F8;
+      text-align: center;
+      font-weight: 500;
+      cursor: pointer;
+      -webkit-transition: box-shadow .2s,background-color .2s ease;
+      transition: box-shadow .2s,background-color .2s ease;
+      /* box-shadow: inset 0 0 1px #fff; */
+    }
+    .SwitchButtons-option:first-of-type {
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 0px;
+    }
+    .SwitchButtons-option:last-of-type {
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 0px;
+        border-right: 1px solid rgba(0,0,0,.12);
+    }
+    .SwitchButtons-option-label {
+        display: inline-block;
+        font-size: 12px;
+        width:100%;
+    }
+    .SwitchButtons-option-label a{
+      width: 100%;
+      display: inline-block;
+      color: var(--app-font-color-light);
+      font-size: 12px;
+      outline: none;
+      text-decoration: none;
+    }
+    .SwitchButtons-option[selected] a{
+      color: var(--app-aqua-font);
+    }
+    .SwitchButtons-option[selected] {
+      background-color: #fff;
+    }
+    @media (max-width: 767px) {
+      .SwitchButtons{
+        width: calc(100% + 1px);
+      }
+      .SwitchButtons-options {
+        /* @apply --layout-vertical; */
+      }
+      .SwitchButtons-option{
+        border: 0px solid var(--app-little-grey);
+        box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        padding: 0 8px;
+      }
+       :host {
+        margin: 0px 8px;
+      }
+    }
+    </style>
+    <div class="SwitchButtons">
+      <div class="SwitchButtons-options">
+        <div class="SwitchButtons-option" selected$="[[_isDetails(type)]]"><span class="SwitchButtons-option-label"><a class="link" href="[[route]]/d" tabindex="-1">Detalles del Contrato</a></span></div>
+        <div class="SwitchButtons-option" selected$="[[!_isDetails(type)]]"><span class="SwitchButtons-option-label"><a class="link" href="[[route]]/m" tabindex="-1">Mensajes</a></span></div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class SuNab extends Polymer.Element {
+    static get is() {
+      return 'su-nav';
+    }
+    static get properties() {
+      return {
+        type: String
+      };
+    }
+    _isDetails(type){
+      if (type === undefined) return;
+      if (type === 'd'){
+        return true;
+      }
+      if (type === 'm'){
+        return false;
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-nav.created');
+    }
+  }
+  window.customElements.define(SuNab.is, SuNab);
+  </script>
+</dom-module>

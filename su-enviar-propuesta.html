@@ -1,0 +1,264 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="data/app-timing-data.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-enviar-propuesta">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      padding-top:30px;
+    }
+    .jobs-wrap {
+      @apply --layout-flex;
+      @apply --common-borders;
+    }
+    .job-desc{
+      @apply --layout-flex;
+      color: var(--app-font-color-light);
+      font-size: 13px;
+      line-height: 1.42857;
+      margin: 24px 0;
+    }
+    .foot-head{
+      @apply --layout-flex;
+      padding: 24px;
+    }
+    .foot-last{
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+      padding: 24px;
+    }
+    .body-wrap{
+      @apply --layout-flex;
+      padding: 20px 30px;
+    }
+    .main-title{
+      @apply --su-page-title;
+      @apply --layout-horizontal;
+      @apply --layout-flex;
+      @apply --layout-center;
+    }
+    .tabs-wrap{
+      @apply --layout-flex;
+      padding-top: 6px;
+      line-height: 23px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .foot{
+      @apply --layout-flex;
+      border-top: 1px solid #e0e0e0;
+    }
+    .head{
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      @apply --layout-horizontal;
+      background-color: #f9f9f9;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    select {
+      @apply --su-oficio-font-base;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      outline: none;
+      padding: 14px 36px 14px 18px;
+      font-size: 14px;
+      background-color: #fff !important;
+      margin-left: 36px;
+      border: 1px solid transparent;
+      color: var(--app-aqua-font);
+      background: url(../images/a-down.svg) no-repeat right;
+      background-size: 34px 34px;
+      -webkit-box-shadow: 0 1px 6px rgba(57,73,76,0.35);
+      box-shadow: 0 1px 6px rgba(57,73,76,0.35);
+    }
+    option{
+      color: var(--app-font-color);
+    }
+    .time-title{
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    textarea {
+      width: calc(100% - 56px);
+      border: 1px solid transparent;
+    }
+    .input {
+      @apply --su-oficio-font-base;
+      margin: 0px;
+      outline: none;
+      padding: 14px 10px;
+      font-size: 16px;
+      border: 1px solid transparent;
+      margin-left: 36px;
+      line-height: 24px;
+      color: var(--app-font-color);
+      -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      -webkit-box-shadow: 0 1px 6px rgba(57,73,76,0.35); */
+      box-shadow: 0 1px 6px rgba(57,73,76,0.35);
+    }
+    .error {
+      border-color: var(--app-red-color) !important;
+    }
+    .main-title{
+      padding: 24px 20px;
+      @apply --su-font-subhead;
+    }
+    @media (max-width: 767px) {
+      .main-title{
+        @apply --su-font-medium;
+        line-height: 24px;
+        padding: 12px 0px 8px 16px;
+      }
+      .foot-last{
+        padding: 0px;
+      }
+      .input {
+        width: calc(100% - 28px);
+        margin: 0px;
+      }
+      select {
+        width: calc(100% - 8px);
+        margin: 0px;
+      }
+      .body-wrap{
+        padding: 8px 8px 20px 8px;
+      }
+      .foot-head{
+        padding: 16px 8px 20px 16px;
+      }
+      .tabs-wrap{
+        padding: 8px;
+        @apply --su-font-medium;
+        font-weight: 500;
+      }
+      .job-desc{
+        padding: 6px 8px;
+        margin: 0px 0px 8px 0px;
+        font-size: 12px;
+      }
+      [responsive]{
+        @apply --layout-fixed-bottom;
+        height: 74px;
+        z-index: 1;
+        margin:0px;
+      }
+      .jobs-wrap {
+        margin-bottom: 78px !important;
+      }
+    }
+    </style>
+    <app-route active="{{isActive}}" route="{{route}}" pattern="/:job_id" data="{{routeData}}"></app-route>
+    <firebase-document path="/jobs/[[routeData.job_id]]" data="{{job}}"></firebase-document>
+    <dom-if if="[[_showForm]]">
+      <template>
+        <app-timing-data times="{{times}}"></app-timing-data>
+        <div class="jobs-wrap">
+          <div class="head">
+            <div class="main-title">Envia tu Propuesta</div>
+          </div>
+          <div class="body-wrap">
+            <div class="tabs-wrap">
+              [[job.name]]
+            </div>
+            <div class="job-desc">
+              [[job.description]]
+            </div>
+          </div>
+          <div class="foot-head foot">
+            <div class="time-title">Presupuesto</div>
+            <input id="psto" class$="input [[s_amount]]" type="text" name="psto">
+          </div>
+          <div class="foot-head foot">
+            <div class="time-title">Plazo en el que llevaras a cabo el proyecto</div>
+            <select id="timeSelect" aria-labelledby="sizeLabel" class$="[[s_timing]]">
+              <option value = "0">Seleccione una opcion</option>
+              <template is="dom-repeat" items="[[times]]">
+                <option value="[[item.value]]">[[item.title]]</option>
+              </template>
+            </select>
+          </div>
+          <div class="foot-head foot">
+            <div class="time-title">Describe como llevaras a cabo el proyecto</div>
+            <textarea id="desc" class$="input [[s_desc]]" rows="8" cols="50"></textarea>
+          </div>
+          <div class="foot-last">
+            <paper-button responsive disabled$="[[_checkBtn(job.maxprop,job.ishired)]]" class="green" on-tap="_sendProposal">
+              &nbsp;Enviar&nbsp;
+            </paper-button>
+          </div>
+        </div>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class SuEnviarPropuesta extends Polymer.Element {
+    static get is() {
+      return 'su-enviar-propuesta';
+    }
+    static get properties() {
+      return {
+        visible: {
+          type: Boolean,
+          value: false
+        },
+        s_amount: String,
+        s_timing: String,
+        s_desc: String,
+        uid: String
+      };
+    }
+    static get observers() {
+      return [
+        '_shouldShowForm(isActive, visible, job.budget)',
+      ]
+    }
+    _shouldShowForm(isActive, visible, job){
+      if(isActive && visible && job !== undefined) {
+        this._showForm = true;
+      };
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-enviar-propuesta.created');
+    }
+    _checkBtn(maxP, ishired) {
+      if (maxP || ishired) return true;
+    }
+    _sendProposal() {
+      let error;
+      if (this.shadowRoot.querySelector('#timeSelect').value === '0') {
+        this.s_timing = 'error';
+        error = true;
+      }
+      if (this.shadowRoot.querySelector('#psto').value === '') {
+        this.s_amount = 'error';
+        error = true;
+      }
+      if (this.shadowRoot.querySelector('#desc').value === '') {
+        this.s_desc = 'error';
+        error = true;
+      }
+      if (error) return;
+      let proposalDetails = {
+        budget: this.shadowRoot.querySelector('#psto').value,
+        timing: parseInt(this.shadowRoot.querySelector('#timeSelect').value, 10),
+        ischat: false,
+        hired: false,
+        description: this.shadowRoot.querySelector('#desc').value
+      };
+      let promise = firebase.app().database().ref(`/proposals/${this.routeData.job_id}/${this.uid}`).set(proposalDetails);
+      promise.then( () => {
+        this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: `propuestas/${this.routeData.job_id}` } }));
+        this.dispatchEvent(new CustomEvent('notify-user', {bubbles: true, composed: true, detail: { message: 'Su propuesta de trabajo ha sido enviada' } }));
+      });
+    }
+  }
+  window.customElements.define(SuEnviarPropuesta.is, SuEnviarPropuesta);
+  </script>
+</dom-module>

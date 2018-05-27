@@ -1,0 +1,131 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-ingresar">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      height: calc(100vh - 74px);
+    }
+    paper-button {
+      padding: 11px 36px;
+    }
+    .box-wrap{
+      @apply --common-borders;
+      padding:20px;
+      width:540px;
+    }
+    .box-wrap > div{
+      margin:0px 0;
+      padding:12px 16px;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    .box-header{
+      margin-bottom: 12px !important;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--app-font-color);
+    }
+    .submit-button{
+      margin-top: 12px !important;
+    }
+    .user-input {
+      width: 96%;
+      outline: none;
+      margin: 0px;
+      transition: all .5s;
+      border: 1px solid var(--app-muted-color);
+      padding-left: 40px;
+      font-size: 14px;
+      line-height: 2.46;
+      color: var(--app-font-color);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      -webkit-transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+    }
+    .user-password{
+      @apply --layout-vertical;
+    }
+    .email{
+      background: url(../images/messages.svg) no-repeat scroll 7px 7px;
+    }
+    .pass{
+      background: url(../images/lock.svg) no-repeat scroll 7px 7px;
+    }
+    .user-input:hover {
+      border-color: var(--app-accent-green);
+    }
+    .error{
+      @apply --su-font-small-bold;
+      color: var(--app-red-color);
+      padding-left: 24px;
+      margin-top:10px;
+    }
+    .error2{
+      border-color: var(--app-red-color);
+    }
+    @media (max-width: 767px) {
+      .box-wrap{
+        padding:4px;
+        border: none;
+        box-shadow: none;
+      }
+    }
+    </style>
+    <iron-a11y-keys target="[[_input]]" keys="enter" on-keys-pressed="_login"></iron-a11y-keys>
+    <div class="box-wrap">
+      <div class="box-header">Ingresa a suoficio</div>
+      <div class="user-name">
+        <input placeholder="Correo Electronico" class$="user-input email [[s_class]]" value="{{email::input}}">
+      </div>
+      <div class="user-password">
+        <input id="password" placeholder="Contraseña" type="password" class$="user-input pass [[s_class]]" value="{{password::input}}">
+      </div>
+      <div class="submit-button">
+        <paper-button class="green" on-tap="_login">Ingresar</paper-button>
+      </div>
+    </div>
+  </template>
+  <script>
+  class SuIngresar extends Polymer.Element {
+    static get is() {
+      return 'su-ingresar';
+    }
+    static get properties() {
+      return {
+        s_class: String,
+        email: String,
+        password: String,
+        _emailError: {
+          Type: Boolean,
+          value: false
+        },
+      };
+    }
+    _isEmail(email) {
+      let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    }
+    _login(){
+      this._emailError = (!this._isEmail(this.email)) ? true : false;
+      this._passError = (this.password === undefined) ? true : false;
+      if (this._emailError || this._passError) {
+        this.s_class = 'error2';
+        return;
+      };
+      this.dispatchEvent(new CustomEvent('do-login', {bubbles: true, composed: true, detail: { email: this.email, pass: this.password } }));
+    }
+    ready() {
+      super.ready();
+      this._input = this.$.password;
+    }
+  }
+  window.customElements.define(SuIngresar.is, SuIngresar);
+  </script>
+</dom-module>

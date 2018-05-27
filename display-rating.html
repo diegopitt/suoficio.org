@@ -1,0 +1,134 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<dom-module id="display-rating">
+  <template>
+    <style>
+    :host {
+      display: inline-block;
+      position: relative;
+      white-space: nowrap;
+      @apply --display-rating;
+    }
+
+    :host([big]) .star {
+      width: 26px;
+      height: 26px;
+      padding: 0px;
+    }
+    :host([medium]) .star {
+      width: 14px;
+      height: 14px;
+      padding: 0px;
+    }
+    :host([tiny]) .star {
+      width: 11px;
+      height: 11px;
+      padding: 0px;
+    }
+    .background-rating {
+      color: var(--app-little-grey);
+    }
+    
+    .foreground-rating {
+      color: var(--app-aqua-font);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    
+    .item {
+      display: inline-block;
+      cursor: default;
+    }
+    
+    .item-icon {
+      overflow: hidden;
+    }
+    
+    .star {
+      width: 16px;
+      height: 16px;
+      padding: 0px;
+    }
+    
+    </style>
+    <div class="background-rating">
+      <dom-repeat items="[[limitItems]]">
+        <template strip-whitespace>
+          <iron-icon class="star" icon="myicons:star"></iron-icon>
+        </template>
+      </dom-repeat>
+    </div>
+    <div class="foreground-rating">
+      <dom-repeat items="[[limitItems]]">
+        <template strip-whitespace>
+          <div class="item">
+            <div class="item-icon">
+              <iron-icon class="star" icon="myicons:star"></iron-icon>
+            </div>
+          </div>
+        </template>
+      </dom-repeat>
+    </div>
+  </template>
+  <script>
+  class DisplayRating extends Polymer.Element {
+    static get is() {
+      return 'display-rating';
+    }
+    static get properties() {
+      return {
+        limit: {
+          type: Number,
+          value: 5,
+          observer: 'renderItems'
+        },
+        score: Number,
+        value: {
+          type: Number,
+          value: 0,
+          observer: '_reset'
+        },
+        limitItems: {
+          type: Array,
+          readOnly: true
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+    }
+    ready() {
+      super.ready();
+      this._reset();
+    }
+    _refreshRating(value) {
+      let items = Polymer.dom(this.root).querySelectorAll('.item-icon');
+      for (let i = 0; i < items.length; i++) {
+        items[i].style.width = Math.min(Math.max(value - i, 0), 1) * 100 + '%';
+      }
+    }
+    renderItems() {
+      let limitItems = [];
+      for (let i = 0; i < this.limit; i++) {
+        limitItems.push(i);
+      }
+      this._setLimitItems(limitItems);
+    }
+    _reset() {
+      Polymer.Async.timeOut.run(() => {
+        this._refreshRating(this.value);
+      });
+    }
+    connectedCallback() {
+      super.connectedCallback();
+    }
+  }
+  window.customElements.define(DisplayRating.is, DisplayRating);
+  </script>
+</dom-module>

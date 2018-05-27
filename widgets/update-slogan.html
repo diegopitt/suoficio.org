@@ -1,0 +1,125 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="update-slogan">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      outline:none;
+      display: block;
+      color: #222;
+      @apply --su-oficio-font-base;
+    }
+    :host([no-wrapper]) .wrapper {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+    :host([no-wrapper]) h2{
+      display: none !important;
+    }
+    :host(:not([no-wrapper])) .wrapper{
+      @apply --common-borders;
+    }
+    .wrapper{
+      @apply --layout-flex;
+      margin: 0 -30px;
+      padding: 30px;
+    }
+    h2{
+      color: var(--app-font-color);
+      word-break: break-word;
+      margin: 0 0 30px;
+      line-height: 28px;
+      font-size: 22px ;
+      font-weight: 400;
+    }
+    .content-wrap{
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
+    label {
+      font-size: 15px;
+      color: var(--app-font-color-light);
+    }
+    .input {
+      @apply --su-oficio-font-base;
+      width: 100%;
+      border: 1px solid var(--app-muted-color);
+      padding: 11px 10px;
+      font-size: 14px;
+      outline: none;
+      margin: 10px 0px 24px 0px;
+      line-height: 14px;
+      color: #656565;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      -webkit-transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+    }
+    .error{
+      border-color: var(--app-red-color);
+    }
+    .input:hover {
+      border-color: var(--app-aqua-font);
+    }
+    .input:focus {
+      border-color: var(--app-aqua-font);
+    }
+    .section{
+      @apply --layout-flex;
+      margin: 0px 14px;
+    }
+    @media (max-width: 767px) {
+      .section{
+        
+      }
+    }
+    </style>
+    <div class="wrapper">
+      <div class="section">
+        <h2>Titulo de tu Perfil</h2>
+        <label>Ingresa un titulo profesional</label>
+        <div class="content-wrap">
+          <input autofocus class="input" id="title" placeholder="Ejemplo: Electrisista con 20 años de experiencia" type="text" name="title" value="{{userSlogan::input}}">
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class UpdateSlogan extends Polymer.Element {
+    static get is() {
+      return 'update-slogan';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        userSlogan: String,
+        saveData:{
+          type: Boolean,
+          notify: true,
+          observer: '_saveData'
+        },
+      };
+    }
+    _saveData(save){
+      if(save){
+        let p1 = firebase.app().database().ref(`/users/${this.uid}/profile/slogan`).set(this.userSlogan);
+        p1.then( () => {
+          console.log('just saved!');
+          this.dispatchEvent(new CustomEvent('close-dialog', {bubbles: true, composed: true, detail: { test: '1' } }));
+        });
+        this.saveData = false;
+      }
+    }
+    ready(){
+      super.ready();
+      firebase.app().database().ref(`/users/${this.uid}/profile/slogan`).once('value').then(function(snapshot) {
+       this.userSlogan = snapshot.val();
+      }.bind(this));
+    }
+    constructor() {
+      super();
+      //this.attachShadow({mode: 'open', delegatesFocus: true});
+    }
+  }
+  window.customElements.define(UpdateSlogan.is, UpdateSlogan);
+  </script>
+</dom-module>

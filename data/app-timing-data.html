@@ -1,0 +1,56 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="app-timing-data">
+  <script>
+  (function() {
+    let timesList = [{
+      title: 'Inmediato',
+      value: 1
+    }, {
+      title: 'Dentro de 2 Dias',
+      value: 2
+    }, {
+      title: 'Dentro de 2 Semanas',
+      value: 3
+    }, {
+      title: 'Dentro de 2 Meses',
+      value: 4
+    }, {
+      title: 'Mas 2 Meses',
+      value: 5
+    }];
+    class appTimingData extends Polymer.Element {
+      static get is() {
+        return 'app-timing-data';
+      }
+      static get properties() {
+        return {
+          timeValue: Number,
+          times: {
+            type: Array,
+            value: timesList,
+            readOnly: true,
+            notify: true
+          },
+          time: {
+            type: Object,
+            computed: '_computeTime(timeValue)',
+            notify: true
+          }
+        }
+      }
+      _getTimeObject(timeValue) {
+        for (let i = 0, c; c = this.times[i]; ++i) {
+          if (c.value === timeValue) {
+            return c;
+          }
+        }
+      }
+      _computeTime(timeValue) {
+        let categoryObj = this._getTimeObject(timeValue);
+        return categoryObj;
+      }
+    }
+    customElements.define(appTimingData.is, appTimingData);
+  })();
+  </script>
+</dom-module>

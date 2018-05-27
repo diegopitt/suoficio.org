@@ -1,0 +1,40 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="two-columns.html">
+<link rel="import" href="job-card.html">
+<link rel="import" href="job-post-details-details.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="job-post-details">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      padding:0px;
+    }
+    </style>
+    <two-columns show-line reverse content-width="730" side-width="260" gutter="20">
+      <job-card is-post slot="content" job-key="[[jobKey]]" job="[[job]]"></job-card>
+      <job-post-details-details is-hired="[[job.ishired]]" slot="sidebar"></job-post-details-details>
+    </two-columns>
+  </template>
+  <script>
+  class JobPostDetails extends Polymer.Element {
+    static get is() {
+      return 'job-post-details';
+    }
+    static get properties() {
+      return {
+        jobKey: String,
+        job: Object
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-post-details.created');
+    }
+  }
+  window.customElements.define(JobPostDetails.is, JobPostDetails);
+  </script>
+</dom-module>

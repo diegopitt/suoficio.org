@@ -1,0 +1,246 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="freelancer-mixin.html">
+<dom-module id="freelancer-bindings">
+  <template>
+    <style>
+    :host {
+      display: none;
+    }
+    </style>
+  </template>
+  <script>
+  class FreelancerBindings extends FreelancerMixin(Polymer.Element) {
+    static get is() {
+      return 'freelancer-bindings';
+    }
+    static get properties() {
+      return {
+        uid: String
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _syncProposals(proposals){
+      let pa = {};
+      let ps = {};
+      let pall = {};
+      if (proposals.child("s").exists()){
+        let sent = proposals.child("s").val();
+        for (var key of Object.keys(sent)) {
+          ps[key] = true;
+          pall[key] = true;
+        }
+      }
+      if (proposals.child("a").exists()){
+        let actives = proposals.child("a").val();
+        for (var key of Object.keys(actives)) {
+          pa[key] = true;
+          pall[key] = true;
+        }
+      }
+      pa['count'] = Object.keys(pa).length;
+      ps['count'] = Object.keys(ps).length;
+      pall['count'] = Object.keys(pall).length;
+      this.dispatch('activeProposals', [ps, pa, pall]);
+      console.log('Proposals Synced');
+    }
+    _synccontracts(contracts) {
+      let C_all = {};
+      let C_active = {};
+      let C_inactive = {};
+      if (contracts.child("a").exists()){
+        let actives = contracts.child("a").val();
+        for (var key of Object.keys(actives)) {
+          C_active[actives[key].jobkey] = key;
+          C_all[actives[key].jobkey] = key;
+        }
+      }
+      if (contracts.child("i").exists()){
+        let inactives = contracts.child("i").val();
+        for (var key of Object.keys(inactives)) {
+          C_inactive[inactives[key].jobkey] = key;
+          C_all[inactives[key].jobkey] = key;
+        }
+      }
+      C_active['count'] = Object.keys(C_active).length;
+      C_inactive['count'] = Object.keys(C_inactive).length;
+      C_all['count'] = Object.keys(C_all).length;
+      this.dispatch('Contracts', [C_all, C_active, C_inactive]);
+      console.log('Contracts Synced');
+    }
+    _syncchats(chats){
+      let C_chats = {};
+      if (chats.hasChildren()) {
+        Object.keys(chats.val()).forEach(key => {
+          C_chats[key] = true;
+        })
+      }
+      C_chats['count'] = Object.keys(C_chats).length;
+      this.dispatch('userchats', [C_chats]);
+      console.log('Chats Synced');
+    }
+    _syncInvites(invitations){
+      let invites = {};
+      if (invitations.hasChildren()) {
+        Object.keys(invitations.val()).forEach(function(val) {
+          invites[val] = true;
+        });
+      };
+      invites['count'] = Object.keys(invites).length;
+      this.dispatch('userinvites', [invites]);
+      console.log('invites Synced');
+    }
+    _syncfavs(favorites){
+      if(!favorites){
+        this.dispatch('Favorites', []);
+      }else{
+        this.dispatch('Favorites', favorites);
+      };
+      console.log('Favorites Synced');
+    }
+    _syncprofiledesc(desc){
+      this.dispatch('userdescription', desc);
+      console.log('P Description Synced');
+    }
+    _syncprofileslogan(slogan){
+      this.dispatch('userslogan', slogan);
+      console.log('P Slogan Synced');
+    }
+    _synccategories(categories){
+      this.dispatch('usercategories', categories);
+      console.log('categories Synced');
+    }
+    _syncname(name){
+      this.dispatch('username', name);
+      console.log('name Synced');
+    }
+    _synclast(last){
+      this.dispatch('userlast', last);
+      console.log('lastname Synced');
+    }
+    _syncjobcount(jcount){
+      this.dispatch('jobcount', jcount);
+      console.log('jobs count Synced');
+    }
+    _syncreviewcount(rcount){
+      this.dispatch('reviewcount', rcount);
+      console.log('reviews count Synced');
+    }
+    _syncscore(score){
+      this.dispatch('userscore', score);
+      console.log('score Synced');
+    }
+    _syncworth(worth){
+      this.dispatch('userworth', worth);
+      console.log('worth Synced');
+    }
+    _syncvisibility(visibility){
+      this.dispatch('uservibility', visibility);
+      console.log('sibility Synced');
+    }
+    _syncprofilepicture(picure){
+      this.dispatch('profilepicture', picure);
+      console.log('profile picure Synced');
+    }
+    _syncuserlocation(location){
+      this.dispatch('userlocation', location);
+      console.log('location Synced');
+    }
+    _syncaccouttype(atype){
+      this.dispatch('accounttype', atype);
+      console.log('account type Synced');
+    }
+    _syncprofilecomplete(pcomplete){
+      this.dispatch('profilecomplete', pcomplete);
+      console.log('profile complete Synced');
+    }
+    _synchasreview(hreview){
+      this.dispatch('hasreview', hreview);
+      console.log('has review Synced');
+    }
+    _synchasnotification(hnotification){
+      this.dispatch('hasnotification', hnotification);
+      console.log('has notification Synced');
+    }
+    _synchasmessage(hmessage){
+      this.dispatch('hasmessage', hmessage);
+      console.log('has message Synced');
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('freelancer-bindings.created');
+    }
+    ready() {
+      super.ready();
+      firebase.app().database().ref(`/users/${this.uid}/contracts`).on('value', function(snapshot){
+        this._synccontracts(snapshot);
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/proposals`).on('value', function(snapshot){
+        this._syncProposals(snapshot);
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/invitations`).on('value', function(snapshot){
+        this._syncInvites(snapshot);
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/favs`).on('value', function(snapshot){
+        this._syncfavs(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/profile/description`).on('value', function(snapshot){
+        this._syncprofiledesc(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/profile/slogan`).on('value', function(snapshot){
+        this._syncprofileslogan(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/c`).on('value', function(snapshot){
+        this._synccategories(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/fn`).on('value', function(snapshot){
+        this._syncname(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/ln`).on('value', function(snapshot){
+        this._synclast(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/chats`).on('value', function(snapshot){
+        this._syncchats(snapshot);
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/jc`).on('value', function(snapshot){
+        this._syncjobcount(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/rc`).on('value', function(snapshot){
+        this._syncreviewcount(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/sc`).on('value', function(snapshot){
+        this._syncscore(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/wo`).on('value', function(snapshot){
+        this._syncworth(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/vi`).on('value', function(snapshot){
+        this._syncvisibility(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/pf`).on('value', function(snapshot){
+        this._syncprofilepicture(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/l`).on('value', function(snapshot){
+        this._syncuserlocation(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/a/t`).on('value', function(snapshot){
+        this._syncaccouttype(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/a/pc`).on('value', function(snapshot){
+        this._syncprofilecomplete(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/hr`).on('value', function(snapshot){
+        this._synchasreview(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/hm`).on('value', function(snapshot){
+        this._synchasmessage(snapshot.val());
+      }.bind(this));
+      firebase.app().database().ref(`/users/${this.uid}/account/hn`).on('value', function(snapshot){
+        this._synchasnotification(snapshot.val());
+      }.bind(this));
+    }
+  }
+  window.customElements.define(FreelancerBindings.is, FreelancerBindings);
+  </script>
+</dom-module>

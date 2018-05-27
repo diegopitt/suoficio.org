@@ -1,0 +1,221 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link href="https://fonts.googleapis.com/css?family=Alegreya+Sans:900" rel="stylesheet">
+<link rel="import" href="../su-animations.html">
+<dom-module id="banner-content">
+  <template>
+    <style include="su-animations">
+    :host {
+      display: block;
+      max-width: 1000px;
+      width: 100%;
+      color: #fff;
+      text-shadow: 2px 2px 4px black, 0 0 2em black, 0 0 0.2em black;
+    }
+    .header {
+      width: 100%;
+      letter-spacing: .125em;
+      @apply --layout-flex;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      color: #fff;
+      font-family: 'Alegreya Sans';
+      padding: 20px 0px 0px 0px;
+      font-size: 50px;
+      font-weight: 900;
+    }
+    
+    p {
+      color: var(--app-accent-color);
+      font-size: 24px;
+      font-weight: 400;
+    }
+
+    .wrap {
+      color: #fff;
+      width: 100%;
+      position:relative;
+      height:190px;
+    }
+
+    .steps {
+      @apply --layout-vertical;
+      @apply --layout-flex-auto;
+      padding: 20px;
+      border-radius: 6px;
+      margin: 20px 10px 20px 10px;
+      position:absolute;
+      top:0;
+      left:0;
+    }
+    
+    .center {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    
+    .text {
+      color: #fff;
+      font-weight: 300;
+      font-size: 18px;
+      padding: 10px 10px 10px 0px;
+      @apply --layout-flex;
+    }
+    
+    .title {
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #f9ee6b;
+      font-size: 26px;
+    }
+    
+    paper-button {
+      padding: 10px 36px;
+      @apply --su-font-subtitle;
+      text-transform: none;
+      margin: 0px!important;
+      border-radius: 0px;
+      background-color: #f9ee6b;
+      color: #000;
+      cursor: pointer;
+      text-shadow:none;
+    }
+    
+    paper-button:hover {
+      background-color: #faea37;
+    }
+    
+    .a {
+      text-decoration: none;
+    }
+
+    .delay-9 {
+      animation-delay: 9s;
+      -webkit-animation-delay: 9s;
+    }
+    
+    .btnwrap {
+      margin-top: 40px;
+      @apply --layout-horizontal;
+    }
+    
+    .divider {
+      text-align: center
+    }
+    
+    .divider:after {
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      content: '';
+      border-bottom: 3px solid #faea37;
+      padding-top: 20px;
+      width: 100px;
+    }
+    
+    .flex {
+      @apply --layout-flex;
+    }
+    
+    .prpl{
+      color:var(--app-pink-color);
+    }
+    @media (max-width: 1000px) {
+      :host {
+        margin-right: 0px;
+      }
+      .wrap {
+        height:280px;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .btnwrap {
+        @apply --layout-vertical;
+        @apply --layout-center;
+      }
+      .header{
+        margin-top: 50px;
+      }
+      .text{
+        padding: 10px 0px;
+      }
+      .wrap {
+        height:400px;
+      }
+    }
+    </style>
+    <div class="header">
+      <div class="divider">EMPECEMOS EL ENLACE!</div>
+    </div>
+    <p>La plataforma de enlace entre hacedor de oficios y solicitantes</p>
+    <div class="wrap">
+      <div id="st01" class="steps animated-med zoomIn delay-9">
+        <div class="title">Si quieres contratar un especialista en tu localidad</div>
+        <div class="btnwrap center">
+          <div class="text">Crea un trabajo, elige un especialista y deja una calificacion</div>
+          <div class="center">
+            <paper-button id="btn1" class="animated-fast" on-tap="_createJob">CREA UN TRABAJO</paper-button>
+          </div>
+        </div>
+      </div>
+<!--       <div id="st02" class="steps animated-med">
+  <div class="title">Si quieres dar a conocer tu ocupacion y especialidad</div>
+  <div class="btnwrap center">
+    <div class="text">Revisa las propuestas de trabajo en tu area y envia tu cotizacion</div>
+    <div class="center">
+      <paper-button id="btn2" class="animated-fast" on-tap="">ENCUENTRA TRABAJO</paper-button>
+    </div>
+  </div>
+</div> -->
+    </div>
+  </template>
+  <script>
+  class BannerContent extends Polymer.Element {
+    static get is() {
+      return 'banner-content';
+    }
+    static get properties() {
+      return {};
+    }
+    ready() {
+      super.ready();
+/*      let el = this.$.st01;
+      let el2 = this.$.st02;
+      let counter = 0;
+      setInterval(function() {
+        if(counter == 0){
+          el.classList.remove("delay-9");
+        }
+        counter = counter + 1;
+        if(counter % 2){
+          el.classList.remove("zoomIn");
+          el.classList.add("zoomOut");
+          el2.classList.remove("zoomOut");
+          el2.classList.add("zoomIn");
+          let btn2 = this.$.btn2;
+          btn2.classList.remove("rubberBand");
+          setTimeout(function(){
+            btn2.classList.add("rubberBand");
+          }.bind(this),5000);
+        }else{
+          el.classList.remove("zoomOut");
+          el.classList.add("zoomIn");
+          el2.classList.remove("zoomIn");
+          el2.classList.add("zoomOut");
+          let btn1 = this.$.btn1;
+          btn1.classList.remove("rubberBand");
+          setTimeout(function(){
+            btn1.classList.add("rubberBand");
+
+          }.bind(this),5000);
+        }
+      }.bind(this), 9000);*/
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('banner-content.created');
+    }
+  }
+  window.customElements.define(BannerContent.is, BannerContent);
+  </script>
+</dom-module>

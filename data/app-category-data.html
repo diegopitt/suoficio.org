@@ -1,0 +1,154 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="app-category-data">
+  <script>
+  (function() {
+    let categoriesList = [{
+      title: 'Especialistas en redes / Antenas',
+      name: 'especialistas-en-redes-antenas',
+      value: 1
+    }, {
+      title: 'Especialistas en Baños',
+      name: 'especialistas-en-baños',
+      value: 2
+    }, {
+      title: 'Carpinteros',
+      name: 'carpinteros',
+      value: 3
+    }, {
+      title: 'Limpiadores',
+      name: 'limpiadores',
+      value: 4
+    }, {
+      title: 'Especialistas en Drenajes',
+      name: 'especialistas-en-drenajes',
+      value: 5
+    }, {
+      title: 'Electricistas',
+      name: 'electricistas',
+      value: 6
+    }, {
+      title: 'Especialistas en Suelos',
+      name: 'especialistas-en-suelos',
+      value: 7
+    }, {
+      title: 'Jardineros / Diseñadores de Jardín',
+      name: 'jardineros-diseñadores-de-jardin',
+      value: 8
+    }, {
+      title: 'Personal de mantenimiento',
+      name: 'personal-de-mantenimiento',
+      value: 9
+    }, {
+      title: 'Ingenieros de Calefacción',
+      name: 'ingenieros-de-calefacción',
+      value: 10
+    }, {
+      title: 'Especialistas en Cocinas',
+      name: 'especialistas-en-cocinas',
+      value: 11
+    }, {
+      title: 'Cerrajeros',
+      name: 'cerrajeros',
+      value: 12
+    }, {
+      title: 'Especialistas en Lofts',
+      name: 'especialistas-en-lofts',
+      value: 13
+    }, {
+      title: 'Herreros',
+      name: 'herreros',
+      value: 14
+    }, {
+      title: 'Decoradores / Pintores',
+      name: 'decoradores-pintores',
+      value: 15
+    }, {
+      title: 'Control de Plagas',
+      name: 'control-de-plagas',
+      value: 16
+    }, {
+      title: 'Plomeria',
+      name: 'plomeria',
+      value: 17
+    }, {
+      title: 'Constructores de tejados / Techos',
+      name: 'constructores-de-tejados-techos',
+      value: 18
+    }, {
+      title: 'Especialistas en Seguridad',
+      name: 'especialistas-en-seguridad',
+      value: 19
+    }, {
+      title: 'Lapidadores',
+      name: 'lapidadores',
+      value: 20
+    }, {
+      title: 'Especialistas en Piscinas',
+      name: 'especialistas-en-piscinas',
+      value: 21
+    }, {
+      title: 'Artesanos Tradicionales',
+      name: 'artesanos-tradicionales',
+      value: 22
+    }, {
+      title: 'Especialistas en Ventanas',
+      name: 'especialistas-en-ventanas',
+      value: 24
+    }, {
+      title: 'Bioconstrucción',
+      name: 'bioconstruccion',
+      value: 25
+    }];
+    class AppCategoryData extends Polymer.Element {
+      static get is() {
+        return 'app-category-data';
+      }
+      static get properties() {
+        return {
+          categoryValue: Number,
+          categoryName: String,
+          categories: {
+            type: Array,
+            value: categoriesList,
+            readOnly: true,
+            notify: true
+          },
+          category: {
+            type: Object,
+            computed: '_computeCategory(categoryValue)',
+            notify: true
+          },
+          categoryByName: {
+            type: Object,
+            computed: '_computeCategoryName(categoryName)',
+            notify: true
+          }
+        }
+      }
+      _getCategoryObject(categoryValue) {
+        for (let i = 0, c; c = this.categories[i]; ++i) {
+          if (c.value === categoryValue) {
+            return c;
+          }
+        }
+      }
+      _getCategoryByName(categoryName) {
+        for (let i = 0, c; c = this.categories[i]; ++i) {
+          if (c.name === categoryName) {
+            return c;
+          }
+        }
+      }
+      _computeCategory(categoryValue) {
+        let categoryObj = this._getCategoryObject(categoryValue);
+        return categoryObj;
+      }
+      _computeCategoryName(categoryName) {
+        let categoryObj = this._getCategoryByName(categoryName);
+        return categoryObj;
+      }
+    }
+    customElements.define(AppCategoryData.is, AppCategoryData);
+  })();
+  </script>
+</dom-module>

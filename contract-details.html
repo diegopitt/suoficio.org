@@ -1,0 +1,212 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="contract-details">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin: 24px 0px;
+    }
+    :host([is-responsive]){
+      @apply --layout-fixed-bottom;
+      margin: 0px;
+      box-sizing: border-box;
+      z-index: 1;
+    }
+    :host([is-responsive]) paper-button{
+      @apply --layout-flex;
+      border-radius: 0px;
+      margin: 0px;
+      height: 64px;
+      font-size: 12px;
+    }
+     :host(:not([is-responsive])) > div {
+      margin: 14px 0;
+    }
+    paper-button {
+      @apply --layout;
+      margin: 0;
+    }
+    :host(:not([is-responsive])) .header {
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    .details {
+      @apply --su-font-medium;
+    }
+    .view-job {
+      @apply --su-font-medium;
+      @apply --layout-flex;
+      margin-top:20px;
+    }
+    .center{
+      text-align: center;
+    }
+    .title {
+      color: #222;
+      font-size: 16px;
+      padding-top:14px;
+      font-weight: 500;
+    }
+    .ref-title {
+      @apply --su-font-medium-bold;
+      color: var(--app-font-color);
+    }
+    .ref-key {
+      @apply --su-font-medium;
+      line-height: 28px;
+      color: var(--app-font-color-light);
+    }
+    .chip{
+      display: inline;
+      padding: 4px 10px;
+      font-size: 11px;
+    }
+    .chip.green{
+      background-color: var(--app-green-color);
+      color: #fff;
+    }
+    .chip.red{
+      background-color: var(--app-red-color);
+      color: #fff;
+    }
+    a{
+      @apply --su-font-medium;
+      color: var(--app-aqua-font) !important;
+      font-weight:500;
+      text-decoration: none !important;
+    }
+    @media (max-width: 767px) {
+      paper-button {
+        border-top:1px solid var(--app-little-grey) !important;
+      }
+      :host([hide-btn]) .shouldhide {
+        display: none;
+      }
+    }
+    </style>
+    <div class="header shouldhide">
+      <dom-if if="[[!_shouldShowrate]]">
+        <template>
+          <paper-button hidden$="[[endContract]]" class="green" on-tap="_toggleCancel">[[_computeTitle(contract.isactive)]]</paper-button>
+          <paper-button hidden$="[[!endContract]]" class="white" on-tap="_toggleCancel">Calificar Mas Tarde</paper-button>
+          <dom-if if="[[!isResponsive]]">
+            <template>
+              <div class="view-job center">
+                <a href="/buscar-trabajo/[[contract.jobkey]]" target="_blank">Ver aviso publicado</a>
+              </div>
+            </template>
+          </dom-if>
+        </template>
+      </dom-if>
+      <dom-if if="[[_shouldShowrate]]">
+        <template>
+          <a href="/buscar-trabajo/[[contract.jobkey]]" target="_blank">
+            <paper-button class="blue">Ver aviso publicado</paper-button>
+          </a>
+        </template>
+      </dom-if>
+    </div>
+    <dom-if if="[[!isResponsive]]">
+      <template>
+        <div class="title">Detalles del Contrato</div>
+        <div class="details">
+          <div class="item"><span>Contrato con</span> <span>[[destination.fn]] [[destination.ln]]</span></div>
+        </div>
+        <div class="details">
+          <dom-if if="[[contract.isactive]]">
+            <template>
+              <div class="chip green">Activo</div>
+            </template>
+          </dom-if>
+          <dom-if if="[[contract.ended]]">
+            <template>
+              <div class="chip red">Finalizado</div>
+            </template>
+          </dom-if>
+        </div>
+        <div class="details">
+          <dom-if if="[[contract.isactive]]">
+            <template>
+              <div class="details">
+                <div class="ref-title">Fecha Inicio</div>
+                <div class="ref-key">[[_getPostTime(contract.started)]]</div>
+              </div>
+            </template>
+          </dom-if>
+          <dom-if if="[[!contract.isactive]]">
+            <template>
+              <div class="details">
+                <div class="ref-title">Finalizado</div>
+                <div class="ref-key">[[_getPostTime(contract.ended)]]</div>
+              </div>
+            </template>
+          </dom-if>
+        </div>
+        <div class="details">
+          <div class="ref-title">Referencia</div>
+          <div class="ref-key">[[key]]</div>
+        </div>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class ContractDetails extends Polymer.Element {
+    static get is() {
+      return 'contract-details';
+    }
+    static get properties() {
+      return {
+        contract: Object,
+        uid: String,
+        hideBtn: {
+          notify: true,
+          type: Boolean,
+          value: false
+        },
+        key: String,
+        isResponsive: {
+          type: Boolean,
+          value: false
+        },
+        endContract: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        _shouldShowrate: {
+          type: Boolean,
+          notify: true,
+          value: null,
+          computed: '_computeShouldShowrate(uid, contract.u)'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('contract-details.created');
+    }
+    _toggleCancel(){
+      this.endContract = !this.endContract;
+      if (this.hideBtn === true){
+        this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: `contratos/${this.key}/d` } }));
+      }
+    }
+    _computeTitle(isActive) {
+      return isActive ? 'Finalizar y Calificar' : 'Calificar';
+    }
+    _computeShouldShowrate(uid, item) {
+      if(uid === undefined || item === undefined) return;
+      return item[uid];
+    }
+    _getPostTime(timestamp) {
+      return moment(timestamp).format('LL');
+    }
+  }
+  window.customElements.define(ContractDetails.is, ContractDetails);
+  </script>
+</dom-module>

@@ -1,0 +1,59 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="job-post-details-details">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      padding: 0px 24px;
+      margin:26px 0;
+    }
+    paper-button.small {
+      margin: 0px 0px 14px 0px;
+      padding: 8px 18px 8px 18px !important;
+      font-weight: 500;
+      font-size: 13px;
+      border-radius: 2px;
+      @apply --layout-horizontal;
+    }
+    </style>
+    <div class="wrap">
+      <paper-button hidden$="[[isHired]]" class="small blue" on-tap="_viewproposal">Editar Trabajo</paper-button>
+      <paper-button hidden$="[[isHired]]" class="small red" on-tap="_viewproposal">Cancelar Trabajo</paper-button>
+      <dom-if if="[[isHired]]">
+        <template>
+           <paper-button class="small blue" on-tap="_viewproposal">Volver a Publicar</paper-button>
+        </template>
+      </dom-if>
+    </div>
+  </template>
+  <script>
+  class JobPostDetailsDetails extends Polymer.Element {
+    static get is() {
+      return 'job-post-details-details';
+    }
+    static get properties() {
+      return {
+        isHired: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    ready(){
+      super.ready();
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-post-details-details.created');
+    }
+  }
+  window.customElements.define(JobPostDetailsDetails.is, JobPostDetailsDetails);
+  </script>
+</dom-module>

@@ -1,0 +1,140 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-storage-multiupload.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-storage-upload-task.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-storage-ref.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="update-pictures">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+      color: var(--app-font-color);
+      @apply --su-oficio-font-base;
+    }
+
+     :host([no-wrapper]) .wrapper {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+
+     :host([no-wrapper]) h2 {
+      display: none !important;
+    }
+
+     :host(:not([no-wrapper])) .wrapper {
+      @apply --common-borders;
+    }
+
+    .wrapper {
+      @apply --layout-flex;
+      margin: 0 -30px;
+      padding: 30px;
+    }
+
+    h2 {
+      color: var(--app-font-color);
+      word-break: break-word;
+      margin: 0 0 30px;
+      line-height: 28px;
+      font-size: 22px;
+      font-weight: 400;
+    }
+
+    .content-wrap {
+      @apply --layout-horizontal;
+      @apply --layout-center;
+      margin-top: 20px;
+    }
+
+    label {
+      font-size: 15px;
+      color: var(--app-font-color-light);
+    }
+
+    .input {
+      width: calc(100%);
+      margin: 0px;
+      border: 2px solid var(--app-muted-color);
+      padding: 11px 10px;
+      font-size: 16px;
+      outline: none;
+      margin: 14px 0px;
+      line-height: 14px;
+      color: var(--app-font-color);
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+      -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    }
+
+    .error {
+      border-color: var(--app-red-color);
+    }
+
+    .input:hover {
+      border-color: var(--app-aqua-font);
+    }
+
+    .input:focus {
+      border-color: var(--app-aqua-font);
+    }
+
+    .section {
+      @apply --layout-flex;
+    }
+
+    @media (max-width: 767px) {
+      .section {
+        margin: 0px 14px;
+      }
+    }
+    </style>
+    <div class="wrapper">
+      <div class="section">
+        <h2>Imagenes de tus trabajos realizado</h2>
+        <label>Ingresa imagenes que describan lo que haces</label>
+        <div class="content-wrap">
+          <firebase-storage-multiupload id="fs" path="/users/[[uid]]" files="[[files]]" upload-tasks="{{uploadedFiles}}" on-error="catchError" force-unique auto>
+          </firebase-storage-multiupload>
+          <input id="file-uploader" type="file" on-change="onFileUpload" multiple />
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class UpdatePictures extends Polymer.Element {
+    static get is() {
+      return 'update-pictures';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        files: {
+          type: Array,
+          notify: true,
+          value: [],
+        },
+        uploadTasks: {
+          type: Array,
+          observer: '_uploadTasksChanged'
+        },
+        uploadedFiles: {
+          type: Array,
+        }
+      };
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('pictures-photo.created');
+    }
+    onFileUpload(e) {
+      this.files = e.target.files;
+      console.log(this.files)
+    }
+    ready() {
+      super.ready();
+    }
+  }
+  window.customElements.define(UpdatePictures.is, UpdatePictures);
+  </script>
+</dom-module>

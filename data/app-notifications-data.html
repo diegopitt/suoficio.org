@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="app-notifications-data">
+  <script>
+  (function() {
+    let notificationsList = [{
+      title: 'Nuevo trabajo disponible de tu interes',
+      value: 0
+    },{
+      title: 'Haz recibido una invitacion para el trabajo',
+      value: 1
+    }, {
+      title: 'Haz sido contratado para el trabajo',
+      value: 2
+    }, {
+      title: 'Se ha iniciado un nuevo contrato para el trabajo',
+      value: 3
+    }, {
+      title: 'Ha finalizado su contrato para el trabajo',
+      value: 4
+    }, {
+      title: 'Su trabajo a recibido una nuenva propuesta',
+      value: 5
+    }, {
+      title: 'Tu propuesta de trabajo fue aceptada',
+      value: 6
+    }, {
+      title: 'Trabajo cerrado, hemos archivado tu propuesta',
+      value: 7
+    }, {
+      title: 'Nuevo candidato para tu trabajo',
+      value: 8
+    }];
+    class appNotificationsData extends Polymer.Element {
+      static get is() {
+        return 'app-notifications-data';
+      }
+      static get properties() {
+        return {
+          notificationValue: Number,
+          notifications: {
+            type: Array,
+            value: notificationsList,
+            readOnly: true,
+            notify: true
+          },
+          notification: {
+            type: Object,
+            computed: '_computeNotification(notificationValue)',
+            notify: true
+          }
+        }
+      }
+      _getNotificationObject(notificationValue) {
+        for (let i = 0, c; c = this.notifications[i]; ++i) {
+          if (c.value === notificationValue) {
+            return c;
+          }
+        }
+      }
+      _computeNotification(notificationValue) {
+        let notiObj = this._getNotificationObject(notificationValue);
+        return notiObj;
+      }
+    }
+    customElements.define(appNotificationsData.is, appNotificationsData);
+  })();
+  </script>
+</dom-module>

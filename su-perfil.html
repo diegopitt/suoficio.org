@@ -1,0 +1,83 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="profile-card.html">
+<link rel="import" href="profile-details.html">
+<link rel="import" href="account-badge.html">
+<link rel="import" href="user-gallery.html">
+<link rel="import" href="two-columns.html">
+<link rel="import" href="redux/redux-mixin.html">
+<dom-module id="su-perfil">
+  <template>
+    <style>
+    :host {
+      display: block;
+      margin-top: 50px;
+    }
+    @media (max-width: 767px) {
+      :host {
+        margin-top:0px;
+      }
+    }
+    </style>
+    <two-columns reverse content-width="720" side-width="240" gutter="20">
+      <profile-card small-screen="[[smallScreen]]" uid="[[uid]]" slot="content"></profile-card>
+      <user-gallery slot="content" uid="[[uid]]"></user-gallery>
+      <dom-if if="[[has_review]]">
+        <template>
+          <user-reviews slot="content" title="Historial y calificaciones" uid="[[uid]]"></user-reviews>
+        </template>
+      </dom-if>
+      <profile-details slot="sidebar"></profile-details>
+      <account-badge is-profile slot="sidebar" user-key="[[uid]]"></account-badge>
+    </two-columns>
+  </template>
+  <script>
+  class SuPerfil extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'su-perfil';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        visible: {
+          type: Boolean,
+          value: false
+        },
+        has_review: {
+          type: Boolean,
+          statePath: 'has_review'
+        },
+        userData: Object,
+        smallScreen: Boolean
+      };
+    }
+    static get observers() {
+      return [
+        '_lazyReviews(has_review, visible)'
+      ]
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-perfil.created');
+    }
+    ready(){
+      super.ready();
+    }
+    _lazyReviews(hasReview, visible){
+      if (hasReview === undefined || hasReview === false || this._reviewsLoaded) return;
+      if(visible === true){
+        this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+          Polymer.Async.microTask, () => {
+            Polymer.RenderStatus.afterNextRender(this, () => {
+              Polymer.importHref(this.resolveUrl('user-reviews.html'), () => {
+                console.log('reviews loaded!');
+                this._reviewsLoaded = true;
+              });
+            });
+          }
+        );
+      }
+    }
+  }
+  window.customElements.define(SuPerfil.is, SuPerfil);
+  </script>
+</dom-module>

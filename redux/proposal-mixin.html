@@ -1,0 +1,18 @@
+<link rel="import" href="redux-mixin.html">
+<script>
+  ProposalMixin = Parent => class ProposalMixin extends ReduxMixin(Parent) {
+    static get properties() {
+      return {};
+    }
+    static get actions() {
+      return {
+        selectProposal(key) {
+          return {
+            type: 'SELECT_PROPOSAL',
+            key
+          };
+        }
+      }
+    }
+  }
+</script>

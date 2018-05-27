@@ -1,0 +1,132 @@
+<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
+<script src="../../node_modules/redux/dist/redux.min.js"></script>
+<script>
+  const State = {};
+  const reducer = (state, action) => {
+    if (!state) return State;
+    switch (action.type) {
+      case 'ALL_JOBPOSTS':
+        return Object.assign({}, state, {
+            all_jobposts: action.jposts[0],
+            active_jobposts: action.jposts[1],
+            inactive_jobposts: action.jposts[2]
+        });
+      case 'HAS_REVIEW':
+        return Object.assign({}, state, {
+            has_review: action.hreview
+        });
+      case 'HAS_MESSAGE':
+        return Object.assign({}, state, {
+            has_message: action.hmessage
+        });
+      case 'HAS_NOTIFICATION':
+        return Object.assign({}, state, {
+            has_notification: action.hnotification
+        });
+      case 'PROFILE_COMPLETE':
+        return Object.assign({}, state, {
+            profile_complete: action.pcomplete
+        });
+      case 'ACTIVE_PROPOSALS':
+        return Object.assign({}, state, {
+            sent_proposals: action.proposals[0],
+            active_proposals: action.proposals[1],
+            all_proposals: action.proposals[2]
+        });
+      case 'USER_LOCATION':
+        return Object.assign({}, state, {
+            user_location: action.location
+        });
+      case 'ACCOUNT_TYPE':
+        return Object.assign({}, state, {
+            account_type: action.atype
+        });
+      case 'PROFILE_PICTURE':
+        return Object.assign({}, state, {
+            profile_picture: action.picture
+        });
+      case 'USER_VISIBILITY':
+        return Object.assign({}, state, {
+            user_visibility: action.visibility
+        });
+      case 'INVITES':
+        return Object.assign({}, state, {
+            invites: action.invites[0]
+        });
+      case 'ACTIVE_CHATS':
+        return Object.assign({}, state, {
+            active_chats: action.chats[0]
+        });
+      case 'SELECT_JOB':
+        return Object.assign({}, state, {
+            selected_job: action.key
+        });
+      case 'SELECT_CONTRACT':
+        return Object.assign({}, state, {
+            selected_contract: action.key
+        });
+      case 'ALL_FAVORITES':
+        return Object.assign({}, state, {
+            user_favorites: action.favorites
+        });
+      case 'USER_NAME':
+        return Object.assign({}, state, {
+            user_name: action.name
+        });
+      case 'USER_LAST':
+        return Object.assign({}, state, {
+            user_last: action.last
+        });
+      case 'USER_SCORE':
+        return Object.assign({}, state, {
+            user_score: action.score
+        });
+      case 'USER_WORTH':
+        return Object.assign({}, state, {
+            user_worth: action.worth
+        });
+      case 'USER_CATEGORIES':
+        return Object.assign({}, state, {
+            user_categories: action.categories
+        });
+      case 'P_DESCRIPTION':
+        return Object.assign({}, state, {
+            p_description: action.description
+        });
+      case 'P_SLOGAN':
+        return Object.assign({}, state, {
+            p_slogan: action.slogan
+        });
+      case 'POPUP_DATA':
+        return Object.assign({}, state, {
+            popup_state: action.popupstate
+        });
+      case 'SELECT_PROPOSAL':
+        return Object.assign({}, state, {
+            selected_proposal: action.key
+        });
+      case 'JOB_COUNT':
+        return Object.assign({}, state, {
+            job_count: action.jcount
+        });
+      case 'REVIEW_COUNT':
+        return Object.assign({}, state, {
+            review_count: action.rcount
+        });
+      case 'ALL_CONTRACTS':
+        return Object.assign({}, state, {
+            all_contracts: action.contracts[0],
+            active_contracts: action.contracts[1],
+            inactive_contracts: action.contracts[2]
+        });
+      default:
+        return state;
+    }
+  };
+  const store = Redux.createStore(reducer, State);
+  store.subscribe(() => {
+    console.log(store.getState()); 
+    //localStorage.setItem('suOficioState', JSON.stringify(store.getState()));
+  });
+  ReduxMixin = PolymerRedux(store);
+</script>

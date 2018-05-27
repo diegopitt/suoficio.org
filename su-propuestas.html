@@ -1,0 +1,219 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="proposal-item.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-propuestas">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      @apply --layout-vertical;
+    }
+    .wrap{
+      @apply --common-borders;
+      margin: 24px 8px 24px 8px;
+    }
+    .header{
+      background-color: #f9f9f9;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      @apply --layout-horizontal;
+      @apply --layout-justified;
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    .help{
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      padding: 24px 20px;
+    }
+    .subtitle{
+      padding: 24px 20px;
+      @apply --su-font-subhead;
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+    }
+    .content{
+      padding-top: 24px;
+    }
+    proposal-item:first-of-type {
+      margin-top: -24px;
+    }
+    paper-icon-button {
+      --paper-icon-button-ink-color: transparent;
+      padding: 3px;
+      width: 24px;
+      height: 24px;
+      color: var(--app-aqua-font);
+    }
+    .page_title{
+      margin-top: 20px;
+    }
+    proposal-item:not(:last-of-type) {
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    @media (max-width: 767px) {
+      :host {
+        margin-top: 24px;
+      }
+      .wrap{
+        margin: 0px 8px 24px 8px;
+      }
+      .subtitle{
+        @apply --su-font-medium;
+        line-height: 24px;
+        padding: 12px 0px 8px 16px;
+      }
+      .help{
+        @apply --layout-vertical;
+        @apply --layout-center-center;
+        line-height: 14px;
+        padding: 0px 12px 0px 0px;
+      }
+      paper-icon-button {
+        padding: 0px;
+        width:14px;
+        height:14px;
+      }
+      .page_title{
+        padding-left: 10px;
+        margin-top: 0px;
+      }
+    }
+    </style>
+    <app-route active="{{isActive}}" route="{{route}}" pattern="/:proposalKey" data="{{routeData}}"></app-route>
+    <app-route active="{{isInvite}}" route="{{route}}" pattern="/invitacion/:proposalKey" data="{{InviterouteData}}"></app-route>
+    <dom-if if="[[!_shouldShowProposal(isActive, visible)]]">
+      <template>
+        <firebase-document path="/users/[[uid]]/proposals" data="{{proposals}}"></firebase-document>
+        <firebase-document path="/users/[[uid]]/invitations" data="{{invitations}}"></firebase-document>
+          <div class="page_title">Propuestas de Trabajo</div>
+          <div class="wrap">
+            <div class="header">
+              <div class="subtitle">[[_countNodes(invitations)]]&nbsp;&nbsp;Invitaciones de trabajos</div>
+              <div class="help"><paper-icon-button noink on-tap="" icon="myicons:help"></paper-icon-button></div>
+            </div>
+            <div class="content">
+              <dom-repeat items="[[arrayify(invitations)]]">
+                <template>
+                  <proposal-item unresolved is-invite uid="[[uid]]" data="[[item]]"></proposal-item>
+                </template>
+              </dom-repeat>
+            </div>
+          </div>
+          <div class="wrap">
+            <div class="header">
+              <div class="subtitle">[[_countNodes(proposals.a)]]&nbsp;&nbsp;Propuestas en discusion</div>
+              <div class="help"><paper-icon-button noink on-tap="" icon="myicons:help"></paper-icon-button></div>
+            </div>
+            <div class="content">
+              <dom-repeat items="[[arrayify(proposals.a)]]">
+                <template>
+                  <proposal-item unresolved uid="[[uid]]" data="[[item]]"></proposal-item>
+                </template>
+              </dom-repeat>
+            </div>
+          </div>
+          <div class="wrap">
+            <div class="header">
+              <div class="subtitle">[[_countNodes(proposals.s)]]&nbsp;&nbsp;Propuestas enviadas</div>
+              <div class="help"><paper-icon-button noink on-tap="" icon="myicons:help"></paper-icon-button></div>
+            </div>
+            <div class="content">
+              <dom-repeat items="[[arrayify(proposals.s)]]">
+                <template>
+                  <proposal-item unresolved uid="[[uid]]" data="[[item]]"></proposal-item>
+                </template>
+              </dom-repeat>
+            </div>
+          </div>
+          <div class="wrap">
+            <div class="header">
+              <div class="subtitle">[[_countNodes(proposals.r)]]&nbsp;&nbsp;Propuestas archivadas</div>
+              <div class="help"><paper-icon-button noink on-tap="" icon="myicons:help"></paper-icon-button></div>
+            </div>
+            <div class="content">
+              <dom-repeat items="[[arrayify(proposals.r)]]">
+                <template>
+                  <proposal-item unresolved uid="[[uid]]" data="[[item]]"></proposal-item>
+                </template>
+              </dom-repeat>
+            </div>
+          </div>
+      </template>
+    </dom-if>
+    <dom-if if="[[_shouldShowProposal(isActive, visible)]]">
+      <template>
+        <dom-if if="[[!_shouldShowInvite(isInvite, visible)]]">
+          <template>
+            <su-propuesta uid="[[uid]]" job-key="[[routeData.proposalKey]]"></su-propuesta>
+          </template>
+        </dom-if>
+        <dom-if if="[[_shouldShowInvite(isInvite, visible)]]">
+          <template>
+            <su-propuesta is-invite uid="[[uid]]" job-key="[[InviterouteData.proposalKey]]"></su-propuesta>
+          </template>
+        </dom-if>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class SuPropuestas extends Polymer.Element {
+    static get is() {
+      return 'su-propuestas';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        route: Object,
+        InviterouteData: Object,
+        routeData: Object,
+        visible: {
+          type: Boolean,
+          value: false
+        }
+      };
+    }
+    static get observers() {
+      return [
+        '_loadLazyResources(isActive, isInvite, visible)',
+      ]
+    }
+    arrayify(obj) { 
+      if (!obj) return;
+      return Object.keys(obj).map(function(k) { return { key: k, value: obj[k] }; }) 
+    }
+    _loadLazyResources(isActive, isInvite, visible) {
+      if (!this.loadComplete) {
+        if ((isActive === true || isInvite === true) && visible === true) {
+          this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+            Polymer.Async.microTask, () => {
+              Polymer.RenderStatus.afterNextRender(this, () => {
+                Polymer.importHref(this.resolveUrl('su-propuesta.html'), () => {
+                  this.loadComplete = true;
+                  console.log('su-propuesta loaded!')
+                });
+              });
+            }
+          );
+        }
+      }
+    }
+    _countNodes(data){
+      if (!data) return 0;
+      return Object.keys(data).length;
+    }
+    ready(){
+      super.ready();
+    }
+    _shouldShowProposal(isActive, visible){
+      return (isActive && visible);
+    }
+    _shouldShowInvite(isInvite, visible){
+      return (isInvite && visible);
+    }
+  }
+  window.customElements.define(SuPropuestas.is, SuPropuestas);
+  </script>
+</dom-module>

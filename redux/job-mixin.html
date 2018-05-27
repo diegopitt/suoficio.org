@@ -1,0 +1,18 @@
+<link rel="import" href="redux-mixin.html">
+<script>
+  JobMixin = Parent => class JobMixin extends ReduxMixin(Parent) {
+    static get properties() {
+      return {};
+    }
+    static get actions() {
+      return {
+        selectJob(key) {
+          return {
+            type: 'SELECT_JOB',
+            key
+          };
+        }
+      }
+    }
+  }
+</script>

@@ -1,0 +1,181 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="job-item.html">
+<link rel="import" href="search-controls.html">
+<link rel="import" href="search-input.html">
+<link rel="import" href="oficio-styles.html">
+<link rel="import" href="home-side.html">
+<link rel="import" href="two-columns.html">
+<link rel="import" href="redux/redux-mixin.html">
+<dom-module id="job-list">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+    }
+    .jobs-wrap {
+      @apply --layout-vertical;
+    }
+    .strong {
+      font-weight: 500;
+    }
+    .search-wrap {
+      margin: 30px 0px 64px 0px;
+    }
+    .job-count {
+      padding: 0px 10px;
+      @apply --su-font-small-thin;
+      line-height: 26px;
+      color: var(--app-font-color-light);
+    }
+    .head-wrap{
+      @apply --layout-flex;
+      /* background-color: var(--app-buble-color); */
+      border-bottom: 1px solid var(--app-little-grey);
+      padding: 0px 0px 20px 0px;
+    }
+    .foot-wrap{
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      background-color: transparent;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 30px;
+      color: var(--app-aqua-font);
+    }
+    .isSearch{
+      background-color: #fff;
+      color:#666;
+      font-style: 12px;
+    }
+    paper-button.white {
+      color: var(--app-aqua-font) !important;
+      font-weight: 500;
+    }
+    @media (max-width: 767px) {
+      .main-wrap{
+        background-color: transparent !important;
+        border:none;
+        box-shadow: none;
+        margin:0px;
+      }
+      .head-wrap{
+        padding: 14px;
+        margin: 14px 0;
+        border-radius: 0px;
+        border-top: 1px solid var(--app-little-grey);
+      }
+      .search-wrap {
+        margin: 24px 0px 0px 0px;
+      }
+    }
+    </style>
+    <div class="search-wrap">
+      <two-columns narrow-layout="{{narrowLayout}}" reverse content-width="680" side-width="264" gutter="36">
+        <search-input query-params="[[queryParams]]" narrow-layout$="[[narrowLayout]]" slot="content"></search-input>
+      </two-columns>
+      <two-columns reverse content-width="680" side-width="264" gutter="36">
+        <home-side uid="[[uid]]" slot="sidebar"></home-side>
+        <div class="main-wrap" slot="content">
+          <div class="head-wrap">
+            <search-controls></search-controls>
+          </div>
+          <div class="jobs-wrap">
+            <dom-if if="[[showSearch]]">
+              <template>
+                <dom-if if="[[matchedQuery]]" restamp>
+                  <template>
+                    <div class="isSearch"></div>
+                    <dom-repeat items="[[searchResults]]" as="job">
+                      <template>
+                        <job-item is-favorite$="{{_isFav(user_favorites, job.objectID)}}" job="[[job]]" job-key="[[job.objectID]]" uid="[[uid]]"></job-item>
+                      </template>
+                    </dom-repeat>
+                  </template>
+                </dom-if>
+              </template>
+            </dom-if>
+            <dom-if if="[[!showSearch]]">
+              <template>
+                <dom-repeat items="[[jobs]]" as="job">
+                  <template>
+                    <job-item is-favorite$="{{_isFav(user_favorites, job.$key)}}" job="[[job]]" job-key="[[job.objectID]]" uid="[[uid]]"></job-item>
+                  </template>
+                </dom-repeat>
+              </template>
+            </dom-if>
+          </div>
+          <div class="foot-wrap">
+            <dom-if if="[[ShowSearching]]" restamp>
+              <template>
+                <span>BUSCANDO [[queryParams]]...</span>
+              </template>
+            </dom-if>
+          </div>
+        </div>
+      </two-columns>
+    </div>
+  </template>
+  <script>
+  class JobList extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'job-list';
+    }
+    static get properties() {
+      return {
+        jobs: {
+          type: Object
+        },
+        query: String,
+        uid: String,
+        user_favorites: {
+          type: Array,
+          statePath: 'user_favorites'
+        },
+        searchData: Object,
+        queryParams: Object,
+        matchedQuery:{
+          type: Boolean,
+          computed: '_computeMatchedQuery(query, queryParams)'
+        },
+        ShowSearching:{
+          type: Boolean,
+          computed: '_computeShowSearching(matchedQuery, showSearch)'
+        },
+        showSearch: {
+          type: Boolean
+        },
+        searchResults: {
+          type: Object,
+          notify: true,
+          reflectToAttribute: true
+        },
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _computeShowSearching(matchedQuery, showSearch){
+      if (matchedQuery === undefined || showSearch === undefined) return;
+      return !(matchedQuery && showSearch);
+    }
+    _computeMatchedQuery(dbQuery, query){
+      if(dbQuery === '' || query === '') return;
+      if(dbQuery === undefined || query === undefined) return;
+      if (dbQuery === query){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-list.created');
+    }
+    _isFav(favorites, key) {
+      if (favorites === undefined || key === undefined) return;
+      return favorites[key];
+    }
+  }
+  window.customElements.define(JobList.is, JobList);
+  </script>
+</dom-module>

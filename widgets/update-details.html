@@ -1,0 +1,210 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../data/app-category-data.html">
+<link rel="import" href="../address-lookup/address-lookup.html">
+<link rel="import" href="../oficio-styles.html">
+<link rel="import" href="../chip-select/chip-select.html">
+<dom-module id="update-details">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      color: var(--app-font-color);
+      @apply --su-oficio-font-base;
+      @apply --layout-flex;
+    }
+    :host(:not([no-wrapper])){
+      min-width: 328px;
+/*       max-width: 686px; */
+    }
+    :host([no-wrapper]) .wrapper {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+    :host([no-wrapper]) h1{
+      display: none !important;
+    }
+    :host([no-wrapper]) h2{
+      display: none !important;
+    }
+    paper-button {
+      padding: 11px 36px;
+      margin: 14px 0px 0px 0px;
+    }
+    address-lookup {
+      padding-top: 24px;
+    }
+    .btop{
+      border-top: 1px solid var(--app-little-grey);
+    }
+    .wrapper{
+      @apply --common-borders;
+      @apply --layout-flex;
+      padding: 0px 24px;
+      margin-bottom: 24px;
+    }
+    h2{
+      color: var(--app-font-color);
+      word-break: break-word;
+      margin: 0 0 4px;
+      line-height: 24px;
+      font-size: 20px ;
+      font-weight: 400;
+    }
+    label {
+      font-size: 15px;
+      color: var(--app-font-color-light);
+
+    }
+    .section{
+      @apply --layout-flex;
+      padding: 44px 0;
+    }
+    .input {
+      width: calc(100% - 24px);
+      border: 1px solid var(--app-muted-color);
+      padding: 11px 10px;
+      font-size: 16px;
+      outline: none;
+      margin: 24px 0px 8px 0px;
+      line-height: 14px;
+      color: var(--app-font-color);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      -webkit-transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+    }
+    .error{
+      border-color: var(--app-red-color);
+    }
+    .input:hover {
+      border-color: var(--app-aqua-font);
+    }
+    .input:focus {
+      border-color: var(--app-aqua-font);
+    }
+    .foot-wrap{
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+      padding-bottom: 24px;
+    }
+    @media (max-width: 767px) {
+      .section{
+        margin: 0px;
+      }
+      .input {
+        width: calc(100% - 24px);
+        margin-left: 0px;
+      }
+      .wrapper{
+        padding: 14px;
+      }
+      div.section:first-child {
+          padding-top: 0px;
+      }
+    }
+    </style>
+    <app-category-data categories="{{categories}}"></app-category-data>
+    <div class="wrapper">
+      <div class="section">
+        <h2>Tu Oficio</h2>
+        <label>Ingresa a que te dedicas (maximo 3 categorias)</label>
+        <chip-select uid="[[uid]]" error$="[[s_items]]" categories="[[categories]]" selected-values="{{items}}"></chip-select>
+      </div>
+      <div class="section btop">
+        <h2>Tu Ubicacion</h2>
+        <label>Ingresa direccion, ciudad, colonia o delegación de su ubicacion</label>
+        <address-lookup uid="[[uid]]" error$="[[s_loc]]" latitude="{{latitude}}" longitude="{{longitude}}" location-name="{{locationName}}"></address-lookup>
+      </div>
+      <div class="section btop">
+        <h2>Titulo de tu Perfil</h2>
+        <label>Ingresa un titulo profesional que describa lo que haces</label>
+        <input class$="input [[s_title]]" id="title" placeholder="Ejemplo: Electrisista con 20 años de experiencia" type="text" name="title">
+      </div>
+      <div class="section btop">
+        <h2>Descripcion de tu Perfil</h2>
+        <label>Ingresa una descripcion profesional que describa lo que haces</label>
+        <textarea id="desc" class$="input [[s_desc]]" rows="8" cols="50"></textarea>
+      </div>
+      <div class="foot-wrap">
+        <paper-button class="green" disabled$="[[saveData]]" on-tap="_saveData">Continuar</paper-button>
+      </div>
+    </div>
+  </template>
+  <script>
+  class UpdateDetails extends Polymer.Element {
+    static get is() {
+      return 'update-details';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        items: Object,
+        latitude: Number,
+        longitude: Number,
+        locationName: String,
+        saveData: {
+          type: Boolean,
+          value: false
+        },
+        _itemsToSave: {
+          type: Number,
+          value: 4
+        },
+        s_title: String,
+        s_loc: String,
+        s_items: String,
+        s_desc: String
+      };
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('update-details.created');
+    }
+    ready(){
+      super.ready();
+    }
+    _saveData(){
+      console.log('saving...');
+      this.saveData = true;
+      this.s_title = null;
+      this.s_loc = null;
+      this.s_items = null;
+      this.s_desc = null;
+      let error;
+      if(this.$.title.value === ''){
+        this.s_title = 'error';
+        error = true;
+      }
+      if(this.$.desc.value === ''){
+        this.s_desc = 'error';
+        error = true;
+      }
+      if(!this.latitude|| !this.longitude){
+        this.s_loc = 'error';
+        error = true;
+      }
+      console.log(this.items);
+      if(this.items.length === 0){
+        this.s_items = 'error';
+        error = true;
+      }
+      if (error) {
+        this.saveData = false;
+        return;
+      };
+      let promises = [];
+      promises.push(firebase.app().database().ref(`/users/${this.uid}/profile`).update({slogan: this.$.title.value, description: this.$.desc.value}));
+      promises.push(firebase.app().database().ref(`/users/${this.uid}/account/c`).set(this.items));
+      promises.push(firebase.app().database().ref(`/users/${this.uid}/account/l`).set({lat:this.latitude, lng:this.longitude, name:this.locationName}));
+      Promise.all(promises).then(values => {
+        console.log('all saved & updated');
+        let promise = firebase.app().database().ref(`/users/${this.uid}/account/a/pc`).set(true);
+        promise.then(() => {
+          Polymer.AppLayout.scroll({ top: 0, behavior: 'silent' });
+        });
+      });
+    }
+  }
+  window.customElements.define(UpdateDetails.is, UpdateDetails);
+  </script>
+</dom-module>

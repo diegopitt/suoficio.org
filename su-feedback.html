@@ -1,0 +1,166 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="redux/redux-mixin.html">
+<link rel="import" href="star-rating.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-feedback">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .feedback-wrap {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      margin: 14px 0;
+    }
+    .feedback-wrap > div{
+      @apply --layout-flex;
+    }
+    .score-value {
+      @apply --layout-vertical;
+      @apply --layout-end;
+    }
+    .item {
+      @apply --layout-horizontal;
+      margin:12px 0;
+    }
+    .score-value {
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+    }
+    .score{
+      padding:20px;
+      font-weight: 300;
+      color: #333;
+      font-size: 52px;
+    }
+    .label {
+      @apply --su-font-medium;
+      line-height: 28px !important;
+      padding:0px 10px;
+      color: var(--app-aqua-font);
+    }
+    textarea {
+      @apply --su-oficio-font-base;
+      width: calc(100% - 20px);
+      border: 1px solid var(--app-muted-color);
+      padding: 11px 10px;
+      font-size: 13px;
+      color: #656565;
+      outline: none;
+      line-height: 14px;
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      -webkit-transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      margin: 6px 0px 14px 0px;
+    }
+    paper-button {
+      text-align: center;
+      display: block;
+    }
+    @media (max-width: 767px) {
+      .score-value{
+        display: none !important;
+      }
+    }
+    </style>
+    <div class="feedback-wrap" id="feedback">
+      <div class="star-scores">
+        <div class="item">
+          <div class="rating-item">
+            <star-rating rate="{{quality}}"></star-rating>
+          </div>
+          <div class="label">Calidad</div>
+        </div>
+        <div class="item">
+          <div class="rating-item">
+            <star-rating rate="{{price}}"></star-rating>
+          </div>
+          <div class="label">Precio</div>
+        </div>
+        <div class="item">
+          <div class="rating-item">
+            <star-rating rate="{{reliability}}"></star-rating>
+          </div>
+          <div class="label">Confiabilidad</div>
+        </div>
+      </div>
+      <div class="score-value">
+        <div class="total"><span class="score">&nbsp;[[total]]</span></div>
+      </div>
+    </div>
+    <textarea id="review_desc" rows="8" rating-items="50" label="Explica tu calificacion aqui"></textarea>
+    <paper-button class="green" on-tap="_sendFeedback">Calificar</paper-button>
+  </template>
+  <script>
+  class SuFeedback extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'su-feedback';
+    }
+    static get properties() {
+      return {
+        contract: Object,
+        feedbackComplete: {
+          type: Boolean,
+          notify: true,
+          value: false
+        },
+        destination: String,
+        selected_contract: {
+          type: String,
+          statePath: 'selected_contract'
+        },
+        key: String,
+        quality: {
+          type: Number,
+          value: 0
+        },
+        price: {
+          type: Number,
+          value: 0
+        },
+        reliability: {
+          type: Number,
+          value: 0
+        },
+        total: {
+          type: Number,
+          computed: '_setScore(quality, price, reliability)'
+        }
+      };
+    }
+    ready() {
+      super.ready();
+      Polymer.AppLayout.scroll({ top: 300, behavior: 'smooth'});
+    }
+    _sendFeedback(){
+      this.set('contract.isactive', false);
+      this.set('contract.ended', firebase.database.ServerValue.TIMESTAMP);
+      this.set('contract.u.' + this.uid, true);
+      let review = {
+        contract: this.selected_contract,
+        jobkey: this.contract.jobkey,
+        date: firebase.database.ServerValue.TIMESTAMP,
+        description: this.shadowRoot.querySelector('#review_desc').value,
+        sc: Number.parseFloat(this.total)
+      };
+      var promise = firebase.app().database().ref(`/reviews/${this.destination}/${this.selected_contract}`).set(review);
+      promise.then( () => {
+        this.feedbackComplete = true;
+        this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: 'contratos' } }));
+        this.dispatchEvent(new CustomEvent('notify-user', {bubbles: true, composed: true, detail: { message: 'Gracias por su calificacion !' } }));
+      });
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-feedback.created');
+    }
+    _setScore(quality, price, reliability) {
+      let sum = quality + price + reliability
+      return (sum / 3).toFixed(2);
+    }
+  }
+  window.customElements.define(SuFeedback.is, SuFeedback);
+  </script>
+</dom-module>

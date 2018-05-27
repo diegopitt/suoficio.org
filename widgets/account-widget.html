@@ -1,0 +1,116 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../redux/redux-mixin.html">
+<link rel="import" href="../su-avatar.html">
+<dom-module id="account-widget">
+  <template>
+    <style>
+    :host {
+      display: block;
+      background-color: #fff;
+      border-radius: 10px;
+      width: 100%;
+    }
+    .main-wrap{
+      @apply --layout-flex;
+    }
+    .row{
+      @apply --layout-horizontal;
+      padding: 14px;
+    }
+    .row-full{
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+      padding: 2px 0px;
+      background-color: #F9F9F9;
+      border-top: 1px solid #CCCCCC;
+      @apply --layout-center;
+    }
+    .details{
+      @apply --layout-flex;
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+    .user-name{
+      font-family: 'Gotham Book M';
+      font-size: 16px;
+      line-height: 17px;
+      color: #000;
+    }
+    .user-email{
+      font-size:12px;
+      line-height: 20px;
+      color: var(--app-font-color-light);
+    }
+    paper-button.white {
+      @apply --su-font-xsmall;
+      margin: 3px 14px;
+      border-radius: 0px;
+      background-color: #fff;
+      padding: 2px 14px;
+      border: 1px solid #CCCCCC;
+      color: var(--app-aqua-font);
+    }
+    </style>
+    <div class="main-wrap">
+      <div class="row">
+        <su-avatar class="avatar" sizing="medium" src="[[profile_picture]]"></su-avatar>
+        <div class="details">
+          <div class="user-name">[[user_name]] [[user_last]]</div>
+          <div class="user-email">[[user.email]]</div>
+          <div></div>
+        </div>
+      </div>
+      <div class="row-full">
+        <paper-button class="white" on-tap="_logout">Salir</paper-button>
+      </div>
+    </div>
+  </template>
+  <script>
+  class AccountWidget extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'account-widget';
+    }
+    static get properties() {
+      return {
+        account: Object,
+        user: Object,
+        profile_picture: {
+          type: String,
+          statePath: 'profile_picture'
+        },
+        user_name: {
+          type: String,
+          statePath: 'user_name'
+        },
+        user_last: {
+          type: String,
+          statePath: 'user_last'
+        },
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('account-widget.created');
+    }
+    _logout(){
+      this.dispatchEvent(new CustomEvent('log-out', {bubbles: true, composed: true}));
+    }
+    _getUsername(userName) {
+      if (userName === undefined) return;
+      return userName;
+    }
+    _getUserLastname(userLast) {
+      if (userLast === undefined) return;
+      return userLast;
+    }
+    _getCreateTime(timestamp) {
+      return moment(timestamp).format('MMMM  [de] YYYY');
+    }
+  }
+  window.customElements.define(AccountWidget.is, AccountWidget);
+  </script>
+</dom-module>

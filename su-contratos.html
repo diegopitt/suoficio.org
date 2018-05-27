@@ -1,0 +1,171 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="contract-item.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-contratos">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      @apply --layout-vertical;
+    }
+    .wrap{
+      @apply --common-borders;
+      margin: 24px 8px 24px 8px;
+    }
+    .header{
+      background-color: #f9f9f9;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      @apply --layout-horizontal;
+      @apply --layout-justified;
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    .page_title{
+      margin-top: 20px;
+    }
+    .help{
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      padding: 24px 20px;
+    }
+    .subtitle{
+      padding: 24px 20px;
+      @apply --su-font-subhead;
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+    }
+    .content{
+      padding-top: 24px;
+    }
+    paper-icon-button {
+      --paper-icon-button-ink-color: transparent;
+      padding: 3px;
+      width: 24px;
+      height: 24px;
+      color: var(--app-aqua-font);
+    }
+    contract-item:first-of-type {
+      margin-top:-24px;
+    }
+    contract-item:not(:last-of-type) {
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    @media (max-width: 767px) {
+      :host {
+        margin-top: 24px;
+      }
+      .wrap{
+        margin: 0px 8px 24px 8px;
+      }
+      .subtitle{
+        @apply --su-font-medium;
+        line-height: 24px;
+        padding: 12px 0px 8px 16px;
+      }
+      .help{
+        @apply --layout-vertical;
+        @apply --layout-center-center;
+        line-height: 14px;
+        padding: 0px 12px 0px 0px;
+      }
+      paper-icon-button {
+        padding: 0px;
+        width:14px;
+        height:14px;
+      }
+      .page_title{
+        padding-left: 10px;
+        margin-top: 0px;
+      }
+    }
+    </style>
+    <app-route active="{{isActive}}" route="{{route}}" pattern="/:contractKey" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <firebase-query path="users/[[uid]]/contracts/a" data="{{activecontracts}}"></firebase-query>
+    <firebase-query path="users/[[uid]]/contracts/i" data="{{inactivecontracts}}"></firebase-query>
+    <dom-if if="[[!_shouldShowContract(isActive, visible)]]">
+      <template>
+        <div class="page_title">Contratos de Trabajo</div>
+        <div class="wrap">
+          <div class="header">
+            <div class="subtitle">[[activecontracts.length]]&nbsp;&nbsp;Contratos activos</div>
+            <div class="help"><paper-icon-button noink on-tap="" icon="myicons:help"></paper-icon-button></div>
+          </div>
+          <div class="content">
+            <dom-repeat items="[[activecontracts]]">
+              <template>
+                <contract-item uid="[[uid]]" contract-key="[[item.$key]]"></contract-item>
+              </template>
+            </dom-repeat>
+          </div>
+        </div>
+        <div class="wrap">
+          <div class="header">
+            <div class="subtitle">[[inactivecontracts.length]]&nbsp;&nbsp;Contratos finalizados</div>
+            <div class="help"><paper-icon-button noink on-tap="" icon="myicons:help"></paper-icon-button></div>
+          </div>
+          <div class="content">
+            <dom-repeat items="[[inactivecontracts]]">
+              <template>
+                <contract-item uid="[[uid]]" contract-key="[[item.$key]]"></contract-item>
+              </template>
+            </dom-repeat>
+          </div>
+        </div>
+      </template>
+    </dom-if>
+    <dom-if if="[[_shouldShowContract(isActive, visible)]]">
+      <template>
+        <my-contract route="[[subroute]]" uid="[[uid]]" contract-key="[[routeData.contractKey]]"></my-contract>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class SuContratos extends Polymer.Element {
+    static get is() {
+      return 'su-contratos';
+    }
+    static get properties() {
+      return {
+        visible: {
+          type: Boolean,
+          value: false
+        },
+        uid: String
+      };
+    }
+    static get observers() {
+      return [
+        '_loadLazyResources(isActive, visible)',
+      ]
+    }
+    _shouldShowContract(isActive, visible) {
+      if (isActive === undefined && visible === undefined) return;
+      return (isActive && visible);
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-contratos.created');
+    }
+    _loadLazyResources(isActive, visible) {
+      if (!this.loadComplete) {
+        if (isActive === true && visible === true) {
+          this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+            Polymer.Async.microTask, () => {
+              Polymer.RenderStatus.afterNextRender(this, () => {
+                Polymer.importHref(this.resolveUrl('my-contract.html'), () => {
+                  this.loadComplete = true;
+                  console.log('my-contract loaded!')
+                });
+              }
+            );
+          });
+        }
+      }
+    }
+  }
+  window.customElements.define(SuContratos.is, SuContratos);
+  </script>
+</dom-module>

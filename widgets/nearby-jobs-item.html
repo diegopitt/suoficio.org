@@ -1,0 +1,111 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
+<dom-module id="nearby-jobs-item">
+  <template>
+    <style>
+    :host {
+      display: block;
+      width: 100%;
+    }
+    :host([is-widget]) .job-wrapper{
+      padding-left:14px;
+    }
+    .job{
+      margin-top: 14px;
+      margin-bottom: 24px;
+      @apply --layout-flex;
+      @apply --su-oficio-font-nowrap;
+      padding:0px 20px 0px 0px;
+    }
+    .job > div{
+      line-height: 1.42857;
+    }
+    .job-wrapper{
+      @apply --layout-horizontal;
+    }
+    .job-description{
+      @apply --su-oficio-font-nowrap;
+      @apply --layout-flex;
+      font-size: 11px;
+      padding: 10px 0px;
+    }
+    .job-footer{
+      font-size: 11px;
+      color:var(--app-font-color-light);
+      @apply --layout-horizontal;
+      @apply --layout-justified;
+    }
+    .job-name{
+      font-size: 13px;
+      text-decoration: none;
+      display: inline;
+      @apply --layout-flex;
+      color: #00A680;
+      @apply --su-oficio-font-nowrap;
+      font-weight: 500;
+    }
+    .job-amount{
+      font-size: 10px;
+      color: #00A680;
+      font-weight: 500;
+    }
+    .chip.blue{
+      font-weight: 500;
+      color: #0093b8;
+      background-color: #d7fafa;
+      font-size: 10px;
+      padding: 4px 8px;
+    }
+    </style>
+    <firebase-document  path="/jobs/[[jobkey]]" data="{{job}}"></firebase-document>
+    <div class="job-wrapper">
+      <div class="job">
+        <a class="job-name" href="/buscar-trabajo/[[jobkey]]">[[job.name]]</a>
+        <div class="job-description">[[job.description]]</div>
+        <div class="job-footer">
+          <div class="chip blue">[[_calculateDistance(distance)]]</div>
+          <div class="job-amount">$ [[_formatAmount(job.budget)]]</div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class NearbyJobsItem extends Polymer.Element {
+    static get is() {
+      return 'nearby-jobs-item';
+    }
+    static get properties() {
+      return {
+        jobkey: String,
+        distance: String
+      };
+    }
+    static get observers() {
+      return []
+    }
+    ready() {
+      super.ready();
+    }
+    _calculateDistance(distance){
+      if (Number(distance) > 1){
+        return (' a ' + distance.toFixed(2) + ' kilometros');
+        
+      }else{
+        return (' a ' + distance.toFixed(2) * 1000 + ' metros');
+      }
+    }
+    _isFav(favorites, key) {
+      if (favorites === undefined || key === undefined) return;
+      return favorites[key];
+    }
+    _formatAmount(amount) {
+      return Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('nearby-jobs-item.created');
+    }
+  }
+  window.customElements.define(NearbyJobsItem.is, NearbyJobsItem);
+  </script>
+</dom-module>

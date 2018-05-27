@@ -1,0 +1,15 @@
+<link rel="import" href="redux-mixin.html">
+<script>
+  PopupMixin = Parent => class PopupMixin extends ReduxMixin(Parent) {
+    static get actions() {
+      return {
+        togglePopup(popupstate) {
+          return {
+            type: 'POPUP_DATA',
+            popupstate
+          };
+        }
+      }
+    }
+  }
+</script>

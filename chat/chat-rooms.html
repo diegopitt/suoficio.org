@@ -1,0 +1,98 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="room-item.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="chat-rooms">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      height: calc(100% - 83px);
+      --selected-border:{
+        border-color: transparent;
+      };
+    }
+    .rooms-wrap{
+      height:100%;
+      overflow: auto;
+    }
+    .img-wrap{
+      margin-top: 14px;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    .copy-wrap{
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      color: var(--app-font-color-light);
+    }
+    .rooms-wrap .iron-selected {
+      --selected-item:{
+        color: var(--app-aqua-font);
+        font-weight: 400;
+      };
+      --selected-border:{
+        border-color: var(--app-aqua-font);
+      };
+      --selected-background:{
+        background-color: #f9f9f9;
+      };
+    }
+    </style>
+    <div class="rooms-wrap">
+      <iron-selector id="rsel" selected="{{selectedRoom}}" attr-for-selected="selected-room" activate-event="tap">
+        <template is="dom-repeat" items="[[userChats]]">
+          <room-item uid="[[uid]]" selected-room="[[item]]" data="[[item]]"></room-item>
+        </template>
+        <dom-if if="[[!userChats.length]]">
+          <template>
+            <div class="img-wrap">
+              <img src="images/notify.png" style="width:119px;height:119px;padding:24px;">
+            </div>
+            <div class="copy-wrap">No tines ningun chat</div>
+          </template>
+        </dom-if>
+      </iron-selector>
+    </div>
+  </template>
+  <script>
+  class LeftHeader extends Polymer.Element {
+    static get is() {
+      return 'chat-rooms';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        userChats: {
+          type: Object
+        },
+        selectedRoom: {
+          type: Object,
+          reflectToAttribute: true,
+          notify: true
+        },
+        smallScreen: Boolean
+      };
+    }
+    static get observers() {
+      return []
+    }
+    ready() {
+      super.ready();
+      this.addEventListener('iron-items-changed', function onIronItemsChanged() {
+        this.removeEventListener('iron-items-changed', onIronItemsChanged);
+        if(!this.smallScreen){
+          setTimeout(function() {
+            this.$.rsel.selectIndex(0);
+          }.bind(this), 500);
+        }
+      });
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('chat-rooms.created');
+    }
+  }
+  window.customElements.define(LeftHeader.is, LeftHeader);
+  </script>
+</dom-module>

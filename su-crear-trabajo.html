@@ -1,0 +1,382 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="data/app-category-data.html">
+<link rel="import" href="data/app-timing-data.html">
+<link rel="import" href="address-lookup/address-lookup.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-crear-trabajo">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+    }
+
+    .create-wrap {
+      margin-top: 40px !important;
+      @apply --layout-flex;
+      @apply --common-borders;
+    }
+
+    .main-title {
+      @apply --su-page-title;
+      @apply --layout-horizontal;
+      @apply --layout-flex;
+      @apply --layout-center;
+    }
+
+    paper-button {
+      width: 200px;
+    }
+
+    .create-head {
+      @apply --layout-horizontal;
+      border-bottom: 1px solid #e0e0e0;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      background-color: #f9f9f9 !important;
+      padding: 24px;
+    }
+
+    .body-wrap {
+      padding: 0px 0px 0px 0px;
+      @apply --layout-flex;
+    }
+
+    .step-create {
+      @apply --layout-flex;
+      @apply --layout-vertical;
+      padding: 30px;
+    }
+
+    .foot-wrap {
+      @apply --layout-horizontal;
+      @apply --layout-end-justified;
+      padding: 24px;
+    }
+
+    .label {
+      display: inline-block;
+      padding: 0px 0px 0px 24px;
+      margin-bottom: 14px;
+      color: var(--app-font-color);
+      line-height: 24px;
+      font-weight: 500;
+      font-size: 16px;
+      text-align: left;
+    }
+
+    .label-wrap {
+      @apply --layout-horizontal;
+    }
+
+    .stp {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 14px;
+      line-height: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: #fff;
+      background: var(--app-aqua-font);
+    }
+
+    select {
+      @apply --su-oficio-font-base;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      outline: none;
+      padding: 14px 36px 14px 18px;
+      width: 80%;
+      font-size: 14px;
+      background-color: #fff;
+      margin-left: 36px;
+      border: none;
+      color: var(--app-aqua-font);
+      background: url(../images/a-down.svg) no-repeat right;
+      background-size: 34px 34px;
+      -webkit-box-shadow: 0 1px 6px rgba(57,73,76,0.35);
+      box-shadow: 0 1px 6px rgba(57,73,76,0.35);
+    }
+
+    select option {
+      font-size: 12px !important;
+    }
+
+    address-lookup {
+      margin-left: 36px;
+    }
+    address-lookup {
+      width: calc(80%);
+    }
+    .input {
+      width: calc(80% - 20px);
+      @apply --su-oficio-font-base;
+      margin: 0px;
+      outline: none;
+      border: none;
+      padding: 14px 10px;
+      font-size: 16px;
+      margin-left: 36px;
+      line-height: 24px;
+      color: var(--app-font-color);
+      -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+      -webkit-box-shadow: 0 1px 6px rgba(57,73,76,0.35); */
+      box-shadow: 0 1px 6px rgba(57,73,76,0.35);
+    }
+
+    .error {
+      border-color: var(--app-red-color);
+    }
+
+    .input:hover {
+      border-color: var(--app-aqua-font);
+    }
+
+    .input:focus {
+      border-color: var(--app-aqua-font);
+    }
+
+    @media (max-width: 767px) {
+      .create-wrap {
+        margin-top: 24px;
+        border: none;
+        box-shadow: none;
+        margin: 0px;
+      }
+      .main-title {
+        display: none !important;
+      }
+      .step-create {
+        @apply --common-borders;
+        padding: 14px 0px 6px 0px;
+        margin-bottom: 24px !important;
+      }
+      .label-wrap {
+        border-bottom: 1px solid var(--app-little-grey);
+      }
+      .create-head {
+        padding: 0px;
+        border-bottom: none;
+        background-color: transparent;
+      }
+      .input {
+        width: calc(100% - 24px);
+        margin-left: 0px;
+        border-right: 0px;
+        border-left: 0px;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+      }
+      select {
+        width: 100%;
+        margin-left: 0px;
+        font-size: 14px !important;
+        border-right: 0px;
+        border-left: 0px;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+      }
+      .stp {
+        margin-left: 14px;
+      }
+      .label {
+        font-size: 14px;
+        color: var(--app-font-color-light);
+        font-weight: 400;
+        line-height: 24px;
+        margin-bottom: 14px;
+        padding: 0px 0px 0px 14px;
+      }
+      address-lookup {
+        margin-left: 0px;
+      }
+      .body-wrap {
+        padding: 0px;
+      }
+      .foot-wrap {
+        padding: 30px 14px 0px 14px;
+      }
+    }
+    </style>
+    <app-category-data categories="{{categories}}"></app-category-data>
+    <app-timing-data times="{{times}}"></app-timing-data>
+    <div class="create-wrap">
+      <div class="create-head">
+        <div class="main-title">Crear Trabajo</div>
+      </div>
+      <div class="body-wrap">
+        <div class="step-create">
+          <div class="label-wrap">
+            <div class="stp">1</div>
+            <div class="label">Selecciona una categoria</div>
+          </div>
+          <select id="catSelect" class$="[[s_category]]">
+            <option value="0">Seleccione una opcion</option>
+            <template is="dom-repeat" items="[[categories]]">
+              <option value="[[item.value]]">[[item.title]]</option>
+            </template>
+          </select>
+        </div>
+        <div class="step-create">
+          <div class="label-wrap">
+            <div class="stp">2</div>
+            <div class="label">Presupuesto para tu trabajo</div>
+          </div>
+          <select id="amountSelect" class$="[[s_amount]]">
+            <option value="0">Seleccione una opcion</option>
+            <option value="500">Menos de $ 500</option>
+            <option value="1000">Menos de $ 1,000.00</option>
+            <option value="2000">Menos de $ 2,000.00</option>
+            <option value="4000">Menos de $ 4,000.00</option>
+            <option value="8000">Menos de $ 8,000.00</option>
+            <option value="10000">Menos de $ 10,000.00</option>
+            <option value="20000">Menos de $ 20,000.00</option>
+            <option value="40000">Menos de $ 40,000.00</option>
+            <option value="80000">Menos de $ 80,000.00</option>
+            <option value="100000">Menos de $ 100,000.00</option>
+          </select>
+        </div>
+        <div class="step-create">
+          <div class="label-wrap">
+            <div class="stp">3</div>
+            <div class="label">Cuando inicia su trabajo?</div>
+          </div>
+          <select id="timingSelect" name="timingSelect" class$="[[s_timing]]">
+            <option value="0">Seleccione una opcion</option>
+            <template is="dom-repeat" items="[[times]]">
+              <option value="[[item.value]]">[[item.title]]</option>
+            </template>
+          </select>
+        </div>
+        <div class="step-create">
+          <div class="label-wrap">
+            <div class="stp">4</div>
+            <div class="label">Titulo de tu trabajo</div>
+          </div>
+          <input class$="input [[s_title]]" id="title" placeholder="Ejemplo: Se solicita pintores para obra en construccion" type="text" name="title">
+        </div>
+        <div class="step-create">
+          <div class="label-wrap">
+            <div class="stp">5</div>
+            <div class="label">Descripcion de tu trabajo</div>
+          </div>
+          <textarea id="desc" class$="input [[s_desc]]" rows="8" cols="50"></textarea>
+        </div>
+        <div class="step-create">
+          <div class="label-wrap">
+            <div class="stp">6</div>
+            <div class="label">Ubicacion de tu trabajo</div>
+          </div>
+          <address-lookup no-borders uid="[[uid]]" latitude="{{latitude}}" longitude="{{longitude}}" location-name="{{locationName}}"></address-lookup>
+        </div>
+        <div class="step-create">
+          <div class="label-wrap">
+            <div class="stp">7</div>
+            <div class="label">Cantidad de trabajadores</div>
+          </div>
+          <select id="workersSelect">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+        <div class="foot-wrap">
+          <paper-button class="green" on-tap="_createJob">Crear Trabajo</paper-button>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class SuCrearTrabajo extends Polymer.Element {
+    static get is() {
+      return 'su-crear-trabajo';
+    }
+    static get properties() {
+      return {
+        s_category: String,
+        uid: String,
+        s_amount: String,
+        s_timing: String,
+        s_title: String,
+        s_desc: String,
+        latitude: Number,
+        longitude: Number,
+        locationName: String
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _createJob() {
+      let error;
+      if (this.$.catSelect.value === '0') {
+        this.s_category = 'error';
+        error = true;
+      }
+      if (this.$.amountSelect.value === '0') {
+        this.s_amount = 'error';
+        error = true;
+      }
+      if (this.$.timingSelect.value === '0') {
+        this.s_timing = 'error';
+        error = true;
+      }
+      if (this.$.title.value === '') {
+        this.s_title = 'error';
+        error = true;
+      }
+      if (this.$.desc.value === '') {
+        this.s_desc = 'error';
+        error = true;
+      }
+      if (this.latitude === undefined || this.longitude === undefined) {
+        this.s_loc = 'error';
+        error = true;
+      }
+      if (error) return;
+      let jobDetails = {
+        date: firebase.database.ServerValue.TIMESTAMP,
+        name: this.$.title.value,
+        description: this.$.desc.value,
+        budget: this.$.amountSelect.value,
+        category: parseInt(this.$.catSelect.value, 10),
+        type: 1,
+        timing: parseInt(this.$.timingSelect.value, 10),
+        proposals: 0,
+        invited: 0,
+        hires: 0,
+        l: {
+          lat: this.latitude,
+          lng: this.longitude,
+          name: this.locationName
+        },
+        workers: parseInt(this.$.workersSelect.value, 10),
+        maxprop: false,
+        ishired: false,
+        owner: this.uid
+      };
+      let promise = firebase.app().database().ref(`/jobs`).push(jobDetails);
+      promise.then(() => {
+        this.dispatchEvent(new CustomEvent('notify-user', { bubbles: true, composed: true, detail: { message: 'Su trabajo a sido publicado exitosamente' } }));
+        this.dispatchEvent(new CustomEvent('change-route', { bubbles: true, composed: true, detail: { location: 'trabajos/activos' } }));
+      });
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-crear-trabajos.created');
+    }
+  }
+  window.customElements.define(SuCrearTrabajo.is, SuCrearTrabajo);
+  </script>
+</dom-module>

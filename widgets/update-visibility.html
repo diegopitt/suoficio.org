@@ -1,0 +1,161 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="update-visibility">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      color: #222;
+      @apply --su-oficio-font-base;
+    }
+    :host([no-wrapper]) .wrapper {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+    :host([no-wrapper]) h2{
+      display: none !important;
+    }
+    :host(:not([no-wrapper])) .wrapper{
+      @apply --common-borders;
+    }
+    .wrapper{
+      @apply --layout-flex;
+      margin: 0 -30px;
+      padding: 30px;
+    }
+    h2{
+      color: var(--app-font-color);
+      word-break: break-word;
+      margin: 0 0 30px;
+      line-height: 28px;
+      font-size: 22px ;
+      font-weight: 400;
+    }
+    .content-wrap{
+      @apply --layout-horizontal;
+      @apply --layout-center;
+      margin: 14px 0px;
+    }
+    label {
+      font-size: 15px;
+      color: var(--app-font-color-light);
+    }
+    .error{
+      border-color: var(--app-red-color);
+    }
+    .section{
+      @apply --layout-flex;
+      margin: 0px 14px;
+    }
+    iron-selector{
+      @apply --layout-horizontal;
+      @apply --layout-around-justified;
+    }
+    iron-selector > div{
+      cursor: pointer;
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      outline: transparent;
+      border: 1px solid var(--app-font-color-light);
+      padding: 14px;
+      margin-right: 14px;
+    }
+    .iron-selected {
+      border-color: var(--app-accent-green);
+    }
+    .iron-selected iron-icon{
+      color: var(--app-accent-green);
+    }
+    iron-icon{
+      color:  var(--app-font-color-light);
+      width: 36px;
+      height: 36px;
+      margin: 14px 0px 14px 0px;
+    }
+    .desc{
+      font-size: 13px;
+      text-align: center;
+      margin: 24px 0;
+      color: var(--app-font-color-light);
+    }
+    @media (max-width: 767px) {
+      .section{
+        
+      }
+    }
+    </style>
+    <div class="wrapper">
+      <div class="section">
+        <h2>Visibilidad de tu Perfil</h2>
+        <label>Selecciona una opcion</label>
+        <div class="content-wrap">
+          <iron-selector selected="{{userVisible}}" attr-for-selected="visible">
+            <div class="item" visible="true" tabindex="-1">
+              <iron-icon icon="myicons:visible"></iron-icon>
+              <div>Visible</div>
+              <div class="desc">Clientes podran encontrarte y enviar propuestas laborales</div>
+            </div>
+            <div class="item" visible="false" tabindex="-1">
+              <iron-icon icon="myicons:visible-off"></iron-icon>
+              <div>No Visible</div>
+              <div class="desc">Clientes no podran encontrarte ni recibiras propuestas laborales</div>
+            </div>
+          </iron-selector>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class UpdateVisibility extends Polymer.Element {
+    static get is() {
+      return 'update-visibility';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        userVisible:{
+          type: Boolean,
+          notify: true,
+          value: true
+        },
+        saveData:{
+          type: Boolean,
+          notify: true,
+          observer: '_saveData'
+        },
+      };
+    }
+    _saveData(save){
+      if(save){
+        let p1 = firebase.app().database().ref(`/users/${this.uid}/account/vi`).set(this.userVisible);
+        p1.then( () => {
+          console.log('just saved!');
+          this.dispatchEvent(new CustomEvent('close-dialog', {bubbles: true, composed: true, detail: { test: '1' } }));
+        });
+        this.saveData = false;
+      }else{
+        firebase.app().database().ref(`/users/${this.uid}/account/vi`).on('value', function(snapshot){
+          this.userVisible = snapshot.val();
+        }.bind(this));
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('update-visibility.created');
+    }
+    ready(){
+      super.ready();
+      this.addEventListener('iron-items-changed', function onIronItemsChanged() {
+        this.removeEventListener('iron-items-changed', onIronItemsChanged);
+        firebase.app().database().ref(`/users/${this.uid}/account/vi`).once('value').then(function(snapshot) {
+         //this.userVisible = snapshot.val();
+         console.log(snapshot.val());
+        }.bind(this));
+      });
+    }
+  }
+  window.customElements.define(UpdateVisibility.is, UpdateVisibility);
+  </script>
+</dom-module>

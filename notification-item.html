@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="data/app-notifications-data.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="notification-item">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .main-wrap{
+      @apply --common-borders;
+      @apply --su-font-medium;
+      @apply --layout-horizontal;
+      border-bottom: 1px solid #d9d9d9;
+      margin-bottom:24px;
+    }
+    .noti-copy{
+      padding: 24px;
+      @apply --layout-flex;
+    }
+    .deco{
+      width: 40px;
+      border-right: 1px solid #d9d9d9;
+    }
+    .bold{
+      font-weight: 500;
+      font-size: 10px;
+      text-transform: capitalize;
+    }
+    .horizontal{
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    .flex {
+      @apply --layout-flex;
+    }
+    paper-button {
+      @apply --su-font-xx-small;
+    }
+    @media (max-width: 767px) {
+      .noti-copy{
+        padding: 14px;
+      }
+    }
+    </style>
+    <app-notifications-data notification-value="[[item.t]]" notification="{{notification}}"></app-notifications-data>
+    <div class="main-wrap">
+      <div class="noti-copy">
+        <div class="bold">[[_formatDate(item.s)]]</div>
+        <div class="horizontal">
+          <div class="flex">[[notification.title]] => [[item.k]]</div>
+          <paper-button noink class="small blue">Ver</paper-button>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class NotificationItem extends Polymer.Element {
+    static get is() {
+      return 'notification-item';
+    }
+    static get properties() {
+      return {
+        item: Object
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('notification-item.created');
+    }
+    _formatDate(timestamp) {
+      return moment(timestamp).fromNow();
+    }
+  }
+  window.customElements.define(NotificationItem.is, NotificationItem);
+  </script>
+</dom-module>

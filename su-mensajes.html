@@ -1,0 +1,61 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="chat/chat-wrapper.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-mensajes">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      padding: 12px 15px;
+      box-sizing: border-box;
+    }
+    .chat-wrap{
+      @apply --layout-flex;
+      @apply --layout-self-stretch;
+      @apply --layout-wrap;
+      border: 1px solid var(--app-little-grey);
+    }
+    @media (max-width: 767px) {
+      :host {
+        padding: 0px 0px;
+      }
+      .chat-wrap{
+        border-width: 0px;
+      }
+    }
+    </style>
+    <firebase-query path="/users/[[uid]]/chats" data="{{userChats}}"></firebase-query>
+    <div class="chat-wrap">
+      <chat-wrapper visible="[[visible]]" user-chats="[[userChats]]" small-screen="[[smallScreen]]" uid="[[uid]]"></chat-wrapper>
+    </div>
+  </template>
+  <script>
+  class SuMensajes extends Polymer.Element {
+    static get is() {
+      return 'su-mensajes';
+    }
+    static get properties() {
+      return {
+        smallScreen: Boolean,
+        uid: String,
+        userChats: {
+          type: Object
+        },
+        visible: {
+          type: Boolean,
+          value: false
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-mensajes.created');
+    }
+  }
+  window.customElements.define(SuMensajes.is, SuMensajes);
+  </script>
+</dom-module>

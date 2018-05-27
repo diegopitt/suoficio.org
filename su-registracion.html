@@ -1,0 +1,283 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-registracion">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      height: calc(100vh - 74px);
+    }
+    paper-button {
+      padding: 11px 36px;
+    }
+    .box-wrap{
+      @apply --common-borders;
+      padding:30px;
+      width:540px;
+    }
+    .submit-button{
+      margin-top: 12px !important;
+    }
+    .box-wrap > div{
+      margin:0px 0;
+      padding:12px 16px;
+      @apply --layout-horizontal;
+    }
+    .user-details{
+      @apply --layout-horizontal;
+      @apply --layout-start;
+    }
+    .user-details > div{
+      @apply --layout-flex;
+      margin:0px;
+      padding:0px 30px;
+    }
+    .center{
+      @apply --layout-center-center;
+    }
+    .user-name{
+      padding-left:0px !important;
+    }
+    .wrap-email{
+      @apply --layout-flex;
+    }
+    .pass-wrap{
+      @apply --layout-flex;
+    }
+    .user-last{
+      padding-right:0px !important;
+    }
+    .box-header{
+      margin-bottom: 12px !important;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 300;
+      color:#222;
+    }
+    .show-email{
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      @apply --su-page-title;
+      font-size: 22px;
+    }
+    .search-input {
+      width: calc(100% - 44px);
+      margin: 0px;
+      border: 1px solid var(--app-muted-color);
+      padding-left: 40px;
+      font-size: 14px;
+      line-height: 2.46;
+      color: var(--app-font-color);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      -webkit-transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+    }
+    .iron-selected {
+      background-color: var(--app-aqua-font);
+      border-color: var(--app-little-grey);
+      color:#fff;
+    }
+    .iron-selected .desc{
+      color:#137575;
+    }
+    .account-type-copy{
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      @apply --su-review-title;
+      padding-bottom: 0px !important;
+    }
+    iron-selector{
+      margin-top: 10px;
+      padding:12px 16px;
+      @apply --layout-horizontal;
+      @apply --layout-around-justified;
+    }
+    iron-selector > div{
+      cursor: pointer;
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      outline: none;
+      border: 1px solid var(--app-little-grey);
+      padding: 14px;
+      margin:  0 10px 0;
+    }
+    .desc{
+      font-size: 11px;
+      margin-top: 14px;
+      text-align: center;
+      color: var(--app-font-color-light);
+    }
+    .search-input:hover {
+      border-color: var(--app-accent-green);
+    }
+    .profile{
+      background: url(../images/profile.svg) no-repeat scroll 7px 7px;
+    }
+    .email{
+      background: url(../images/messages.svg) no-repeat scroll 7px 7px;
+    }
+    .pass{
+      background: url(../images/lock.svg) no-repeat scroll 7px 7px;
+    }
+    .pass-wrap{
+      @apply --layout-flex;
+      @apply --layout-vertical;
+    }
+    .item{
+      @apply --layout-flex;
+    }
+    .container {
+      @apply --layout-flex;
+    }
+    .error{
+      @apply --su-font-small-bold;
+      color: var(--app-red-color);
+      padding-left: 24px;
+      margin-top:10px;
+    }
+    .tcenter{
+      text-align:center;
+    }
+    @media (max-width: 767px) {
+      .user-details > div{
+        padding:0px 10px;
+      }
+      .box-wrap{
+        padding:4px;
+        border: none;
+        box-shadow: none;
+      }
+      paper-button.green {
+        @apply --layout-flex;
+      }
+      .submit-button{
+        margin-top: 2px !important;
+      }
+    }
+    </style>
+    <div class="box-wrap">
+      <dom-if if="[[!final]]">
+        <template>
+          <div class="box-header center">Registro de Usuario</div>
+          <div class="user-details">
+            <div class="user-name">
+              <input placeholder="Nombre" class="search-input profile" value="{{fname::input}}">
+              <div class="error" hidden$="[[!_nameError]]">Su Nombre es requerido</div>
+            </div>
+            <div class="user-last">
+              <input placeholder="Apellido" class="search-input profile" value="{{last::input}}">
+              <div class="error" hidden$="[[!_lastError]]">Su Apellido es requerido</div>
+            </div>
+          </div>
+          <div class="user-email">
+            <div class="wrap-email">
+              <input placeholder="Correo Electronico" class="search-input email" value="{{email::input}}">
+              <div class="error" hidden$="[[!_emailError]]">Su Correo Electronico es requerido</div>
+            </div>
+          </div>
+          <div class="submit-button center">
+            <paper-button class="green" on-tap="_next">Comenzar</paper-button>
+          </div>
+        </template>
+      </dom-if>
+      <dom-if if="[[final]]">
+        <template>
+          <div class="box-header center">Completa tu Registracion</div>
+          <div class="show-email">
+            [[email]]
+          </div>
+          <div class="user-password">
+            <div class="pass-wrap">
+              <input placeholder="Ingresa una Contraseña" type="password" class="search-input pass" value="{{password::input}}">
+              <div class="error" hidden$="[[!_passwordError]]">Una Contraseña es requerida (minimo 6 letras)</div>
+            </div>
+          </div>
+          <div class="account-type-copy">
+            Quiero
+          </div>
+          <iron-selector selected="{{accountType}}" attr-for-selected="type">
+            <div class="item" type="1" tabindex="-1">
+              <div>Contratar Personal</div>
+              <div class="desc">Crea una cuenta para contratar personal</div>
+            </div>
+            <div class="item" type="2" tabindex="-1">
+              <div>Encontrar Trabajo</div>
+              <div class="desc">Crea una cuenta para encontrar trabajos</div>
+            </div>
+          </iron-selector>
+          <div class="error tcenter" hidden$="[[!_accountError]]">Seleccione que desea hacer en suoficio</div>
+          <div class="submit-button center">
+            <paper-button class="green" on-tap="_register">Siguiente</paper-button>
+          </div>
+        </template>
+      </dom-if>
+    </div>
+  </template>
+  <script>
+  class SuRegistracion extends Polymer.Element {
+    static get is() {
+      return 'su-registracion';
+    }
+    static get properties() {
+      return {
+        fname: String,
+        last: String,
+        route: Object,
+        email: String,
+        password: String,
+        accountType: Number,
+        final: {
+          type: Boolean,
+          value: false
+        },
+        _emailError: {
+          Type: Boolean,
+          value: false
+        },
+        _nameError: {
+          Type: Boolean,
+          value: false
+        },
+        _lastError: {
+          Type: Boolean,
+          value: false
+        },
+        _passwordError: {
+          Type: Boolean,
+          value: false
+        },
+        _accountError: {
+          Type: Boolean,
+          value: false
+        },
+      };
+    }
+    _isEmail(email) {
+      let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    }
+    _isValidPassword(pass) {
+      let re = /^[a-zA-Z0-9!@#$%^&*]{6,16}$/
+      return re.test(pass);
+    }
+    _next(){
+      this._emailError = (!this._isEmail(this.email)) ? true : false;
+      this._nameError = (this.fname === undefined) ? true : false;
+      this._lastError = (this.last === undefined) ? true : false;
+      if (this._emailError || this._nameError || this._lastError) return;
+      this.final = true;
+    }
+    _register(){
+      this._passwordError = (!this._isValidPassword(this.password) || (this.password === undefined)) ? true : false;
+      this._accountError = (this.accountType === undefined) ? true : false;
+      if (this._accountError || this._passwordError || this.accountType === undefined) return;
+      this.dispatchEvent(new CustomEvent('register-user', { bubbles: true, composed: true, detail: { name: this.fname, last: this.last, email: this.email, pass: this.password, account: parseInt(this.accountType, 10) } }));
+    }
+  }
+  window.customElements.define(SuRegistracion.is, SuRegistracion);
+  </script>
+</dom-module>

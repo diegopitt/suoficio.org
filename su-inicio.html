@@ -1,0 +1,34 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="oficio-styles.html">
+<link rel="import" href="home/main-banner.html">
+<link rel="import" href="home/how-works.html">
+<link rel="import" href="home/home-categories.html">
+<link rel="import" href="home/home-map.html">
+<dom-module id="su-inicio">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    </style>
+    <main-banner></main-banner>
+    <how-works></how-works>
+    <home-categories></home-categories>
+    <home-map></home-map>
+  </template>
+  <script>
+  class SuInicio extends Polymer.Element {
+    static get is() {
+      return 'su-inicio';
+    }
+    static get properties() {
+      return {};
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-inicio.created');
+    }
+  }
+  window.customElements.define(SuInicio.is, SuInicio);
+  </script>
+</dom-module>

@@ -1,0 +1,299 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="widgets/account-widget.html">
+<link rel="import" href="redux/redux-mixin.html">
+<link rel="import" href="su-avatar.html">
+<link rel="import" href="su-dropdown.html">
+<dom-module id="su-header">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    app-header {
+      background-color: #fff;
+      border-bottom: 0px solid transparent;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    }
+    :host(:not([full-width])) app-toolbar {
+      /*max-width: 1000px;*/
+      max-width: 1030px;
+      height: 68px;
+      margin: 0 auto;
+    }
+    iron-icon {
+      width:18px;
+      height: 18px;
+      padding:0px 4px;
+    }
+    paper-button {
+      padding: 0px;
+      margin: 0px;
+      @apply --su-font-header;
+      color: var(--app-font-color-light);
+    }
+    paper-button.green {
+      padding: 11px 26px;
+      border-radius: 2px;
+      background-color: var(--app-aqua-font);
+      border: 1px solid var(--app-aqua-font);
+      color: #fff;
+    }
+    paper-button.gm {
+      color: var(--app-font-color);
+      font-size: 12px;
+      opacity: 0.7;
+      font-weight: 500;
+    }
+    paper-button.gm:hover {
+      opacity: 1;
+    }
+    [hidden]{
+      display: none !important;
+    }
+    .navigation{
+      @apply --layout-flex;
+    }
+    .wrap {
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
+    .wrap-guest{
+      @apply --layout-horizontal;
+      @apply --layout-center;
+    }
+    .wrap-guest * {
+      margin-left: 12px;
+    }
+    .wrap > div{
+      margin: 0 14px;
+    }
+    .notification-wrap {
+      padding:0px;
+      margin:0px;
+      position:relative;
+    }
+    .notifier-m{
+      position:absolute;
+      left: 28px;
+      top: 0px;
+      width: 10px;
+      height: 10px;
+      border-radius: 10px;
+      background-color: var(--app-orange-color-light);
+    }
+    .notifier{
+      position:absolute;
+      left: 22px;
+      top: 0px;
+      width: 10px;
+      height: 10px;
+      border-radius: 10px;
+      background-color: var(--app-orange-color-light);
+    }
+    paper-icon-button {
+      --paper-icon-button-ink-color: transparent;
+      color: #4B4B4B;
+      width: 26px;
+      height: 26px;
+      padding:0px;
+    }
+    paper-icon-button:hover {
+      color: var(--app-aqua-font);
+    }
+    .logo {
+      margin: 0 14px;
+      position: relative;
+      display: inline-block;
+      font-family: 'Gotham Bold';
+      font-size: 20px;
+      cursor: pointer;
+      color: #4B4B4B;
+    }
+    .o {
+      color: var(--app-aqua-font);
+    }
+    .os {
+      font-family: 'Gotham SSm';
+      color: var(--app-aqua-font);
+      font-size: 28px;
+      font-weight: 300;
+    }
+    .o2 {
+      padding-left: 1px;
+      position: relative;
+      background-color: #FFFFFF;
+      z-index: 1;
+    }
+    a{
+      text-decoration: none;
+    }
+    su-dropdown{
+      --su-dropdown-border-color: var(--app-little-grey);
+      --su-dropdown-background-color: #fff;
+      --su-dropdown-border-radius: 2px;
+    }
+    .drawer-toggle{
+      margin-right: 14px;
+      color: var(--app-aqua-font);
+    }
+    @media (max-width: 900px) {
+      .wrap > div{
+        margin: 0px 0px 0px 20px;
+      }
+    }
+    @media (max-width: 767px) {
+      .logo {
+        margin: 0 2px;
+        font-size: 19px;
+      }
+      paper-icon-button {
+        width: 23px;
+        height: 23px;
+      }
+      .notifier-m{
+        left: 24px;
+      }
+      .notifier{
+        left: 18px;
+      }
+    }
+    @media (max-width: 360px) {
+      .hidden{
+        display: none;
+      }
+      iron-icon{
+        display: none;
+      }
+    }
+    </style>
+    <iron-media-query query="max-width: 767px" query-matches="{{smallScreen}}"></iron-media-query>
+    <app-header role="navigation" id="header" condenses reveals>
+      <app-toolbar class="set-width">
+        <div class="wrap logo" on-tap="_goHome">
+          <span class="o">SU</span><span class="o2">OfICIO</span>
+        </div>
+        <div class="navigation">
+          <slot name="navigation"></slot>
+        </div>
+        <dom-if if="[[user]]">
+          <template>
+            <div class="wrap">
+              <div class="notification-wrap">
+                <a href="/mensajes" aria-label="Mensajes"><paper-icon-button  icon="myicons:mail-outline"></paper-icon-button></a>
+                <span class="notifier-m" hidden$="[[!has_message]]"></span>
+              </div>
+              <div class="notification-wrap">
+                <a href="/notificaciones" aria-label="Notificaciones"><paper-icon-button  icon="myicons:notifications-none"></paper-icon-button></a>
+                <span class="notifier" hidden$="[[!has_notification]]"></span>
+              </div>
+              <div>
+                <su-dropdown>
+                  <su-avatar slot="trigger" class="avatar" sizing="tiny" src="[[profile_picture]]"></su-avatar>
+                  <div slot="content" class="content">
+                    <account-widget user="[[user]]"></account-widget>
+                  </div>
+                </su-dropdown>
+              </div>
+            </div>
+          </template>
+        </dom-if>
+        <dom-if if="[[!user]]">
+          <template>
+            <div class="wrap-guest">
+              <paper-button hidden$="[[!_shouldShowButtons]]" class="gm" noink on-tap="">Como&nbsp;Funciona</paper-button>
+              <a href="/ingresar" tabindex="-1"><paper-button spacer hidden$="[[!_shouldShowlogin]]" class="gm" noink><iron-icon icon="myicons:app-in"></iron-icon>Ingresar</paper-button></a>
+              <a href="/registracion" tabindex="-1"><paper-button spacer hidden$="[[!_shouldShowButtons]]" class="green">ENCUENTRA&nbsp;TRABAJO</paper-button></a>
+            </div>
+          </template>
+        </dom-if>
+      </app-toolbar>
+    </app-header>
+  </template>
+  <script>
+  class SuHeader extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'su-header';
+    }
+    static get properties() {
+      return {
+        profile_picture: {
+          type: String,
+          statePath: 'profile_picture'
+        },
+        has_message: {
+          type: Boolean,
+          value: false,
+          statePath: 'has_message'
+        },
+        has_notification: {
+          type: Boolean,
+          value: false,
+          statePath: 'has_notification'
+        },
+        user: Object,
+        page: {
+          type: String,
+          observer: '_pageChanged'
+        },
+        opened: Boolean,
+        smallScreen: Boolean,
+        drawerOpened: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true
+        },
+        _shouldShowlogin: {
+          computed: '_compute_shouldShowlogin(page)'
+        },
+        _shouldShowregister: {
+          computed: '_compute_shouldShowregister(page)'
+        },
+        _shouldShowButtons: {
+          computed: '_computeShouldShowButtons(page, smallScreen)'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _pageChanged(page){
+      this.opened = false;
+    }
+    _goHome(){
+      if (this.smallScreen === true) {
+        this._toggleDrawer();
+        return
+      };
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: '/' } }));
+    }
+    _toggleDrawer(){
+      this.drawerOpened = !this.drawerOpened;
+    }
+    _compute_shouldShowlogin(page) {
+      return (page !== 'ingresar');
+    }
+    _compute_shouldShowregister(page) {
+      return (page !== 'registracion');
+    }
+    _computeShouldShowButtons(page, smallScreen) {
+      return (page === 'inicio' || page === 'categoria') && !smallScreen;
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-header.created');
+    }
+    _logout() {
+      //this.$.auth.signOut();
+      //this.set('route.path', '');
+      this.dispatchEvent(new CustomEvent('notify-user', {bubbles: true, composed: true, detail: { message: 'This is the message notification we want to show!' } }));
+    }
+  }
+  window.customElements.define(SuHeader.is, SuHeader);
+  </script>
+</dom-module>

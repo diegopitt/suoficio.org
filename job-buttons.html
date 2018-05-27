@@ -1,0 +1,202 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="su-animations.html">
+<link rel="import" href="redux/redux-mixin.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="job-buttons">
+  <template>
+    <style include="oficio-styles su-animations">
+    :host {
+      display: block;
+      margin: 24px 0;
+    }
+    :host([is-responsive]){
+      @apply --layout-fixed-bottom;
+      margin: 0px;
+      box-sizing: border-box;
+      z-index: 1;
+    }
+    paper-button {
+      @apply --layout;
+      margin:24px 0;
+    }
+    :host([is-responsive]) paper-button{
+      @apply --layout-flex;
+      border-radius: 0px;
+      margin: 0px;
+      height: 74px;
+      font-size: 12px;
+    }
+    :host([is-responsive]) .wrap{
+      @apply --layout-horizontal;
+    }
+    iron-icon {
+      width: 20x;
+      height: 20px;
+      margin-right:8px;
+      color: var(--app-muted-color);
+    }
+    .leyend {
+      @apply --su-font-xsmall;
+      color: var(--paper-grey-500);
+      padding: 0px 8px 14px 8px;
+      text-align: center;
+    }
+    .heart {
+      width: 20px;
+      height: 20px;
+      padding-right: 8px;
+      color: var(--app-muted-color);
+    }
+
+    .heartred{
+      width: 20px;
+      height: 20px;
+      padding-right: 8px;
+      color: #f75d63;
+    }
+    .tit-wrap{
+      width:140px;
+    }
+    </style>
+    <div class="wrap">
+      <dom-if if="[[_showProposal]]">
+        <template>
+          <paper-button responsive class="green" on-tap="_viewproposal">Ver Propuesta</paper-button>
+        </template>
+      </dom-if>
+      <dom-if if="[[!_showProposal]]">
+        <template>
+          <paper-button disabled$="[[buttonOpen]]" class="green" on-tap="_sendproposal">Envia Tu Propuesta</paper-button>
+          <dom-if if="[[!buttonOpen]]">
+            <template>
+              <paper-button responsive on-tap="_computeFavorite" noink class="white"><iron-icon class$="{{heartclass}}" icon$="myicons:[[hearticon]]"></iron-icon><span class="tit-wrap">[[hearttitle]]</span></paper-button>
+            </template>
+          </dom-if>
+        </template>
+      </dom-if>
+      <dom-if if="[[!isResponsive]]">
+        <template>
+          <div class="leyend">
+            [[_legend]]
+          </div>
+        </template>
+      </dom-if>
+    </div>
+  </template>
+  <script>
+  class JobButtons extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'job-buttons';
+    }
+    static get properties() {
+      return {
+        _showProposal: {
+          type: Boolean,
+          computed: '_computeShowProposal(all_proposals, selected_job)'
+        },
+        isResponsive: {
+          type: Boolean,
+          value: false
+        },
+        all_proposals: {
+          type: Array,
+          statePath: 'all_proposals'
+        },
+        _legend: {
+          type: String,
+          value: '',
+          computed: '_computeLegend(buttonOpen, invites, selected_job)' 
+        },
+        hearttitle: String,
+        user_favorites: {
+          type: Array,
+          statePath: 'user_favorites'
+        },
+        selected_job: {
+          type: String,
+          statePath: 'selected_job'
+        },
+        invites: {
+          type: Array,
+          statePath: 'invites'
+        },
+        hearticon: {
+          type: String,
+          value: 'favorite'
+        },
+        heartclass: {
+          type: String,
+          value: 'heart',
+        },
+        maxLimit: Boolean,
+        isHired: Boolean,
+        buttonOpen: {
+          type: Boolean,
+          computed:'_computeButtonOpen(isHired, maxLimit, invites, selected_job)'
+        },
+        uid: String
+      };
+    }
+    _computeShowProposal(proposals, job){
+      if (proposals === undefined) return;
+      return proposals[job] ? true : false;
+    }
+    _computeButtonOpen(isHired, maxLimit, invites, selected_job){
+      if(isHired === undefined || maxLimit === undefined || selected_job === undefined) return;
+      return (isHired || maxLimit || invites[selected_job] === true);
+    }
+    static get observers() {
+      return [
+        '_updateClass(selected_job, user_favorites)'
+      ]
+    }
+    _computeFavorite(){
+      let firebaseDbRef = firebase.app().database().ref();
+      let val = this.user_favorites[this.selected_job] ? null : true;
+      const updates = {};
+      updates['/favorites/jobs/' + this.selected_job + '/' + this.uid] = val;
+      updates['/users/' + this.uid + '/favs/' + this.selected_job] = val;
+      let me = this;
+      firebaseDbRef.update(updates).then(function() {
+        me._updateClass(me.selected_job, me.user_favorites);
+      });
+    }
+    _updateClass(selected_job, user_favorites){
+      if(user_favorites === undefined || selected_job === undefined) return;
+      if(user_favorites[selected_job]){
+        this.heartclass = 'heartred animated-fast pulse';
+        this.hearttitle = 'Trabajo Guardado';
+        this.hearticon = 'favorite';
+      }else{
+        this.heartclass = 'heart';
+        this.hearttitle = 'Guardar Trabajo';
+        this.hearticon = 'favorite';
+      }
+    }
+    ready(){
+      super.ready();
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-buttons.created');
+    }
+    _sendproposal(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: '/enviar-propuesta/' + this.selected_job } }));
+    }
+    _viewproposal(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: '/propuestas/' + this.selected_job } }));
+    }
+    _computeLegend(buttonOpen, invites, selected_job) {
+      if(invites === undefined || selected_job === undefined) return;
+      if (invites[selected_job]) {
+        return 'Tienes una invitacion para este trabajo';
+      }else{
+        return buttonOpen ? 'Este trabajo ya no esta disponible' : 'Se requiere una coneccion para el envio de tu propuesta';
+      }
+    }
+  }
+  window.customElements.define(JobButtons.is, JobButtons);
+  </script>
+</dom-module>

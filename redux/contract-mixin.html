@@ -1,0 +1,23 @@
+<link rel="import" href="redux-mixin.html">
+<script>
+  ContractMixin = Parent => class ContractMixin extends ReduxMixin(Parent) {
+    static get properties() {
+      return {
+        selectedContract: {
+          type: Array,
+          statePath: 'selected_contract'
+        }
+      };
+    }
+    static get actions() {
+      return {
+        selectContract(key) {
+          return {
+            type: 'SELECT_CONTRACT',
+            key
+          };
+        }
+      }
+    }
+  }
+</script>

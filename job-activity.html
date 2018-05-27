@@ -1,0 +1,108 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="job-activity">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin-top: 28px;
+      margin-bottom: 28px;
+    }
+    .title{
+      @apply --su-font-header-big;
+      margin-bottom: 24px;
+    }
+    .main-wrap{
+      @apply --su-font-medium;
+      @apply --common-borders;
+      padding: 36px;
+    }
+    .item {
+      padding: 8px 0px;
+      font-weight: 500;
+    }
+    .value {
+      font-weight: 400;
+      padding-left: 6px;
+      text-transform: capitalize;
+      color: var(--app-font-color-light);
+    }
+    .header {
+      @apply --layout-vertical;
+      @apply --layout-flex;
+    }
+    @media (max-width: 767px) {
+      .main-wrap {
+        padding: 36px 14px;
+      }
+      .main-wrap {
+        padding: 0px;
+      }
+      .header {
+        background-color: #f9f9f9;
+        padding: 16px 12px;
+      }
+      .title{
+        margin-bottom: 0px !important;
+        font-size: 14px;
+        line-height: 14px;
+        font-weight: 500;
+      }
+      .item {
+        font-weight: 400 !important;
+        border-top: 1px solid var(--app-little-grey);
+        padding: 14px 16px;
+      }
+      .value{
+        padding: 24px 16px;
+      }
+    }
+    </style>
+    <div class="main-wrap">
+      <div class="header">
+        <div class="title">Actividad del Trabajo</div>
+      </div>
+      <div class="content">
+        <div class="item">Contrataciones:<span class="value">[[job.hires]]</span></div>
+        <div class="item">Propuestas recibidas:<span class="value">[[job.proposals]]</span></div>
+        <div class="item">Invitaciones enviadas:<span class="value">[[job.invited]]</span></div>
+        <div class="item">Visto por última vez:<span class="value">[[_getLastSeen(job.date)]]</span></div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class JobActivity extends Polymer.Element {
+    static get is() {
+      return 'job-activity';
+    }
+    static get properties() {
+      return {
+        job: Object,
+        jobKey: String,
+        jobOpen: {
+          type: Boolean,
+          computed:'_computeJobOpen(job.ishired, job.maxprop)'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-activity.created');
+    }
+    _sendproposal(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: '/enviar-propuesta/' + this.jobKey } }));
+    }
+    _computeJobOpen(isHired, maxLimit){
+      if(isHired === undefined || maxLimit === undefined) return;
+      return (isHired || maxLimit);
+    }
+    _getLastSeen(timestamp) {
+      return moment(timestamp).format('MMMM DD YYYY');
+    }
+  }
+  window.customElements.define(JobActivity.is, JobActivity);
+  </script>
+</dom-module>

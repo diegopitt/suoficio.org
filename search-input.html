@@ -1,0 +1,132 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="search-input">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      padding: 24px 0px;
+    }
+    :host([narrow-layout]) .search-wrap {
+      /* padding: 0px 14px; */
+    }
+    .search-wrap{
+      /* margin-bottom: 30px; */
+    }
+    .advance{
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .search-box{
+      @apply --layout-horizontal;
+      @apply --layout-flex;
+    }
+    .search {
+      width: 100%;
+      margin: 0px;
+      outline: none;
+      border: 1px solid var(--app-little-grey);
+      padding: 11px 24px;
+      background-color: var(--app-background-container);
+      font-size: 13px;
+      line-height: 18px;
+      border-right: none;
+      color: var(--app-font-color);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      -webkit-transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+    .search:hover {
+      border-color: var(--app-aqua-font);
+      box-shadow: inset 0 0 5px rgba(0,0,0,.3);
+    }
+    paper-icon-button {
+      --paper-icon-button-ink-color: transparent;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+      height: 42px;
+      width: 42px;
+      color: #fff;
+      padding: 8px;
+      background-color: var(--app-aqua-font);
+    }
+    paper-icon-button:hover {
+      transition: all .3s;
+      background-color: #1ba8a8;
+    }
+    @media (max-width: 767px) {
+      .search-wrap {
+        padding: 0px 14px;
+      }
+    }
+    </style>
+    <iron-a11y-keys target="[[_input]]" keys="enter" on-keys-pressed="_fireSearch"></iron-a11y-keys>
+    <div class="search-wrap">
+      <div class="search-box">
+        <input id="search" value="[[queryParams]]" on-keydown="_search" placeholder="Encuentra Trabajos " type="text" class="search" />
+        <dom-if if="[[hasQuery]]">
+          <template>
+            <paper-icon-button suffix icon="myicons:close" on-tap="_clearSearch"></paper-icon-button>
+          </template>
+        </dom-if>
+        <dom-if if="[[!hasQuery]]">
+          <template>
+            <paper-icon-button suffix icon="myicons:search" on-tap="_fireSearch"></paper-icon-button>
+          </template>
+        </dom-if>
+      </div>
+    </div>
+  </template>
+  <script>
+  class SearchInput extends Polymer.Element {
+    static get is() {
+      return 'search-input';
+    }
+    static get properties() {
+      return {
+        queryParams:  String,
+        hasQuery:{
+          type: Boolean,
+          value: false,
+          computed: '_hasQuery(queryParams)'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+    }
+    ready(){
+      super.ready();
+      this._input = this.$.search;
+    }
+    _fireSearch(e){
+      let value = this.$.search.value;
+      this.dispatchEvent(new CustomEvent('query-params', { detail: { query: value }, bubbles: true, composed: true}));
+    }
+    _clearSearch(){
+      this.dispatchEvent(new CustomEvent('query-params', { detail: { query: '' }, bubbles: true, composed: true}));
+    }
+    _hasQuery(query){
+      if (query){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _search(e){
+      if (e.keyCode === 13) {
+        this._fireSearch();
+      }
+    }
+  }
+  window.customElements.define(SearchInput.is, SearchInput);
+  </script>
+</dom-module>

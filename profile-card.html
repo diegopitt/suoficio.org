@@ -1,0 +1,244 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="data/app-category-data.html">
+<link rel="import" href="redux/redux-mixin.html">
+<link rel="import" href="oficio-styles.html">
+<link rel="import" href="su-avatar.html">
+<dom-module id="profile-card">
+  <template>
+    <style include="oficio-styles">
+     :host {
+      display: block;
+    }
+
+    .profile-header {
+      @apply --layout-horizontal;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--app-little-grey);
+      padding-bottom: 42px;
+    }
+
+    .avatar-wrapper {
+      @apply --layout-start;
+      @apply --layout-center;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .description-copy {
+      white-space: pre-line;
+      @apply --su-font-medium;
+    }
+
+    .edit-wrap {
+      display: inline-block;
+      position: relative;
+    }
+
+    .user-click {
+      position: absolute;
+      top: -4px;
+      right: -34px;
+    }
+
+    iron-icon {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      color: var(--app-aqua-font);
+    }
+
+    .user-name {
+      @apply --su-page-title;
+    }
+
+    .user-slogan {
+      @apply --su-font-title;
+      color: var(--app-font-color);
+      font-weight: 400 !important;
+    }
+
+    .profile-details {
+      @apply --layout-flex;
+      padding: 4px 4px 0px 24px;
+    }
+
+    .user-categories {
+      @apply --layout-horizontal;
+      @apply --layout-wrap;
+      margin: 8px 0;
+    }
+
+    .review-score {
+      margin: 4px 0;
+    }
+
+    .user-section {
+      @apply --common-borders;
+      padding: 24px;
+    }
+
+    .cat {
+      color: #222;
+      background-color: var(--app-muted-color);
+      @apply --su-oficio-font-nowrap;
+      font-weight: 500;
+      margin: 6px 6px 6px 0px;
+    }
+
+    .title {
+      @apply --su-font-header-big;
+      line-height: 38px;
+    }
+
+    .space {
+      padding-top: 36px;
+    }
+
+    .edit {
+      display: none;
+    }
+
+    .m14 {
+      margin-bottom: 14px;
+    }
+
+    .ml14 {
+      margin-left: 8px;
+    }
+
+    @media (max-width: 767px) {
+      .user-section {
+        padding: 24px 14px;
+        margin-top: 24px;
+      }
+      .profile-details {
+        text-align: center;
+        padding: 14px 4px 0px 4px;
+      }
+      .profile-details>div {
+        text-align: center;
+        @apply --layout-center;
+      }
+      .user-categories {
+        @apply --layout-center-center;
+        margin-right: 14px;
+      }
+      .edit-wrap {
+        @apply --layout-center-center;
+      }
+      .profile-header {
+        @apply --layout-vertical;
+        @apply --layout-center-center;
+        padding-bottom: 24px;
+      }
+    }
+    </style>
+    <div>
+      <app-category-data categories="{{cats}}"></app-category-data>
+      <div class="user-section">
+        <div class="profile-header">
+          <div class="avatar-wrapper">
+            <su-avatar sizing="large" src="[[profile_picture]]" on-tap="updatePhoto"></su-avatar>
+          </div>
+          <div class="profile-details">
+            <div class="edit-wrap">
+              <div class="user-name">[[user_name]]&nbsp;[[user_last]]</div>
+              <div class="user-click">
+                <iron-icon icon="myicons:edit2" on-tap="editDetails"></iron-icon>
+              </div>
+            </div>
+            <div class="user-slogan">[[p_slogan]]</div>
+            <!--div class="review-score">
+              <display-rating big value="[[profileData.account.sc]]"></display-rating>
+            </div-->
+            <div class="user-categories">
+              <dom-repeat items="[[user_categories]]" as="category">
+                <template>
+                  <div class="chip cat">[[_getCategoryName(category)]]</div>
+                </template>
+              </dom-repeat>
+              <div style="width: 1px;height: 1px;position: relative;">
+                <div style="position:absolute;top:-8px;">
+                  <iron-icon icon="myicons:edit2" class="ml14" on-tap="editCategories"></iron-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="edit-wrap m14">
+          <div class="title">Introduccion</div>
+          <div class="user-click">
+            <iron-icon icon="myicons:edit2" on-tap="editDescription"></iron-icon>
+          </div>
+        </div>
+        <div class="description-copy">[[p_description]]</div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class ProfileCard extends ReduxMixin(Polymer.Element) {
+    static get is() {
+      return 'profile-card';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        cats: Array,
+        profile_picture: {
+          type: String,
+          statePath: 'profile_picture'
+        },
+        user_last: {
+          type: String,
+          statePath: 'user_last'
+        },
+        user_categories: {
+          type: String,
+          statePath: 'user_categories'
+        },
+        p_slogan: {
+          type: String,
+          statePath: 'p_slogan'
+        },
+        p_description: {
+          type: String,
+          statePath: 'p_description'
+        },
+        user_name: {
+          type: String,
+          statePath: 'user_name'
+        },
+      };
+    }
+    static get observers() {
+      return []
+    }
+    editDescription() {
+      this.dispatchEvent(new CustomEvent('open-dialog', { bubbles: true, composed: true, detail: { status: 'open', action: 'update-description', title: 'Descripcion de tu Perfil', full: false } }));
+    }
+    updatePhoto(){
+      this.dispatchEvent(new CustomEvent('open-dialog', { bubbles: true, composed: true, detail: { status: 'open', action: 'update-photo', title: 'Tu foto de Perfil', full: true } }));
+    }
+    editCategories() {
+      this.dispatchEvent(new CustomEvent('open-dialog', { bubbles: true, composed: true, detail: { status: 'open', action: 'update-categories', title: 'Escoge tus categorias', full: false } }));
+    }
+    editDetails() {
+      this.dispatchEvent(new CustomEvent('open-dialog', { bubbles: true, composed: true, detail: { status: 'open', action: 'update-slogan', title: 'Detalles de Perfil', full: false } }));
+    }
+    _getCategoryName(value) {
+      for (let i = 0, c; c = this.cats[i]; ++i) {
+        if (c.value === value) {
+          return c.title;
+        }
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('profile-card.created');
+    }
+  }
+  window.customElements.define(ProfileCard.is, ProfileCard);
+  </script>
+</dom-module>

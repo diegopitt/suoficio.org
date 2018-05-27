@@ -1,0 +1,234 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="candidate-list.html">
+<link rel="import" href="job-post-details.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-candidatos">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .jobs-wrap {
+      margin-top: 48px;
+    }
+    .candidate-wrap{
+      margin-top: 34px;
+    }
+    .main-title{
+      @apply --su-job-title;
+      @apply --layout-flex;
+      padding: 0px 0px 24px 0px;
+    }
+    .body-wrap{
+      border: 1px solid var(--app-little-grey);
+    }
+    .tabs-wrap{
+      padding: 0px 0px 0px 0px;
+      @apply --layout-flex;
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    .head-data{
+      padding: 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .job-data{
+      padding: 0px;
+    }
+    paper-tabs{
+      color: var(--app-accent-green);
+      @apply --layout-flex;
+      --paper-tabs: {
+        height: 42px;
+      };
+      --paper-tabs-selection-bar: {
+        border-bottom-width: 4px;
+      };
+      --paper-tabs-selection-bar-color: var(--app-accent-green);
+    }
+    paper-tab{
+      padding: 0px 10px 20px 10px;
+      margin-right: 8px;
+      --paper-tab: {
+        @apply --layout-flex-none;
+      };
+      --paper-tab-ink: var(--app-accent-green);
+      --paper-tab-content-unselected: {
+        opacity: 1;
+      }
+    }
+
+    paper-tab.iron-selected a {
+      color: var(--app-font-color) !important;
+      font-weight: 500 !important;
+    }
+    paper-tab a {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      font-size: 11px;
+      outline: none;
+      text-transform: uppercase;
+      padding-top: 8px;
+      text-decoration: none;
+      height: 100%;
+    }
+    a{
+      color: var(--app-font-color-light) !important;
+    }
+    a span{
+      /*color: var(--app-grey-color) !important;*/
+    }
+    paper-tab[link] a {
+      @apply --su-oficio-font-base;
+      font-weight: 400;
+      text-decoration: none;
+    }
+    .candidate-title{
+      @apply --layout-flex;
+      border-bottom: 1px solid var(--app-little-grey);
+      padding: 24px;
+      @apply --su-job-title;
+      color: var(--app-font-color);
+    }
+    .item{
+      @apply --layout-flex;
+    }
+    @media (max-width: 767px) {
+      .jobs-wrap {
+        margin-top: 20px;
+      }
+      .tabs-wrap{
+        padding: 0px;
+      }
+      paper-tab a {
+        font-size: 10px;
+      }
+      .body-wrap{
+        border:none;
+        margin-top: 14px;
+        background-color: transparent;
+        box-shadow: none;
+      }
+      .body-wrap{
+      }
+      .main-title{
+        padding: 14px 14px 0px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 22px;
+      }
+      .candidate-title{
+        padding: 14px;
+        font-weight: 500;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .candidate-wrap{
+        margin-top: 0px;
+      }
+    }
+    </style>
+    <app-route active="{{jobIdActive}}" route="{{route}}" pattern="/:jobKey" data="{{routeData}}" tail="{{subroute}}"></app-route>
+    <app-route active="{{isActive}}" route="{{subroute}}" pattern="/:location" data="{{subrouteData}}"></app-route>
+    <firebase-document path="/jobs/[[routeData.jobKey]]" data="{{job}}"></firebase-document>
+    <firebase-query id="proposals" path="/proposals/[[routeData.jobKey]]" data="{{proposals}}"></firebase-query>
+    <firebase-query id="hires" path="/proposals/[[routeData.jobKey]]" data="{{hires}}" order-by-child="hired" equal-to="true"></firebase-query>
+    <firebase-query id="invitations" path="/proposals/[[routeData.jobKey]]" data="{{invitations}}" order-by-child="isinvitation" equal-to="true"></firebase-query>
+    <firebase-query id="candidates" path="/users/[[uid]]/j/a/[[routeData.jobKey]]/n" data="{{candidates}}"></firebase-query>
+    <div class="jobs-wrap">
+      <div class="main-title">[[job.name]]</div>
+      <div class="body-wrap">
+        <div class="tabs-wrap">
+          <paper-tabs  selected="[[subrouteData.location]]" attr-for-selected="name" hide-scroll-buttons>
+            <paper-tab name="trabajo" link><a class="link" href="/candidatos/[[routeData.jobKey]]/trabajo" tabindex="-1">DETALLES</a></paper-tab>
+            <!--paper-tab name="lista" link><a class="link" href="/candidatos/[[routeData.jobKey]]/lista" tabindex="-1">CANDIDATOS</a></paper-tab-->
+            <paper-tab name="propuestas" link><a class="link" href="/candidatos/[[routeData.jobKey]]/propuestas" tabindex="-1">PROPUESTAS<span>&nbsp;([[proposals.length]])</span></a></paper-tab>
+            <!--<paper-tab name="invitaciones" link><a class="link" href="/candidatos/[[routeData.jobKey]]/invitaciones" tabindex="-1">INVITACIONES<span>&nbsp;([[invitations.length]])</span></a></paper-tab> -->
+            <paper-tab name="contrataciones" link><a class="link" href="/candidatos/[[routeData.jobKey]]/contrataciones" tabindex="-1">CONTRATACIONES<span>&nbsp;([[hires.length]])</span></a></paper-tab>
+          </paper-tabs>
+        </div>
+        <div class="job-data" hidden$="[[!jobLoaded]]">
+          <iron-pages selected="[[subrouteData.location]]" selected-attribute="visible" attr-for-selected="name" fallback-selection="trabajo">
+            <job-post-details job="[[job]]" name="trabajo" job-key="[[routeData.jobKey]]"></job-post-details>
+            <candidate-list key="[[routeData.jobKey]]" job-ended$="[[job.ishired]]" name="propuestas" data="[[proposals]]" page="[[subrouteData.location]]"></candidate-list>
+            <candidate-list job-ended$="[[job.ishired]]" name="invitaciones" data="[[invitations]]" page="[[subrouteData.location]]"></candidate-list>
+            <candidate-list is-hired name="contrataciones" data="[[hires]]" page="[[subrouteData.location]]"></candidate-list>
+          </iron-pages>
+        </div>
+      </div>
+      <div class="foot-head foot"></div>
+    </div>
+    <dom-if if="[[_shouldShowCandidates(subrouteData.location, job.ishired)]]">
+      <template>
+        <div class="candidate-wrap">
+          <div class="body-wrap">
+            <div class="candidate-title">Candidatos para tu Trabajo</div>
+            <div class="job-data">
+              <candidate-list is-candidate data="[[candidates]]" key="[[routeData.jobKey]]" page="[[subrouteData.location]]"></candidate-list>
+            </div>
+          </div>
+        </div>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class SuCandidatos extends Polymer.Element {
+    static get is() {
+      return 'su-candidatos';
+    }
+    static get properties() {
+      return {
+        routeData: Object,
+        subrouteData: Object,
+        smallScreen: Boolean,
+        uid: String,
+        hires: Object,
+        jobLoaded: {
+          type: Boolean,
+          value: false
+        },
+        job: {
+          type: Object,
+          value: null,
+          observer: '_jobChanged'
+        },
+        invitations: Object,
+        proposals: {
+          type: Object
+        },
+      };
+    }
+    ready() {
+      super.ready();
+      window.addEventListener('send-invite', (e)=>this._sendInvite(e));
+    }
+    _shouldShowCandidates(page, ishired){
+      return (page === 'trabajo' && !ishired);
+    }
+    _jobChanged(data){
+      console.log(data);
+      if (!data) return;
+      if(data.budget) {
+        this.jobLoaded = true;
+      };
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-candidatos.created');
+    }
+    _sendInvite(e){
+      let promises = [];
+      promises.push(firebase.app().database().ref(`/users/${this.uid}/j/a/${e.detail.jobKey}/n/${e.detail.talentId}/i`).set(true));
+      promises.push(firebase.app().database().ref(`/users/${e.detail.talentId}/invitations/${e.detail.jobKey}`).set({o: this.job.owner, b: this.job.budget, t: this.job.timing, a: false, s: firebase.database.ServerValue.TIMESTAMP}));
+      Promise.all(promises).then(values => {
+        this.dispatchEvent(new CustomEvent('notify-user', { bubbles: true, composed: true, detail: { message: `Tu invitacion a ${e.detail.talentName} fue enviada exitosamente` } }));
+      });
+    }
+  }
+  window.customElements.define(SuCandidatos.is, SuCandidatos);
+  </script>
+</dom-module>

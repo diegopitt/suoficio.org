@@ -1,0 +1,31 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-como-funciona">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    </style>
+    <div>pagina como funciona la plataforma</div>
+  </template>
+  <script>
+  class SuComoFunciona extends Polymer.Element {
+    static get is() {
+      return 'su-como-funciona';
+    }
+    static get properties() {
+      return {};
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-como-funciona.created');
+    }
+  }
+  window.customElements.define(SuComoFunciona.is, SuComoFunciona);
+  </script>
+</dom-module>

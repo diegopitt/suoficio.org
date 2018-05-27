@@ -1,0 +1,360 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="data/app-category-data.html">
+<link rel="import" href="data/app-timing-data.html">
+<link rel="import" href="su-nav.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="contract-card">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .header{
+      margin: 28px 0;
+      padding: 0px 8px;
+    }
+    .contract-head {
+      padding: 0px 8px;
+    }
+    .contract-name{
+      @apply --su-job-title;
+      margin: 24px 0;
+    }
+    .ended-title {
+      font-size: 13px;
+      color: var(--app-red-color);
+      margin: 28px 0px 0px 0px;
+    }
+    .started-title {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 400;
+      color: #008329;
+      background-color: #d2f3d5;
+      margin: 28px 0px 0px 0px;
+      padding: 4px 8px;
+    }
+    .e-title {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 400;
+      padding: 3px 6px;
+      color: var(--app-red-color);
+      margin: 28px 0px 0px 0px;
+    }
+    .s-title {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 400;
+      color: #008329;
+      background-color: #d2f3d5;
+      padding: 3px 6px;
+    }
+    .chip.grey{
+      font-weight: 500;
+      color: #222;
+      margin-right: 10px;
+      background-color: var(--app-muted-color);
+    }
+    .contract-details{
+      margin: 0px 0px 28px 0px;
+      @apply --common-borders;
+      padding: 36px;
+      border-top-width: 0px !important;
+    }
+    su-nav{
+      margin-top: 28px;
+    }
+    .details{
+      @apply --su-font-title;
+      color:#222;
+    }
+    .contract-description {
+      @apply --su-font-medium;
+      margin: 18px 0px;
+      color: var(--app-font-color);
+    }
+    .details-bar {
+      @apply --layout-horizontal;
+      @apply --layout-justified;
+      @apply --common-borders;
+      padding: 18px 14px;
+      margin-top: 36px;
+    }
+    .details-bar > div {
+      @apply --layout-horizontal;
+      @apply --layout-flex;
+    }
+    .strong{
+      @apply --su-font-medium-bold;
+      color: var(--app-font-color);
+      margin-bottom:4px;
+    }
+    .item {
+      @apply --layout-flex;
+      font-size: 12px;
+      padding-top: 2px;
+      color: var(--app-font-color-light);
+    }
+    iron-icon {
+      height: 18px;
+      width: 18px;
+      padding: 0px;
+      margin-right: 8px;
+      color: var(--app-font-color);
+    }
+    .item-wrap {
+      @apply --layout-flex;
+      padding:0px 8px;
+    }
+    .copy {
+      font-size: 12px;
+      line-height: 20px;
+    }
+    .details-bar2 {
+      display: none;
+      @apply --layout-horizontal;
+      @apply --layout-justified;
+    }
+    .r-screen{
+      display: none;
+    }
+    @media (max-width: 767px) {
+      .contract-head {
+        padding: 0px;
+      }
+      .r-screen {
+        display: block;
+      }
+      .details-bar2{
+        display: block;
+      }
+      .details{
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: 500;
+        margin-bottom: 0px;
+      }
+      .item {
+        padding-bottom: 24px;
+      }
+      .contract-details{
+        padding: 20px 14px !important;
+        border-top-width: 0px;
+        border-top-right-radius: 0px;
+        border-top-left-radius: 0px;
+      }
+      .contract-name{
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 22px;
+        margin-top: 0px !important;
+      }
+      .d_icon {
+        display:none;
+      }
+      .header{
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
+      }
+      .details-bar {
+        display: none !important;
+        padding: 18px 8px !important;
+      }
+      .ended-title {
+        display: none !important;
+      }
+      .started-title {
+        display: none !important;
+      }
+    }
+    </style>
+    <app-category-data category-value="[[job.category]]" category="{{category}}"></app-category-data>
+    <app-timing-data time-value="[[job.timing]]" time="{{time}}"></app-timing-data>
+    <div class="contract-head">
+      <div class="header">
+        <div class="contract-name">[[job.name]] <span hidden$="[[!endContract]]" class="red"></span></div>
+        <span class="chip grey">[[category.title]]</span>
+      </div>
+      <div class="details-bar">
+        <div class="item-wrap">
+          <div class="icon">
+            <iron-icon class="d_icon" icon="myicons:atm"></iron-icon>
+          </div>
+          <div class="item">
+            <div class="strong">Importe</div>
+            <div class="copy">[[_formatAmount(contract.amount)]] Pesos</div>
+          </div>
+        </div>
+        <div class="item-wrap">
+          <div class="icon">
+            <iron-icon class="d_icon" icon="myicons:time"></iron-icon>
+          </div>
+          <div class="item">
+            <div class="strong">Plazo</div>
+            <div class="copy">Tiempo aproximado para llevar a cabo el trabajo es <span class="timetitle">[[time.title]]</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dom-if if="[[!contract.isactive]]">
+      <template>
+        <div class="ended-title">
+          Finalizado el [[_getPostTime(contract.ended)]]
+        </div>
+      </template>
+    </dom-if>
+    <dom-if if="[[contract.isactive]]">
+      <template>
+        <div class="started-title">
+          Iniciado el [[_getPostTime(contract.started)]]
+        </div>
+      </template>
+    </dom-if>
+    <su-nav type="[[type]]" route="[[route.prefix]]"></su-nav>
+    <dom-if if="[[showDts]]">
+      <template>
+        <div class="contract-details">
+          <dom-if if="[[!endContract]]">
+            <template>
+              <div class="r-screen">
+                <div class="details-bar2">
+                  <div class="item">
+                    <div class="strong">Importe</div>
+                    <div class="copy">[[_formatAmount(contract.amount)]] Pesos</div>
+                  </div>
+                  <div class="item">
+                    <div class="strong">Plazo</div>
+                    <div class="copy">Tiempo aproximado para llevar a cabo el trabajo es <span class="timetitle">[[time.title]]</span></div>
+                  </div>
+                </div>
+                <dom-if if="[[!contract.isactive]]">
+                  <template>
+                    <div class="e-title">
+                      Finalizado el [[_getPostTime(contract.ended)]]
+                    </div>
+                  </template>
+                </dom-if>
+                <dom-if if="[[contract.isactive]]">
+                  <template>
+                    <div class="s-title">
+                      Iniciado el [[_getPostTime(contract.started)]]
+                    </div>
+                  </template>
+                </dom-if>
+              </div>
+              <div class="contract-description">[[job.description]]</div>
+            </template>
+          </dom-if>
+          <dom-if if="[[endContract]]">
+            <template>
+              <div class="details">Calificacion del Contrato</div>
+              <div>
+                <su-feedback feedback-complete="{{feedbackComplete}}" uid="[[uid]]" contract="{{contract}}" destination="[[destination]]"></su-feedback>
+              </div>
+            </template>
+          </dom-if>
+        </div>
+      </template>
+    </dom-if>
+    <dom-if if="[[showMsg]]">
+      <template>
+        <dom-if if="[[contract.isactive]]">
+          <template>
+            <dom-if if="[[contract.chatid]]">
+              <template>
+                <proposal-messages no-top-border job="[[job]]" receiver="[[job.owner]]" uid="[[uid]]" room-key="[[contract.chatid]]" slot="content"></proposal-messages>
+              </template>
+            </dom-if>
+          </template>
+        </dom-if>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class ContractCard extends Polymer.Element {
+    static get is() {
+      return 'contract-card';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        type: String,
+        contract: Object,
+        job: Object,
+        route: {
+          type: Object
+        },
+        endContract: {
+          type: Boolean,
+          observer: 'LoadResource'
+        },
+        showDts: Boolean,
+        showMsg: Boolean,
+        destination: {
+          value: String,
+          reflectToAttribute: true,
+          notify: true
+        }
+      };
+    }
+    static get observers() {
+      return [
+        '_setDestination(contract.u, uid)',
+        'restoreContract(feedbackComplete)',
+        '_loadMsg(showMsg)'
+      ]
+    }
+    restoreContract(isComplete){
+      if (isComplete){
+        this.endContract = false;
+      }
+    }
+    _loadMsg(showMsg){
+      if (this._messagesLoaded) return;
+      if (showMsg === true){
+        Polymer.importHref(this.resolveUrl('proposal-messages.html'), () => {
+          console.log('Lazy loaded chat');
+          this._messagesLoaded = true;
+        }, null, true);
+      }
+    }
+    LoadResource(ending){
+      if (ending === undefined) return;
+      if (!this._feedbackLoaded){
+        if (ending === true) {
+          Polymer.importHref(this.resolveUrl('su-feedback.html'), () => {
+            this._feedbackLoaded = true;
+            console.log('feedback component loaded');
+          });
+        }
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('contract-card.created');
+    }
+    _getPostTime(timestamp) {
+      return moment(timestamp).format('LL');
+    }
+    _formatAmount(amount) {
+      return Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+    }
+    _setDestination(participants, uid){
+      if (participants === undefined || uid === undefined) return;
+      this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+        Polymer.Async.microTask, () => {
+          let key;
+          Object.keys(participants).forEach(function(val) {
+            if (uid !== val){
+              key = val;
+            };
+          });
+          this.destination = key;
+        }
+      );
+    }
+  }
+  window.customElements.define(ContractCard.is, ContractCard);
+  </script>
+</dom-module>

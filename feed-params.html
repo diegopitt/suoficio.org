@@ -1,0 +1,141 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="data/app-category-data.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="feed-params">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin-top:24px;
+    }
+    :host([horizontal]) {
+      @apply --layout-horizontal;
+      @apply --layout-wrap;
+    }
+    :host([vertical]) {
+      margin-top:24px;
+    }
+    paper-checkbox.blue {
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 0px 13px 6px 0px;
+      --paper-checkbox-checked-color: var(--app-aqua-font);
+      --paper-checkbox-checked-ink-color: var(--app-font-color-light);
+      --paper-checkbox-unchecked-color: var(--app-font-color);
+      --paper-checkbox-label-checked-color: var(--app-font-color);
+      --paper-checkbox-label-color: var(--app-font-color-light);
+      --paper-checkbox-size: 16px;
+      --paper-checkbox-unchecked-ink-color: var(--app-muted-color);
+      --paper-checkbox-label-spacing: 0;
+      --paper-checkbox-margin: 2px 8px 4px 0;
+      --paper-checkbox-vertical-align: top;
+    }
+    select {
+      padding: 8px 6px 8px 6px;
+      width: 100%;
+      max-width: 180px;
+      color: var(--app-font-color);
+    }
+
+    select:hover {
+      border-color: var(--app-aqua-font);
+    }
+    .wrap {
+      @apply --layout-self-stretch;
+      @apply --layout-flex-auto;
+      @apply --layout-vertical;
+      box-sizing: border-box;
+      margin: 0px;
+      padding:0px 14px 24px 14px;
+    }
+    :host([vertical]) .wrap{
+      padding:0px 8px 8px 8px;
+    }
+    .category-title {
+      width: 100%;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 14px 0;
+      color: var(--app-font-coilor);
+    }
+    @media (max-width: 767px) {
+      :host([horizontal]){
+
+      }
+      .wrap {
+        /*margin: 0px 4px 13px 4px;*/
+      }
+    }
+    </style>
+    <app-category-data categories="{{categories}}"></app-category-data>
+    <div class="wrap">
+      <div>
+        <div class="category-title">Tiempo de Contratación</div>
+        <paper-checkbox checked class="blue">
+          Inmediato
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          Dentro de 2 Dias
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          Dentro de 2 Semanas
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          Dentro de 2 Meses
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          2 Meses +
+        </paper-checkbox>
+      </div>
+    </div>
+    <div class="wrap">
+      <div>
+        <div class="category-title">Mostrar</div>
+        <paper-checkbox checked id="chk_1" class="blue">
+          Destacados
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          Sin Propuestas
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          Con Imagenes
+        </paper-checkbox>
+      </div>
+    </div>
+    <div class="wrap">
+      <div>
+        <div class="category-title">Etapa de contratación</div>
+        <paper-checkbox checked class="blue">
+          Listo para Contratar
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          Planeamiento y presupuesto
+        </paper-checkbox>
+        <paper-checkbox checked class="blue">
+          Solo Presupuesto
+        </paper-checkbox>
+      </div>
+    </div>
+  </template>
+  <script>
+  class FeedParams extends Polymer.Element {
+    static get is() {
+      return 'feed-params';
+    }
+    static get properties() {
+      return {
+        feedParams: Object
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+    }
+  }
+  window.customElements.define(FeedParams.is, FeedParams);
+  </script>
+</dom-module>

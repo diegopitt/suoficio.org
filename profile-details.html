@@ -1,0 +1,49 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="profile-details">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block; 
+    }
+    paper-button {
+      @apply --layout;
+      margin:0px 0px 24px 0px;
+    }
+    .view-profile {
+      @apply --su-font-medium-bold;
+      text-align: center;
+      padding-bottom: 14px;
+    }
+    .view-profile a{
+      color: var(--app-font-color-light);
+    }
+    </style>
+    <paper-button disabled$="[[jobOpen]]" class="green" on-tap="_profileOptions">Opciones de Perfil</paper-button>
+    <div class="view-profile">
+      <a class="action" target="_blank" href="https://suoficio.mx/perfiles/[[uid]]">Ver perfil como otros lo ven</a>
+    </div>
+  </template>
+  <script>
+  class ProfileDetails extends Polymer.Element {
+    static get is() {
+      return 'profile-details';
+    }
+    static get properties() {
+      return {};
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('profile-details.created');
+    }
+    _profileOptions() {
+      this.dispatchEvent(new CustomEvent('open-dialog', {bubbles: true, composed: true, detail: {status: 'open', action: 'update-categories', title: 'Tus Oficios'}}));
+    }
+  }
+  window.customElements.define(ProfileDetails.is, ProfileDetails);
+  </script>
+</dom-module>

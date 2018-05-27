@@ -1,0 +1,62 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="app-locations-data">
+  <script>
+  (function() {
+    let locationsList = [{
+      name: 'Distrito Federal',
+      title: 'Distrito Federal, Mexico',
+      value: 1
+    }, {
+      name: 'Cancun',
+      title: 'Cancun, Quintana Roo',
+      value: 2
+    }, {
+      name: 'Merida',
+      title: 'Merida, Yucatan',
+      value: 3
+    }, {
+      name: 'San Cristobal',
+      title: 'San Cristobal de las Casas, Chiapas',
+      value: 4
+    }, {
+      name: 'Valladolid',
+      title: 'Valladolid, Yucatan',
+      value: 5
+    }];
+
+    class appLocationsData extends Polymer.Element {
+      static get is() {
+        return 'app-locations-data';
+      }
+      static get properties() {
+        return {
+          locationValue: Number,
+          locations: {
+            type: Array,
+            value: locationsList,
+            readOnly: true,
+            notify: true
+          },
+          location: {
+            type: Object,
+            computed: '_computeLocation(locationValue)',
+            notify: true
+          }
+        }
+      }
+      _getLocationObject(locationValue) {
+        for (let i = 0, c; c = this.locations[i]; ++i) {
+          if (c.value === locationValue) {
+            return c;
+          }
+        }
+      }
+      _computeLocation(locationValue) {
+        let categoryObj = this._getLocationObject(locationValue);
+        return categoryObj;
+      }
+    }
+    customElements.define(appLocationsData.is, appLocationsData);
+  })();
+  </script>
+</dom-module>

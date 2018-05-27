@@ -1,0 +1,191 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="job-posts.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-trabajos">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      margin-top: 40px;
+    }
+    .jobs-wrap {
+      @apply --layout-flex;
+      @apply --common-borders;
+    }
+    .job-posts{
+      @apply --layout-flex;
+      margin: 24px 0;
+    }
+    .foot-head{
+      @apply --layout-flex;
+      background-color: #f9f9f9;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      padding: 24px;
+    }
+    .body-wrap{
+      @apply --layout-flex;
+      padding: 20px 30px;
+    }
+    .main-title{
+      @apply --su-page-title;
+      @apply --layout-horizontal;
+      @apply --layout-flex;
+      @apply --layout-center;
+    }
+    .tabs-wrap{
+      @apply --layout-flex;
+      padding-top: 6px;
+      border-bottom: 1px solid var(--app-little-grey);
+    }
+    paper-tabs{
+      @apply --layout-flex;
+      --paper-tabs: {
+        height: 32px;
+      };
+      --paper-tabs-selection-bar: {
+        border-bottom-width: 4px;
+      };
+      --paper-tabs-selection-bar-color: var(--app-accent-green);
+    }
+    paper-tab{
+      padding: 0px 10px 10px 10px;
+      margin-right: 8px;
+      --paper-tab: {
+        @apply --layout-flex-none;
+      };
+      --paper-tab-ink: var(--app-accent-green);
+      --paper-tab-content-unselected: {
+        opacity: 1;
+      }
+    }
+
+    paper-tab.iron-selected a {
+      color: var(--app-accent-green) !important;
+    }
+    paper-tab a {
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      outline: none;
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      text-decoration: none;
+      height: 100%;
+    }
+    a{
+      color: var(--app-font-color-light) !important;
+    }
+    paper-tab[link] a {
+      @apply --su-oficio-font-base;
+      text-decoration: none;
+    }
+    .foot{
+      @apply --layout-flex;
+      border-top: 1px solid #e0e0e0;
+    }
+    .head{
+      @apply --layout-horizontal;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    @media (max-width: 767px) {
+      .jobs-wrap {
+        margin:0px;
+        padding:0px;
+        border:none;
+        box-shadow: none;
+      }
+      .body-wrap{
+        padding: 8px 0px 20px 0px;
+      }
+      .foot-head{
+        display: none;
+      }
+      .tabs-wrap{
+        padding: 0px;
+      }
+      .job-posts{
+        padding: 0px;
+      }
+      [responsive]{
+        @apply --layout-fixed-bottom;
+        height: 74px;
+        z-index: 1;
+        margin:0px;
+      }
+    }
+    </style>
+    <firebase-query id="jobs" path="/users/[[uid]]/j/[[status]]" data="{{jobs}}"></firebase-query>
+    <app-route active="{{isActive}}" route="{{route}}" pattern="/:location" data="{{routeData}}"></app-route>
+    <div class="jobs-wrap">
+      <div class="foot-head head">
+        <div class="main-title">Trabajos Publicados</div>
+        <paper-button class="green" on-tap="_createJob">Crear un Trabajo</paper-button>
+      </div>
+      <div class="body-wrap">
+        <div class="tabs-wrap">
+          <paper-tabs selected="[[routeData.location]]" attr-for-selected="name">
+            <paper-tab name="activos" link><a class="link" href="trabajos/activos" tabindex="-1">TRABAJOS ACTIVOS</a></paper-tab>
+            <paper-tab name="inactivos" link><a class="link" href="trabajos/inactivos" tabindex="-1">TRABAJOS FINALIZADOS</a></paper-tab>
+          </paper-tabs>
+        </div>
+        <div class="job-posts">
+          <job-posts jobs="[[jobs]]" active="[[status]]"></job-posts>
+        </div>
+      </div>
+      <!-- <div class="foot-head foot"></div> -->
+    </div>
+    <dom-if if="[[smallScreen]]">
+      <template>
+         <paper-button class="green" on-tap="_createJob" responsive>Crear un Trabajo</paper-button>
+      </template>
+    </dom-if>
+  </template>
+  <script>
+  class SuTrabajos extends Polymer.Element {
+    static get is() {
+      return 'su-trabajos';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        routeData: {
+          type: Object,
+        },
+        smallScreen: Boolean,
+        status: {
+          type: String,
+          computed: '_computeStatus(routeData.location)'
+        },
+        jobs: Array,
+        route: Object
+      }
+    }
+    static get observers() {
+      return [
+        '_setLocation(routeData.location)'
+      ]
+    }
+    _createJob(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: 'crear-trabajo' } }));
+    }
+    _computeStatus(location){
+      return (location === 'activos') ? 'a' : 'i';
+    }
+    _setLocation(location){
+      if(location === undefined) {
+        this.set('routeData.location', 'activos');
+      };
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-trabajos.created');
+    }
+  }
+  window.customElements.define(SuTrabajos.is, SuTrabajos);
+  </script>
+</dom-module>

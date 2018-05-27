@@ -1,0 +1,75 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-dropdown/iron-dropdown.html">
+<dom-module id="su-dropdown">
+  <template>
+    <style>
+    :host {
+      display: inline;
+    }
+    .menu-item{
+      cursor: pointer;
+      text-align: center;
+      vertical-align: middle;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+    }
+    .menu-item:hover{
+      color: var(--app-aqua-font);
+    }
+    .content{
+      @apply --layout-flex;
+    }
+    .menu{
+      @apply --layout-flex;
+      min-width: 320px;
+      max-width: 360px;
+      box-sizing: border-box;
+      border: 1px solid var(--su-dropdown-border-color, var(--app-muted-color));
+      box-shadow: 0 1px 6px rgba(57,73,76,.35);
+      padding: 0px;
+      background-color: var(--su-dropdown-background-color, #fff);
+      border-radius: var(--su-dropdown-border-radius, 0px);
+      
+    }
+    </style>
+    <div id="trigger" class="menu-item">
+      <slot name="trigger"></slot>
+    </div>
+    <iron-dropdown auto-fit-on-attach="true" horizontal-align="right" id="dropdown" dynamic-align="true" horizontal-offset="-18" opened="{{opened}}" no-animations="true" vertical-offset="38">
+      <div class="menu" slot="dropdown-content">
+        <slot name="content" class="content"></slot>
+      </div>
+    </iron-dropdown>
+  </template>
+  <script>
+  class SuDropdown extends Polymer.Element {
+    static get is() {
+      return 'su-dropdown';
+    }
+    static get properties() {
+      return {
+        opened:{
+          type: Boolean,
+          value: false,
+          notify:true,
+          reflectToAttribute: true
+        }
+      };
+    }
+      ready() {
+        super.ready();
+        Polymer.Gestures.addListener(this.$.trigger, 'tap', e => this.open());
+      }
+    constructor() {
+      super();
+    }
+    open() {
+      this.$.dropdown.open();
+    }
+    close() {
+      this.$.dropdown.close();
+    }
+  }
+  window.customElements.define(SuDropdown.is, SuDropdown);
+  </script>
+</dom-module>

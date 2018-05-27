@@ -1,0 +1,393 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="data/app-timing-data.html">
+<link rel="import" href="data/app-category-data.html">
+<link rel="import" href="su-avatar.html">
+<link rel="import" href="oficio-styles.html">
+<link rel="import" href="display-rating.html">
+<dom-module id="talent-item">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      font-size: 13px;
+    }
+    .main-wrap {
+      padding:30px 30px;
+      border-radius: 0px;
+      /* border-bottom: 1px solid #e0e0e0; */
+      @apply --layout-horizontal;
+    }
+    .chip.green{
+      font-weight: 500;
+      color: var(--paper-green-800);
+      margin-right: 10px;
+      background-color: var(--paper-green-100);
+    }
+    .talent-avatar {
+      @apply --layout-flex;
+      position: relative;
+      width: 100%;
+    }
+    .talent-details {
+      @apply --layout-flex-11;
+      padding-right: 15px;
+      padding-left: 10px;
+      position: relative;
+      width: 100%;
+      min-height: 1px;
+    }
+    .talent-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .talent-name a{
+      color: var(--app-aqua-font);
+    }
+    .talent-actions {
+      @apply --layout-flex-2;
+      padding-right: 15px;
+      padding-left: 15px;
+      position: relative;
+    }
+    .avatar-wrap {
+      @apply --layout-flex-10;
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      padding-right: 5px;
+    }
+    .reviews{
+      font-size:10px;
+      margin-left: 6px;
+      color: var(--app-aqua-font);
+    }
+    .talent-info {
+      @apply --layout-horizontal;
+      @apply --layout-wrap;
+      margin: 8px 0px 0px 0px;
+    }
+    .info-item {
+      @apply --layout-flex-3;
+      color: var(--app-font-color-light);
+      font-size: 12px;
+      @apply --su-oficio-font-nowrap;
+      line-height: 30px;
+    }
+    .distance-item {
+      @apply --layout-flex-3;
+      color: var(--app-font-color-light);
+      font-size: 12px;
+      @apply --su-oficio-font-nowrap;
+      line-height: 30px;
+    }
+    .talent-title {
+      @apply --su-oficio-font-nowrap;
+      color: var(--app-font-color-light);
+      margin-top: 2px;
+    }
+    .talent-slogan{
+      color: var(--app-font-color);
+      font-weight: 500;
+      margin-top: 2px;
+      line-height: 1.42857;
+    }
+    .talent-description {
+      @apply --su-font-medium;
+      margin-top: 8px;
+    }
+    paper-button.small{
+      margin: 0px;
+      padding: 8px 18px 8px 18px !important;
+      font-weight: 500;
+      font-size: 13px;
+      border-radius: 2px;
+      @apply --layout-horizontal;
+    }
+    paper-button.small.green{
+      margin: 0px 0px 20px 0px;
+    }
+    .invited-chip {
+      @apply --layout-flex;
+      border: 1px solid var(--app-accent-color);
+      background-color: #fff;
+      text-transform: uppercase;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-weight: 700;
+      color: var(--app-accent-color);
+    }
+    .hired-chip{
+      @apply --layout-flex;
+      border: 1px solid var(--app-aqua-font);
+      background-color: var(--app-accent-green);
+      text-transform: uppercase;
+      font-size: 8px;
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .locaticon-icon{
+      width: 16px;
+      height: 16px;
+      margin-right: 3px;
+      margin-top: -2px;
+      color: var(--app-font-color-light);
+    }
+    .chip-wrap {
+      @apply --layout-flex;
+      margin-top:10px;
+    }
+    .black {
+      font-weight: 500;
+      white-space: nowrap;
+      display: inline;
+    }
+    .talent-header{
+      @apply --layout-flex-10;
+      @apply --layout-horizontal;
+    }
+    .small-screen{
+      display: none;
+    }
+    .chip.blue{
+      font-weight: 500;
+      color: #0093b8;
+      background-color: #d7fafa;
+      font-size: 10px;
+      padding: 4px 8px;
+    }
+    @media (max-width: 767px) {
+      .main-wrap {
+        margin-top: 24px !important;
+        @apply --layout-vertical;
+        @apply --common-borders;
+        padding: 14px;
+      }
+      .talent-header {
+        margin: 0px 0px 14px 0px;
+      }
+      .talent-info {
+        @apply --layout-horizontal;
+        font-size: 11px;
+        margin: 0px;
+      }
+      .talent-name {
+        font-size: 12px;
+      }
+      .talent-slogan{
+        font-size: 12px;
+        line-height: 1.42857;
+      }
+      .talent-description {
+        @apply --su-font-medium;
+        margin-bottom: 14px;
+      }
+      .talent-details {
+        padding-right: 0px;
+        padding-left: 8px;
+      }
+      .talent-actions {
+        margin-top:0px;
+        padding: 0px;
+      }
+      .small-screen{
+        display: flex;
+        padding: 0px;
+      }
+      .large-screen{
+        display: none;
+      }
+      .info-item{
+        font-size: 11px;
+      }
+    }
+    </style>
+    <firebase-document path="/users/[[talentId]]" data="{{account}}"></firebase-document>
+    <app-timing-data time-value="[[proposal.timing]]" time="{{time}}"></app-timing-data>
+    <app-category-data category-value="[[proposal.c]]" category="{{category}}"></app-category-data>
+    <div class="main-wrap">
+      <div class="talent-header">
+        <div class="talent-avatar">
+          <div class="avatar-wrap">
+            <su-avatar sizing="medium" src="[[account.account.pf]]"></su-avatar>
+            <dom-if if="[[_computeIfInvited(invited, isInvited)]]">
+              <template>
+                <div class="chip-wrap">
+                  <span class="invited-chip">INVITADO</span>
+                </div>
+              </template>
+            </dom-if>
+            <dom-if if="[[isHired]]">
+              <template>
+                <div class="chip-wrap">
+                  <span class="hired-chip">CONTRATADO</span>
+                </div>
+              </template>
+            </dom-if>
+          </div>
+        </div>
+        <div class="talent-details">
+          <div class="talent-name"><a>[[account.account.fn]] [[account.account.ln]]</a></div>
+          <div class="talent-slogan">[[account.profile.slogan]]</div>
+          <div class="talent-title"><display-rating medium value="[[account.account.sc]]"></display-rating><span class="reviews">([[account.account.rc]])</span></div>
+          <div class="talent-info large-screen">
+            <dom-if if="[[isCandidate]]">
+              <template>
+                <div class="distance-item"><span class="chip blue">[[_calculateDistance(proposal.d)]]</span></div>
+              </template>
+            </dom-if>
+            <dom-if if="[[!isCandidate]]">
+              <template>
+                <div class="info-item">$ [[proposal.budget]]</div>
+              </template>
+            </dom-if>
+            <div class="info-item">[[category.title]]</div>
+            <div class="info-item"><iron-icon class="locaticon-icon" icon="myicons:location"></iron-icon>[[account.account.l.name]]</div>
+          </div>
+          <div class="talent-description large-screen">[[proposal.description]]</div>
+        </div>
+      </div>
+      <div class="talent-info  small-screen">
+        <dom-if if="[[isCandidate]]">
+          <template>
+            <div class="distance-item"><span class="chip blue">[[_calculateDistance(proposal.d)]]</span></div>
+          </template>
+        </dom-if>
+        <dom-if if="[[!isCandidate]]">
+          <template>
+            <div class="info-item">$ [[proposal.budget]]</div>
+          </template>
+        </dom-if>
+        <div class="info-item">[[category.title]]</div>
+        <div class="info-item"><iron-icon class="locaticon-icon" icon="myicons:location"></iron-icon>[[account.account.l.name]]</div>
+      </div>
+      <div class="talent-description small-screen">[[proposal.description]]</div>
+      <div class="talent-actions">
+        <dom-if if="[[isCandidate]]">
+          <template>
+            <paper-button hidden$="[[!proposal.p]]" noink class="small green" on-tap="_showProposals">Ver propuesta</paper-button>
+            <paper-button hidden$="[[proposal.p]]" disabled$="[[isInvited]]" noink class="small green" on-tap="_sendInvite">Invitar al Trabajo</paper-button>
+            <paper-button noink class="small white" on-tap="">Guardar</paper-button>
+          </template>
+        </dom-if>
+        <dom-if if="[[_shouldSowHireButtons(isCandidate, isHired)]]">
+          <template>
+            <paper-button disabled$="[[_computeDisabledHired(jobEnded, proposalHired)]]" noink class="small green" on-tap="_hireTalent">Contrata a [[account.account.fn]]</paper-button>
+            <paper-button disabled$="[[_shouldDisable(jobEnded, proposal.ischat, proposalHired)]]" noink class="small blue" on-tap="_sendMsg">Enviar mensaje</paper-button>
+          </template>
+        </dom-if>
+        <dom-if if="[[isHired]]">
+          <template>
+            <paper-button noink class="small blue" on-tap="">Ver Perfil</paper-button>
+          </template>
+        </dom-if>
+      </div>
+    </div>
+  </template>
+  <script>
+  class TalentItem extends Polymer.Element {
+    static get is() {
+      return 'talent-item';
+    }
+    static get properties() {
+      return {
+        key: String,
+        invited: {
+          type: Boolean,
+          value: false
+        },
+        isCandidate: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        },
+        isHired: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        },
+        isInvited: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        },
+        proposalHired: {
+          type: Boolean,
+          value: false,
+        },
+        jobEnded: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          notify: true
+        },
+        account: Object,
+        type: Boolean,
+        talentId: String,
+        proposal: Object,
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _computeIfInvited(a,b){
+      return(a || b);
+    }
+    _calculateDistance(distance){
+      if (Number(distance) > 1){
+        return (' a ' + distance.toFixed(2) + ' KM');
+      }else{
+        return (' a ' + distance.toFixed(2) * 1000 + ' metros');
+      }
+    }
+    _computeDisabledHired(jobEnded, proposalHired){
+      if (jobEnded || proposalHired){
+        return true;
+      }
+      return false;
+    }
+    _shouldDisable(ischat, ended, proposalHired){
+      if(ischat || ended || proposalHired){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _sendMsg(){
+      let promise = firebase.app().database().ref(`/proposals/${this.key}/${this.talentId}/ischat`).set(true);
+      promise.then( () => {
+        firebase.app().database().ref(`/proposals/${this.key}/${this.talentId}/chatid`).on('value', function(snapshot){
+          if(snapshot.val()){
+            this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: `mensajes/${snapshot.val()}` } }));
+          }
+        }.bind(this));
+      });
+    }
+    _showProposals(){
+      this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: `candidatos/${this.key}/propuestas` } }));
+    }
+    _sendInvite(){
+      this.dispatchEvent(new CustomEvent('send-invite', { bubbles: true, composed: true, detail: { talentId: this.talentId, jobKey: this.key, talentName: this.account.account.fn} }));
+    }
+    _hireTalent(){
+      let promise = firebase.app().database().ref(`/proposals/${this.key}/${this.talentId}/hired`).set(true);
+      promise.then( () => {
+        this.dispatchEvent(new CustomEvent('change-route', {bubbles: true, composed: true, detail: { location: 'contratos' } }));
+      });
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('talent-item.created');
+    }
+    _shouldSowHireButtons(isCandidate, isHired){
+      return(!isCandidate && !isHired);
+    }
+  }
+  window.customElements.define(TalentItem.is, TalentItem);
+  </script>
+</dom-module>

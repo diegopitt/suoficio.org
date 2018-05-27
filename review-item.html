@@ -1,0 +1,104 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="display-rating.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="review-item">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      color: var(--app-font-color);
+      margin: 8px 0;
+    }
+    .main-wrap {
+      @apply --layout-horizontal;
+      padding:14px 0px;
+    }
+    .review-content {
+      @apply --layout-flex-9;
+    }
+    .review-details {
+      @apply --layout-vertical;
+      @apply --layout-end;
+      @apply --layout-flex-3;
+      min-width: 130px;
+    }
+    .review-description {
+      @apply --su-font-small;
+      font-style: italic;
+      margin: 10px 0;
+      color: var(--app-font-color);
+    }
+    .review-title a {
+      @apply --su-review-title;
+    }
+    .job-amount {
+      color: #000;
+      @apply --su-font-medium-bold;
+    }
+    .review-date {
+      @apply --su-font-small;
+      color: var(--app-font-color);
+    }
+    .item {
+      margin: 2px 0;
+    }
+    @media (max-width: 320px) {
+      .main-wrap {
+        @apply --layout-vertical;
+      }
+      .rating_wrap{
+      }
+    }
+    @media (max-width: 767px) {
+      .review-title a {
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .review-date{
+        @apply --su-font-xsmall;
+      }
+    }
+    </style>
+    <firebase-document path="/jobs/[[review.jobkey]]" data="{{job}}"></firebase-document>
+    <div class="main-wrap">
+      <div class="review-content">
+        <div class="review-title"><a href="#">[[job.name]]</a></div>
+        <div class="review-description">[[review.description]]</div>
+      </div>
+      <div class="review-details">
+        <div class="item">
+          <div class="rating_wrap" id="xreview">
+            <display-rating value="[[review.sc]]"></display-rating>
+          </div>
+        </div>
+        <div class="item"><span class="review-date">[[_getReviewDate(review.date)]]</span></div>
+        <div class="item"><span class="job-amount">$&nbsp;[[_formatAmount(job.budget)]]</span></div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class ReviewItem extends Polymer.Element {
+    static get is() {
+      return 'review-item';
+    }
+    static get properties() {
+      return {};
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('review-item.created');
+    }
+    _formatAmount(amount) {
+      return Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+    }
+    _getReviewDate(timestamp) {
+      return moment(timestamp).format('ll');
+    }
+  }
+  window.customElements.define(ReviewItem.is, ReviewItem);
+  </script>
+</dom-module>

@@ -1,0 +1,177 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="proposal-item">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: none;
+    }
+     :host(:not([unresolved])) {
+      display: block;
+    }
+    .main-wrap {
+      @apply --layout-horizontal;
+    }
+    .item {
+      @apply --layout;
+      @apply --layout-center;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 16px;
+      width: 100%;
+    }
+    .item > .no {
+      width: 40px;
+    }
+    .item > .job {
+      @apply --layout-flex;
+      padding-right: 10px;
+    }
+    .item > .job a {
+      @apply --su-font-subtitle;
+    }
+    .mutedlink {
+      color: var(--app-font-color) !important;
+      font-weight: 400 !important;
+    }
+    .greenlink {
+      color: var(--app-aqua-font) !important;
+    }
+    .item > .date {
+      width: 116px;
+    }
+    .time {
+      color: var(--app-font-color);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 20px;
+    }
+    .days {
+      color: var(--app-font-color-light);
+      @apply --paper-font-common-nowrap;
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 16px;
+    }
+    .showdays{
+      display: none !important;
+    }
+    .green {
+      background-color: var(--app-aqua-font);
+    }
+    .muted {
+      background-color: var(--app-muted-color);
+    }
+    @media (max-width: 767px) {
+      .showdays{
+        display: block !important;
+      }
+      .time {
+        font-size: 12px;
+      }
+      .days {
+        font-size: 9px;
+        line-height: 24px;
+      }
+      .item > .job {
+        padding-right: 0px;
+      }
+      .item > .job a {
+        @apply --su-font-header;
+      }
+      .item > .date {
+        width: 106px;
+      }
+      .item > .no {
+        width: 24px;
+      }
+      .date{
+        display: none;
+      }
+    }
+    </style>
+    <firebase-document path="/jobs/[[data.key]]" data="{{job}}"></firebase-document>
+    <div class="main-wrap">
+      <div class="item">
+        <div class="no">
+          <div class$="circle [[_computeColor(job.ishired)]]"></div>
+        </div>
+        <div class="date">
+          <div class="time">[[_getPostTime(data.value.s)]]</div>
+          <div class="days">[[_getPostDays(data.value.s)]]</div>
+        </div>
+        <div class="job">
+          <dom-if if="[[isInvite]]">
+            <template>
+              <a href="propuestas/invitacion/[[data.key]]" class$="[[_computelinkColor(job.ishired)]]">[[job.name]]</a>
+            </template>
+          </dom-if>
+          <dom-if if="[[!isInvite]]">
+            <template>
+              <a href="propuestas/[[data.key]]" class$="[[_computelinkColor(job.ishired)]]">[[job.name]]</a>
+            </template>
+          </dom-if>
+          <dom-if if="[[!isInvite]]">
+            <template>
+              <div class="days showdays">Enviada: [[_getPostDays(data.value.s)]]</div>
+            </template>
+          </dom-if>
+          <dom-if if="[[isInvite]]">
+            <template>
+              <div class="days showdays">Recibida: [[_getPostDays(data.value.s)]]</div>
+            </template>
+          </dom-if>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class ProposalItem extends Polymer.Element {
+    static get is() {
+      return 'proposal-item';
+    }
+    static get properties() {
+      return {
+        data: Array,
+        isInvite: {
+          type: Boolean,
+          value: false
+        },
+        job: Object
+      };
+    }
+    static get observers() {
+      return [
+        '_dataLoaded(data.value.s, job.name)'
+      ]
+    }
+    ready() {
+      super.ready();
+    }
+    _dataLoaded(s, n){
+      if (s === undefined || n === undefined) return;
+      if (s && n){
+        this.removeAttribute('unresolved');
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('proposal-item');
+    }
+    _getPostTime(timestamp) {
+      return moment(timestamp).format('L');
+    }
+    _getPostDays(timestamp) {
+      return moment(timestamp).fromNow();
+    }
+    _computeColor(isActive) {
+      return isActive ? 'muted' : 'green';
+    }
+    _computelinkColor(isActive) {
+      return isActive ? 'mutedlink': 'greenlink';
+    }
+  }
+  window.customElements.define(ProposalItem.is, ProposalItem);
+  </script>
+</dom-module>

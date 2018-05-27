@@ -1,0 +1,116 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="data/app-category-data.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-categoria">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    header {
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+      min-height: calc(70vh);
+      backgrond-repeat: no-repeat;
+      background-size: cover;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../../images/suelos.jpg);
+      color: var(--app-font-color);
+    }
+    
+    .title {
+      font-size: 38px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+    }
+    
+    .subtitle {
+      font-size: 24px;
+      padding: 30px 0px;
+      text-align: center;
+      font-weight: 300;
+      color: #fff;
+    }
+    
+    .bg-wrap {
+      background-color: var(--app-orange-color);
+    }
+    
+    #tabContainer {
+      position: relative;
+      height: 36px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    paper-tabs {
+      @apply --layout-flex;
+      height: 36px;
+      margin: 0 auto;
+      --paper-tabs-selection-bar-color: var(--app-orange-color-light);
+      --paper-tab-ink: var(--app-orange-color-light);
+    }
+    
+    paper-tab[link] a {
+      @apply --su-oficio-font-base;
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      padding: 0px 14px;
+      font-weight: 300;
+      font-size: 13px;
+      color: #fff;
+      text-decoration: none;
+    }
+    
+    paper-button.orange {
+      padding: 6px 40px;
+      border-radius: 0px !important;
+      background-color: #f9ee6b;
+      @apply --su-font-header;
+      border: 2px solid #f9ee6b;
+      color: #000;
+    }
+    </style>
+    <app-route route="{{route}}" pattern="/:category_name" data="{{routeData}}"></app-route>
+    <app-category-data category-name="[[routeData.category_name]]" categories="{{categories}}" category-by-name="{{categoryByName}}"></app-category-data>
+    <header>
+      <div class="title">[[categoryByName.title]]</div>
+      <div class="subtitle">Escoje entre los mejores</div>
+      <paper-button noink class="orange" alt="menu">COMENZAR</paper-button>
+    </header>
+    <div class="bg-wrap">
+      <div id="tabContainer">
+        <div class="flex">
+          <paper-tabs selected="[[routeData.category_name]]" scrollable attr-for-selected="name">
+            <template is="dom-repeat" items="[[categories]]" as="cat">
+              <paper-tab name="[[cat.name]]" link>
+                <a href="/categoria/[[cat.name]]">[[cat.title]]</a>
+              </paper-tab>
+            </template>
+          </paper-tabs>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class SuCategoria extends Polymer.Element {
+    static get is() {
+      return 'su-categoria';
+    }
+    static get properties() {
+      return {};
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-categoria.created');
+    }
+  }
+  window.customElements.define(SuCategoria.is, SuCategoria);
+  </script>
+</dom-module>

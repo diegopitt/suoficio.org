@@ -1,0 +1,224 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<dom-module id="oficio-styles">
+  <template>
+    <style>
+    :host {
+      --page-title: {
+        @apply --su-page-title;
+        padding: 18px 0px 12px 42px;
+        color: var(--app-font-color);
+      };
+      --page-sub-header: {
+        @apply --su-font-subhead;
+        padding:11px 0px;
+        color: var(--app-font-color);
+      };
+      --common-borders: {
+        background-color: var(--app-background-container);
+        border-radius: 0px;
+        border: 1px solid var(--app-little-grey);
+      };
+      --common-shadow: {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 1px -1px rgba(0,0,0,0.14);
+      };
+      --material-shadow: {
+        box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+      };
+      --common-shadow-hover: {
+         box-shadow: 0 2px 10px 1px rgba(57,73,76,.4), 0 1px 2px rgba(57,73,76,.25);
+        /*box-shadow: 0 0 2px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.24);*/
+      };
+      --common-card-shadow-hover: {
+        box-shadow: 0 2px 10px 1px rgba(57,73,76,.4), 0 1px 2px rgba(57,73,76,.25);
+      }
+    }
+    [hidden]{
+      display: none !important;
+    }
+    .page_title{
+      @apply --page-title;
+      margin-bottom: 8px;
+    }
+
+    .job_title{
+      @apply --su-job-title;
+    }
+    
+    .subtitle{
+      @apply --page-sub-header;
+    }
+    
+    .circle {
+      border-radius: 14px;
+      width: 14px;
+      height: 14px;
+    }
+    .circle.pending {
+      @apply --common-shadow;
+    }
+    .circle.green {
+      @apply --common-shadow;
+    }
+    paper-button {
+      @apply --su-oficio-font-base;
+      @apply --common-shadow;
+      padding: 11px 16px;
+      font-size: 14px;
+      white-space: nowrap;
+      text-transform: none;
+      font-weight: 500;
+      border-radius: 2px;
+      min-width: 110px;
+      color: #fff;
+    }
+    paper-button:hover{
+      @apply --common-shadow-hover;
+    }
+    paper-button.small {
+      padding: 4px 10px;
+      @apply --su-font-medium;
+      border-width: 1px !important;
+    }
+    .chip{
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: default;
+      @apply --su-oficio-font-nowrap;
+    }
+    .chip:hover{
+      color: #fff;
+      background-color: var(--app-aqua-font);
+    }
+    paper-button.blue {
+      background-color: var(--app-aqua-font);
+      border: 1px solid var(--app-aqua-font);
+    }
+    
+    paper-button.red {
+      background-color: var(--app-red-color);
+      border: 1px solid var(--app-red-color);
+    }
+    
+    paper-button.white {
+      border: 1px solid transparent;
+      background-color: #fff;
+      color: var(--app-font-color-light);
+    }
+    
+    paper-button[disabled] {
+      border: 1px solid var(--app-little-grey) !important;
+      background-color: var(--app-disabled-color) !important;
+      color: var(--app-font-color-light) !important;
+      cursor: not-allowed;
+      box-shadow: none !important;
+    }
+    
+    paper-button.green {
+background-color: var(--app-aqua-font);
+border: 1px solid var(--app-aqua-font);
+/*       background-color: #673AB7;
+border: 1px solid #673AB7; */
+    }
+    paper-button.green:hover{
+      transition: all .3s;
+      background-color: #17aeae;
+    }
+    paper-button.aqua {
+      background-color: var(--app-aqua-font);
+      border: 1px solid var(--app-aqua-font);
+    }
+    
+    paper-button.orange {
+      background-color: var(--app-orange-color);
+      border: 1px solid var(--app-orange-color);
+    }
+    
+    a {
+      text-decoration: none;
+      color:var(--app-aqua-font);
+    }
+    
+    a:visited {
+      color:var(--app-aqua-font);
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .sticker{
+      display:inline-block;
+      padding: 3px 8px;
+      color: #fff;
+      @apply --su-font-xx-small;
+      margin-bottom: 4px;
+      cursor:default;
+      font-size: 10px;
+      border-radius: 0px;
+      font-weight: 600;
+      background-color: transparent;
+      opacity: .9;
+      @apply --su-oficio-font-nowrap;
+      margin-right: 10px;
+    }
+
+    .flag {
+      @apply --paper-font-common-nowrap;
+      position: relative;
+      padding: 3px 16px 3px 8px;
+    }
+    
+    .flag:after {
+      content: " ";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-right: 9px solid var(--app-background-container);
+    }
+    ::-webkit-input-placeholder {
+      font-size: 13px;
+      color: #848D95;
+    }
+    ::-moz-placeholder {
+      color: #848D95;
+      font-size: 13px;
+    }
+    :-ms-input-placeholder {
+      color: #848D95;
+      font-size: 13px;
+    }
+    :-moz-placeholder {
+      color: #848D95;
+      font-size: 13px;
+    }
+    @media (max-width: 767px) {
+      :host {
+        --common-borders: {
+          margin: 0px 8px;
+          background-color: var(--app-background-container);
+          border-radius: 8px;
+          border: none;
+          box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        };
+      };
+      .page_title{
+        display: none !important;
+        padding: 14px 0px 0px 0px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--app-font-color-light);
+      }
+      .circle {
+        border-radius: 10px;
+        width: 10px;
+        height: 10px;
+      }
+    }
+    </style>
+  </template>
+</dom-module>

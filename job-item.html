@@ -1,0 +1,395 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="data/app-category-data.html">
+<link rel="import" href="oficio-styles.html">
+<link rel="import" href="su-animations.html">
+<link rel="import" href="display-rating.html">
+<dom-module id="job-item">
+  <template>
+    <style include="oficio-styles su-animations">
+     :host {
+      display: block;
+    }
+     :host([is-wide]) .main-wrap {
+      padding: 18px 12px !important;
+    }
+     :host([is-wide]) .v-padding {
+      padding-right: 0px !important;
+    }
+     :host([is-saved]) .main-wrap {
+      border-width: 0px;
+      @apply --common-borders;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+    }
+     :host(:not([is-saved])) .main-wrap {
+      padding: 20px 0px;
+      background-color: transparent;
+      border-radius: 0px;
+      border: 0px solid transparent;
+    }
+     :host([is-saved]) .isSaved {
+      display: none;
+    }
+     :host([is-saved]) .job-description {
+      margin-top: 8px;
+      @apply --su-font-small;
+    }
+    .v-padding {
+      padding-right: 60px;
+    }
+    .job-description {
+      @apply --su-font-medium;
+      line-height: 1.42857;
+      color: var(--app-font-color);
+    }
+     :host(:not([is-saved])) .hide {
+      display: none !important;
+    }
+     :host(:not([is-saved])) .main-wrap:hover .sticker.red {
+      background-color: #f75d63 !important;
+      color: #f5f5f5 !important;
+    }
+    .main-wrap:hover .job-title a {
+      color: var(--app-aqua-font);
+    }
+     :host(:not([is-saved])) .main-wrap:after {
+      content: " ";
+      border-bottom: 1px solid var(--app-little-grey);
+      display: block;
+      position: relative;
+      top: 21px;
+    }
+    .job-header {
+      @apply --layout-horizontal;
+      @apply --layout-justified;
+    }
+    .job-title a {
+      @apply --su-review-title;
+      padding-right: 10px;
+      color: var(--app-aqua-font);
+    }
+     :host([is-saved]) .job-title a {
+      color: var(--app-aqua-font);
+    }
+     :host([is-wide]) .job-title a {
+      color: var(--app-font-color);
+    }
+    .job-title {
+      line-height: 22px;
+    }
+    .default-margin {
+      margin: 2px 0;
+    }
+     :host([is-saved]) .default-margin {
+      margin: 2px 0 !important;
+    }
+    .post-date {
+      @apply --su-font-small;
+      @apply --su-oficio-font-nowrap;
+      margin-right: 10px;
+      line-height: 50px;
+      color: var(--app-font-color-light);
+    }
+    .chip.grey {
+      background-color: #e3e8e8;
+      margin-right: 10px;
+      color: var(--app-font-color);
+    }
+    .chip.green {
+      font-weight: 500;
+      color: #008329;
+      background-color: #EAF5E9;
+      margin-right: 10px;
+    }
+    .heart-icon {
+      margin-left: 10px;
+      padding: 0px;
+      width: 22px;
+      height: 22px;
+      color: var(--app-muted-color);
+    }
+    .heart-icon-red {
+      margin-left: 10px;
+      padding: 0px;
+      width: 22px;
+      height: 22px;
+      color: #EF6945;
+    }
+     :host([is-favorite]) .heart-icon {
+      color: #EF6945 !important;
+    }
+     :host([is-saved]) .heart-icon {
+      color: #EF6945 !important;
+    }
+    .orange {
+      border: 1px solid var(--app-accent-color);
+      color: var(--app-accent-color);
+    }
+    .red {
+      border: 1px solid #f7b2b4;
+      color: #f75d63;
+    }
+
+    .locaticon-icon {
+      width: 14px;
+      height: 14px;
+      margin-right: 4px;
+      color: #2579E7;
+    }
+    .job-favorite>div {
+      @apply --layout-horizontal;
+      @apply --layout-justified-end;
+    }
+    paper-icon-button {
+      --paper-icon-button-ink-color: transparent;
+    }
+    .job-footer {
+      @apply --layout-horizontal;
+      @apply --su-font-small-bold;
+      color: var(--app-font-color-light);
+      margin: 14px 0px 0px 0px;
+    }
+    .job-location {
+      @apply --layout-horizontal;
+      font-weight: 400;
+      font-size: 12px;
+    }
+    .job-rating {
+      margin-left: 14px;
+    }
+    .job-proposals {
+      margin-top: 14px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .user-worth {
+      margin-left: 14px;
+      font-size: 11px;
+      font-weight: 400;
+    }
+    .user-worth span {
+      font-weight: 500;
+      color: var(--app-font-color);
+    }
+    .loc-value {
+      display: inline-block;
+      font-size: 11px;
+      line-height: 15px;
+    }
+    .chip {
+      border-radius: 0px;
+    }
+    @media (max-width: 767px) {
+       :host([is-saved]) .main-wrap {}
+      .v-padding {
+        padding-right: 40px;
+      }
+      .main-wrap {
+        padding: 20px 14px !important;
+      }
+    }
+    @media (max-width: 567px) {
+      .default-margin {
+        margin: 12px 0px 0px 0px;
+      }
+      .v-padding {
+        padding-right: 20px;
+      }
+    }
+    @media (max-width: 467px) {
+      .v-padding {
+        padding-right: 0px;
+      }
+    }
+    </style>
+    <dom-if if="[[jobKey]]">
+      <template>
+        <firebase-document path="/jobs/[[jobKey]]" data="{{job}}"></firebase-document>
+      </template>
+    </dom-if>
+    <app-category-data category-value="[[job.category]]" category="{{category}}"></app-category-data>
+    <div class="main-wrap">
+      <div class="job-content">
+        <div class="chip-container isSaved">
+          <dom-if if="[[job.ishighlight]]">
+            <template>
+              <div class="sticker orange">DESTACADO</div>
+            </template>
+          </dom-if>
+          <dom-if if="[[_computeIsUrgent(job.timing)]]">
+            <template>
+              <div class="sticker red">CONTRATA URGENTE</div>
+            </template>
+          </dom-if>
+        </div>
+        <div class="job-header">
+          <div class="job-title v-padding">
+            <a href="buscar-trabajo/[[key]]" tabindex="-1">{{job.name}}</a>
+          </div>
+          <div class="job-favorite">
+            <div>
+              <div class="chip grey hide">[[job.proposals]] Propuestas</div>
+              <paper-icon-button noink on-tap="_favoriteMe" class$="[[_updateClass(isFavorite)]]" icon="myicons:favorite"></paper-icon-button>
+            </div>
+          </div>
+        </div>
+        <div class="job-details isSaved default-margin">
+          <dom-if if="[[!isWide]]">
+            <template>
+              <div class="chip-container">
+                <span class="chip grey">{{category.title}}</span>
+                <span class="chip green">$ [[_formatAmount(job.budget)]]</span>
+                <span class="post-date">Posteado [[_getPostTime(job.date)]]</span>
+              </div>
+            </template>
+          </dom-if>
+        </div>
+        <dom-if if="[[!isWide]]">
+          <template>
+            <div class="job-description v-padding">[[_truncate(job.description)]]</div>
+            <div class="job-proposals isSaved">[[job.proposals]] Propuestas recibidas</div>
+          </template>
+        </dom-if>
+      </div>
+      <div class="job-footer isSaved">
+        <div class="job-location">
+          <iron-icon class="locaticon-icon" icon="myicons:location"></iron-icon>
+          <dom-if if="[[distance]]">
+            <template>
+              <span>[[_calculateDistance(distance)]]</span>
+            </template>
+          </dom-if>
+          <dom-if if="[[!distance]]">
+            <template>
+              <div class="loc-value">[[job.l.name]]</div>
+            </template>
+          </dom-if>
+        </div>
+        <div class="job-rating">
+          <display-rating tiny value="[[_ownerScore]]"></display-rating>
+        </div>
+        <dom-if if="[[!isWide]]">
+          <template>
+            <div class="user-worth"><span>$ [[_ownerWorth]]</span> Gastado</div>
+          </template>
+        </dom-if>
+      </div>
+    </div>
+  </template>
+  <script>
+  class jobItem extends Polymer.Element {
+    static get is() {
+      return 'job-item';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        _ownerScore: Number,
+        jobKey: {
+          type: String,
+          value: null
+        },
+        distance: {
+          type: Number,
+          value: null,
+        },
+        isSaved: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+        isFavorite: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+        isWide: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true,
+          value: false
+        },
+        key: {
+          type: String,
+          computed: '_computeKey(jobKey, job)'
+        },
+        job: Object,
+        heartIcon: {
+          type: String,
+          value: 'heart-icon'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('job-item.created');
+    }
+    _truncate(description){
+      if (description === undefined) return;
+      return description.length > 170 ? description.slice(0, 171) + "…" : description;
+    }
+    _calculateDistance(distance) {
+      console.log(distance);
+      if (Number(distance) < 0) {
+        return (' a ' + distance.toFixed(2) * 100 + ' km');
+      } else if (Number(distance) > 0) {
+        return (' a ' + distance.toFixed(2) * 1000 + ' metros');
+      }
+    }
+    _computeKey(jobkey, job) {
+      return jobkey || job.$key;
+    }
+    _computeIsUrgent(time) {
+      return time === 1;
+    }
+    _favoriteMe() {
+      let firebaseDbRef = firebase.app().database().ref();
+      let val = this.isFavorite ? null : true;
+      const updates = {};
+      updates['favorites/jobs/' + this.key + '/' + this.uid] = val;
+      updates['users/' + this.uid + '/favs/' + this.key] = val;
+      let me = this;
+      firebaseDbRef.update(updates).then(function() {
+        me.isFavorite = val;
+      });
+    }
+    _updateClass(isFavorite) {
+      if (isFavorite) {
+        return 'heart-icon-red animated-fast pulse';
+      } else {
+        return 'heart-icon';
+      }
+    }
+    _formatAmount(amount) {
+      return Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+    }
+    _getPostTime(timestamp) {
+      return moment(timestamp).fromNow();
+    }
+    ready(){
+      super.ready();
+      if (!this.isSaved){
+        firebase.app().database().ref(`/users/${this.job.owner}/account/sc`).once('value').then(function(score) {
+         this._ownerScore = score.val();
+        }.bind(this));
+        firebase.app().database().ref(`/users/${this.job.owner}/account/wo`).once('value').then(function(worth) {
+          if (worth.val() === undefined) return 0;
+          if (worth.val() < 1000) {
+            this._ownerWorth =  worth.val();
+          }else{
+            this._ownerWorth =  worth.val() > 999 ? (worth.val()/1000).toFixed(0) + 'MIL+' : worth.val()
+          }
+        }.bind(this));
+      }
+    }
+  }
+  window.customElements.define(jobItem.is, jobItem);
+  </script>
+</dom-module>

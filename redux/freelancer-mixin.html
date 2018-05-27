@@ -1,0 +1,149 @@
+<link rel="import" href="redux-mixin.html">
+<script>
+  FreelancerMixin = Parent => class FreelancerMixin extends ReduxMixin(Parent) {
+    static get properties() {
+      return {
+        all_proposals: {
+          type: Array,
+          statePath: 'all_proposals'
+        }
+      };
+    }
+    static get actions() {
+      return {
+        activeProposals(proposals) {
+          return {
+            type: 'ACTIVE_PROPOSALS',
+            proposals
+          };
+        },
+        accounttype(atype) {
+          return {
+            type: 'ACCOUNT_TYPE',
+            atype
+          };
+        },
+        Contracts(contracts) {
+          return {
+            type: 'ALL_CONTRACTS',
+            contracts
+          };
+        },
+        Favorites(favorites) {
+          return {
+            type: 'ALL_FAVORITES',
+            favorites
+          };
+        },
+        userchats(chats) {
+          return {
+            type: 'ACTIVE_CHATS',
+            chats
+          };
+        },
+        username(name) {
+          return {
+            type: 'USER_NAME',
+            name
+          };
+        },
+        uservibility(visibility) {
+          return {
+            type: 'USER_VISIBILITY',
+            visibility
+          };
+        },
+        userlast(last) {
+          return {
+            type: 'USER_LAST',
+            last
+          };
+        },
+        userinvites(invites) {
+          return {
+            type: 'INVITES',
+            invites
+          };
+        },
+        userscore(score) {
+          return {
+            type: 'USER_SCORE',
+            score
+          };
+        },
+        userworth(worth) {
+          return {
+            type: 'USER_WORTH',
+            worth
+          };
+        },
+        usercategories(categories) {
+          return {
+            type: 'USER_CATEGORIES',
+            categories
+          };
+        },
+        userdescription(description) {
+          return {
+            type: 'P_DESCRIPTION',
+            description
+          };
+        },
+        reviewcount(rcount) {
+          return {
+            type: 'REVIEW_COUNT',
+            rcount
+          };
+        },
+        jobcount(jcount) {
+          return {
+            type: 'JOB_COUNT',
+            jcount
+          };
+        },
+        profilepicture(picture) {
+          return {
+            type: 'PROFILE_PICTURE',
+            picture
+          };
+        },
+        userlocation(location) {
+          return {
+            type: 'USER_LOCATION',
+            location
+          };
+        },
+        userslogan(slogan) {
+          return {
+            type: 'P_SLOGAN',
+            slogan
+          };
+        },
+        hasreview(hreview) {
+          return {
+            type: 'HAS_REVIEW',
+            hreview
+          };
+        },
+        hasnotification(hnotification) {
+          return {
+            type: 'HAS_NOTIFICATION',
+            hnotification
+          };
+        },
+        hasmessage(hmessage) {
+          return {
+            type: 'HAS_MESSAGE',
+            hmessage
+          };
+        },
+        profilecomplete(pcomplete) {
+          return {
+            type: 'PROFILE_COMPLETE',
+            pcomplete
+          };
+        }
+      }
+    }
+  }
+</script>

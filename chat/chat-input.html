@@ -1,0 +1,117 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="chat-input">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      @apply --layout-flex;
+    }
+    .input {
+      width: calc(100% - 30px);
+      margin: 0px;
+      resize: none;
+      border: 1px solid var(--app-muted-color);
+      padding: 6px 10px;
+      font-size: 16px;
+      line-height: 18px;
+      color: var(--app-font-color);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+      -webkit-transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+      transition: border-color ease-in-out 0.15s,box-shadow ease-in-out 0.15s;
+    }
+    .input:disabled {
+      background: #f5f5f5;
+      border: 1px solid var(--app-little-grey);
+      box-shadow: none;
+    }
+    .input-wrap {
+      padding: 8px;
+      max-height: 66px;
+      @apply --layout-flex;
+      @apply --layout-horizontal;
+    }
+    .text-input{
+      @apply --layout-flex;
+      @apply --layout-horizontal;
+    }
+    .text-send {
+      @apply --layout-horizontal;
+      width: 114px;
+      @apply --layout-center-center;
+      
+    }
+    paper-button{
+      @apply --layout-flex;
+      border-radius: 0px !important;
+    }
+    </style>
+    <div class="input-wrap">
+      <div class="text-input">
+        <textarea disabled$="[[inputDisable]]" value="{{text::input}}" id="desc" class="input" rows="2" cols="50"></textarea>
+      </div>
+      <div class="text-send">
+        <paper-button disabled$="[[!text]]" class="green" on-tap="_SendMsg">Enviar</paper-button>
+      </div>
+    </div>
+  </template>
+  <script>
+  class ChatInput extends Polymer.Element {
+    static get is() {
+      return 'chat-input';
+    }
+    static get properties() {
+      return {
+        roomKey: String,
+        receiver: {
+          type: String,
+          value: null
+        },
+        inputDisable: {
+          type: Boolean,
+          computed: 'ComputeInput(receiver)'
+        },
+        uid: String,
+        text: {
+          type: String,
+          notify: true,
+          value: null
+        },
+      };
+    }
+    static get observers() {
+      return []
+    }
+    ComputeInput(receiver){
+      if (receiver === undefined){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    _SendMsg(){
+      if(this.text === undefined || this.text === ' ') return;
+      let message = {
+        text: this.text,
+        receiver: this.receiver,
+        created: firebase.database.ServerValue.TIMESTAMP,
+        author: this.uid
+      };
+      let promise = firebase.app().database().ref(`/messages/${this.roomKey}`).push(message);
+      promise.then( () => {
+        this.text = '';
+        let promise2 = firebase.app().database().ref(`/users/${this.receiver}/account/hm`).set(true);
+        promise.then( () => {
+          return;
+        });
+      });
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('chat-input.created');
+    }
+  }
+  window.customElements.define(ChatInput.is, ChatInput);
+  </script>
+</dom-module>

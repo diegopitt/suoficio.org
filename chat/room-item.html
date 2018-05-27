@@ -1,0 +1,135 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../su-avatar.html">
+<dom-module id="room-item">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      color: #494949;
+    }
+    .room-wrap{
+      @apply --layout-horizontal;
+      margin:1px 0;
+      border-left: 4px solid transparent;
+      padding:6px;
+      cursor: pointer;
+      @apply --selected-border;
+      @apply --selected-background;
+    }
+    .room-wrap:hover .user-name{
+      color: var(--app-aqua-font);
+    }
+    .avatar {
+      padding:6px 10px;
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+    }
+    [hidden]{
+      display: none !important;
+    }
+    .user-name{
+      @apply --layout-horizontal;
+      @apply --layout-justified;
+      font-size: 13px;
+      line-height: 1.5em;
+      @apply --su-oficio-font-nowrap;
+      @apply --selected-item;
+    }
+    .job-title{
+      font-size: 12px;
+      color: #222;
+      line-height: 1.5em;
+      @apply --su-oficio-font-nowrap;
+    }
+    .last-msg{
+      font-size: 11px;
+      color: #999;
+      @apply --su-oficio-font-nowrap;
+    }
+    .details{
+      @apply --layout-flex;
+      padding:4px 2px;
+      @apply --su-oficio-font-nowrap;
+    }
+    .new{
+      display:inline-block;
+      margin-right: 2px;
+      width: 8px;
+      height: 8px;
+      border-radius: 10px;
+      background-color: var(--app-aqua-font);
+    }
+    </style>
+    <firebase-document path="/jobs/[[data.j]]" data="{{jData}}"></firebase-document>
+    <firebase-document path="/users/[[data.r]]/account" data="{{aData}}"></firebase-document>
+    <div class="room-wrap" hidden$="[[_shouldHide]]">
+      <div class="avatar">
+        <su-avatar sizing="small" src="[[aData.pf]]"></su-avatar>
+      </div>
+      <div class="details">
+        <div class="user-name">
+          <div>[[aData.fn]] [[aData.ln]]</div>
+          <dom-if if="[[data.n]]">
+            <template>
+              <span class="new"></span>
+            </template>
+          </dom-if>
+        </div>
+        <div class="job-title">[[jData.name]]</div>
+        <dom-if if="[[data.l]]">
+          <template>
+            <div class="last-msg">[[_computeAuthor(data.a)]] [[data.l]]</div>
+          </template>
+        </dom-if>
+      </div>
+    </div>
+  </template>
+  <script>
+  class RoomItem extends Polymer.Element {
+    static get is() {
+      return 'room-item';
+    }
+    static get properties() {
+      return {
+        data: {
+          type: Object,
+          value: null
+        },
+        uid: {
+          type: String,
+          value: null
+        },
+        _shouldHide:{
+          type: Boolean,
+          computed: '_computeShouldHide(jData.name, aData.fn, data.j)',
+          value: true
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _computeAuthor(author){
+      if (author === undefined) return; 
+      if (author === this.uid){
+        return 'Tu:';
+      }else{
+        return this.aData.fn;
+      }
+    }
+    _computeShouldHide(jobname, receiver, jobkey){
+      if (jobname === undefined || receiver === undefined || jobkey === undefined){
+        return true;
+      }else{
+        return false;
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('room-item.created');
+    }
+  }
+  window.customElements.define(RoomItem.is, RoomItem);
+  </script>
+</dom-module>

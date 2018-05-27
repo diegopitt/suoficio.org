@@ -1,0 +1,157 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../su-avatar.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="update-photo">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+      color: var(--app-font-color);
+      @apply --su-oficio-font-base;
+      @apply --layout-flex;
+      margin-bottom: 24px;
+    }
+    :host([no-wrapper]) .wrapper {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+    :host([no-wrapper]) h2{
+      display: none !important;
+    }
+    :host(:not([no-wrapper])) .wrapper{
+      max-width: 290px;
+      @apply --common-borders;
+    }
+    .wrapper{
+      @apply --layout-flex;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    h2{
+      word-break: break-word;
+      margin: 0 0 14px;
+      line-height: 24px;
+      font-size: 20px ;
+      font-weight: 400;
+    }
+    label {
+      font-size: 15px;
+      display: inline-block;
+      margin-bottom: 14px;
+      color: var(--app-font-color-light);
+    }
+    .section{
+      @apply --layout-flex;
+      margin: 0px 14px;
+    }
+    .image-wrap{
+      @apply --layout-horizontal;
+      margin: 14px 0;
+    }
+    iron-icon {
+      height: 20px;
+      margin-top:-4px;
+      width: 20px;
+      padding: 0px;
+      margin-right: 2px;
+      color: var(--app-aqua-font);
+    }
+    .uploader-wrap{
+      @apply --layout-flex;
+      margin-left: 14px;
+    }
+    .info{
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+    }
+    .lbl{
+      line-height: 20px;
+      display: inline-block;
+    }
+    .photo{
+      white-space: nowrap;
+      cursor: pointer;
+      color: var(--app-aqua-font);
+    }
+    @media (max-width: 767px) {
+      .section{
+        margin: 0px;
+      }
+      :host(:not([no-wrapper])) .wrapper{
+        max-width: 100%;
+      }
+      .wrapper{
+        padding: 14px;
+      }
+    }
+    </style>
+    <firebase-document path="/users/[[uid]]/account" data="{{userAccount}}"></firebase-document>
+    <div class="wrapper">
+      <div class="section">
+        <h2>Tu Foto de Perfil</h2>
+        <label>Seleccione una foto que muestre claramente su cara</label>
+        <div class="image-wrap">
+          <div class="avatar-wrap">
+            <su-avatar class="avatar" sizing="large" src="[[userAccount.pf]]"></su-avatar>
+          </div>
+          <div class="uploader-wrap">
+            <div class="info">
+              Un perfil con una foto amigable y profesional tiene 5 veces mas chance a conseguir trabajo
+            </div>
+          </div>
+        </div>
+        <div style="text-align: right;margin-top:24px;">
+          <label for="upload" class="photo">
+            <iron-icon icon="myicons:add-a-photo"></iron-icon>
+            <div class="lbl" aria-hidden="true">Selecciona una foto</div>
+            <input class="upload" type="file" accept="image/*" id="upload" style="display:none">
+          </label>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class UpdatePhoto extends Polymer.Element {
+    static get is() {
+      return 'update-photo';
+    }
+    static get properties() {
+      return {
+        uid: String,
+        userAccount: Object
+      };
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('update-photo.created');
+    }
+    ready(){
+      super.ready();
+       this.$.upload.addEventListener('change', this.upload)
+    }
+    upload(e){
+      var storage = firebase.storage();
+      var storageRef = storage.ref();
+      var file = e.target.files[0];
+      var uid = firebase.auth().currentUser.uid;
+      var metadata = {
+        'contentType': file.type
+      };
+      storageRef.child(uid + '/' + uid).put(file, metadata).then(function(snapshot) {
+        console.log('Uploaded', snapshot.totalBytes, 'bytes.');
+        var uid = firebase.auth().currentUser.uid;
+        let promise = firebase.app().database().ref(`/users/${uid}/account/pf`).set(snapshot.downloadURL);
+        promise.then( () => {});
+      }).catch(function(error) {
+        // [START onfailure]
+        console.error('Upload failed:', error);
+        // [END onfailure]
+      });
+    }
+  }
+  window.customElements.define(UpdatePhoto.is, UpdatePhoto);
+  </script>
+</dom-module>

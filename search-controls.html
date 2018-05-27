@@ -1,0 +1,160 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="search-controls">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .searchWrap{
+      padding: 0px;
+    }
+    .search{
+      @apply --layout-horizontal;
+      @apply --layout-center-center;
+      margin: 0px 0;
+    }
+    paper-button {
+      margin: 0px 0px 0px 14px;
+    }
+    iron-icon {
+      height: 22px;
+      padding: 3px;
+      margin-right: 6px;
+    }
+    .addLine {
+      margin: 20px 0px 0px 0px;
+      border-top: 1px solid var(--app-muted-color);
+    }
+    paper-button.green {
+      color: #fff !important;
+    }
+    paper-button.white {
+      color: var(--app-font-color-light) !important;
+      font-weight: 500;
+    }
+    paper-icon-button {
+      border-top-right-radius: 2px;
+      border-bottom-right-radius: 2px;
+      height: 42px;
+      width: 40px;
+      @apply --common-shadow;
+      margin-right: 10px;
+      color: #fff;
+      background-color: var(--app-aqua-font);
+    }
+    .head-title{
+      position: relative;
+      @apply --layout-flex;
+      height:40px;
+    }
+    .head-title span{
+      display: block;
+      position: absolute;
+      bottom:0;
+      left:0;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      vertical-align: bottom;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 13px;
+      color: var(--app-font-color-light);
+    }
+    @media (max-width: 767px) {
+      .label {
+        display:none;
+      }
+      .head-title{
+        @apply --su-font-title-thin;
+      }
+      .addLine {
+        margin: 14px 0;
+      }
+      paper-button {
+        min-width: 30px;
+        height: 22px;
+        margin-left: 8px;
+        padding: 0px !important;
+      }
+      iron-icon {
+        margin-right: 0px;
+      }
+      paper-button.aqua {
+        @apply --common-shadow;
+        color: #fff !important;
+        border-radius: 40px;
+        width: 40px; 
+        height: 40px;
+      }
+      paper-button.white {
+        color: var(--app-aqua-font) !important;
+        border-radius: 40px;
+        width: 40px;
+        height: 40px;
+      }
+    }
+    </style>
+    <div class="searchWrap">
+      <div class="search">
+        <div class="head-title"><span>LISTADO DE TRABAJOS</span></div>
+        <div>
+          <paper-button noink class="small white" on-tap="_changeFilters" class$="[[_computeClass(filters)]]">
+            <iron-icon icon="myicons:filters"></iron-icon><span class="label">Filtros</span>
+          </paper-button>
+        </div>
+      </div>
+      <dom-if if="[[filters]]">
+        <template>
+           <div class="addLine">
+              <feed-params horizontal feed-params="{{params}}"></feed-params>
+            </div>
+        </template>
+      </dom-if>
+    </div>
+  </template>
+  <script>
+  class SearchControls extends Polymer.Element {
+    static get is() {
+      return 'search-controls';
+    }
+    static get properties() {
+      return {
+        filters: {
+          type: Boolean,
+          value: false
+        },
+        params: Object,
+      };
+    }
+    static get observers() {
+      return [
+        '_loadLazyFilter(filters)'
+      ]
+    }
+    constructor() {
+      super();
+    }
+    _changeFilters() {
+      this.filters = !this.filters;
+    }
+    _computeClass(filters) {
+      return filters ? 'small aqua' : 'small white';
+    }
+    _loadLazyFilter(filters){
+      if (filters === undefined) return;
+      if (!this._filtersLoaded){
+        if (filters) {
+          Polymer.importHref(this.resolveUrl('feed-params.html'), () => {
+            this._filtersLoaded = true;
+            console.log('filters component loaded');
+          });
+        }
+      }
+    }
+  }
+  window.customElements.define(SearchControls.is, SearchControls);
+  </script>
+</dom-module>

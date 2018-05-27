@@ -1,0 +1,91 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="redux/proposal-mixin.html">
+<link rel="import" href="job-card.html">
+<link rel="import" href="two-columns.html">
+<link rel="import" href="proposal-messages.html">
+<link rel="import" href="proposal-details.html">
+<link rel="import" href="account-badge.html">
+<dom-module id="su-propuesta">
+  <template>
+    <style>
+    :host {
+      display: block;
+      margin-top: 20px;
+    }
+    @media (max-width: 767px) {
+      :host {
+        margin-top: -24px !important;
+        margin-bottom: 94px;
+      }
+    }
+    </style>
+    <firebase-document path="/jobs/[[jobKey]]" data="{{job}}"></firebase-document>
+    <firebase-document path="/proposals/[[jobKey]]/[[uid]]" data="{{proposal}}"></firebase-document>
+    <two-columns narrow-layout="{{narrowLayout}}" reverse content-width="710" side-width="250" gutter="20">
+      <job-card is-proposal slot="content" job="[[job]]" job-key="[[jobKey]]"></job-card>
+      <dom-if if="[[!job.ishired]]">
+        <template>
+          <dom-if if="[[proposal.chatid]]">
+            <template>
+              <proposal-messages job="[[job]]" receiver="[[job.owner]]" uid="[[uid]]" room-key="[[proposal.chatid]]" slot="content"></proposal-messages>
+            </template>
+          </dom-if>
+        </template>
+      </dom-if>
+      <proposal-details uid="[[uid]]" job-key="[[jobKey]]" is-invite$="[[isInvite]]" is-responsive$="[[narrowLayout]]" slot="[[_slot]]" job-open="[[job.ishired]]" proposal-invitation="[[proposal.isinvitation]]" proposal="[[proposal]]" client-name="[[firstname]]" client-last="[[lastname]]"></proposal-details>
+      <account-badge slot="sidebar" user-key="[[job.owner]]" location="[[job.l.name]]" lastname="{{lastname}}" firstname="{{firstname}}"></account-badge>
+    </two-columns>
+  </template>
+  <script>
+  class SuPropuesta extends ProposalMixin(Polymer.Element) {
+    static get is() {
+      return 'su-propuesta';
+    }
+    static get properties() {
+      return {
+        jobKey: {
+          type: String,
+          observer: 'syncKey'
+        },
+        _slot:{
+          type: String,
+          computed: '_computeSlot(narrowLayout)'
+        },
+        narrowLayout: Boolean,
+        isInvite: {
+          type: Boolean,
+          value: false
+        },
+        uid: String,
+        client: Object
+      };
+    }
+    static get observers() {
+      return [
+        '_chatOpen(proposal.chatid, job.ishired)'
+      ]
+    }
+    _computeSlot(isNarrow){
+      if (isNarrow){
+        return 'content';
+      } else{
+        return 'sidebar';
+      }
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-propuesta.created');
+    }
+    _chatOpen(chatId, ishired){
+      if (chatId === undefined || ishired) return;
+      var resolvedPageUrl = this.resolveUrl('proposal-messages.html');
+      Polymer.importHref(resolvedPageUrl, null, null, true);
+    }
+    syncKey(key){
+      this.dispatch('selectProposal', key);
+    }
+  }
+  window.customElements.define(SuPropuesta.is, SuPropuesta);
+  </script>
+</dom-module>

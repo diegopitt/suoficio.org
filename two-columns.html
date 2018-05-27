@@ -1,0 +1,107 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+
+<dom-module id="two-columns">
+  <template>
+    <style>
+    :host {
+      display: block;
+      @apply --layout-horizontal;
+      @apply --layout-center-justified;
+    }
+    :host([reverse]) {
+      @apply --layout-horizontal-reverse;
+    }
+    :host([narrow-layout]) #sideContent{
+      display: none;
+    }
+    :host([narrow-layout]) #mainContent{
+      width: calc(var(--side-width) + var(--content-width)) !important;
+    }
+    :host([show-line]) #sideContent{
+      border-left: 1px solid var(--app-little-grey);
+    }
+    #sideContent > ::slotted(*) {
+      margin-bottom: 20px;
+    }
+    :host(:not([narrow-layout])) #mainContent > ::slotted(*) {
+      margin-bottom: 20px;
+    }
+    :host(:not([reverse])) #mainContent{
+      width: var(--content-width);
+      margin: 0px 0px 0px var(--gutter-size);
+    }
+    :host(:not([reverse])) #sideContent{
+      width: var(--side-width);
+      margin: 0px var(--gutter-size) 0px 0px;
+    }
+    :host([reverse]) #mainContent{
+      width: var(--content-width);
+      margin: 0px var(--gutter-size) 0px 0px;
+    }
+    :host([reverse]) #sideContent{
+      width: var(--side-width);
+      margin: 0px 0px 0px var(--gutter-size);
+    }
+    :host([narrow-layout]) #mainContent{
+      margin: 0px;
+    }
+    </style>
+    <iron-media-query query="[[query]]" query-matches="{{narrowLayout}}"></iron-media-query>
+    <div id="sideContent">
+      <slot name="sidebar"></slot>
+    </div>
+    <div id="mainContent">
+      <slot name="content"></slot>
+    </div>
+  </template>
+  <script>
+  class TwoColumns extends Polymer.Element {
+    static get is() {
+      return 'two-columns';
+    }
+    static get properties() {
+      return {
+        username: String,
+        contentWidth: {
+          type: Number,
+          value: 700
+        },
+        narrowLayout: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true
+        },
+        sideWidth: {
+          type: Number,
+          value: 300
+        },
+        gutter: {
+          type: Number,
+          value: 0
+        }
+      };
+    }
+    static get observers() {
+      return [
+          '_updateLayout(contentWidth, sideWidth, gutter)'
+      ]
+    }
+    attached() {
+      this._updateCustomStyles();
+    }
+    _updateLayout(contentWidth, sideWidth, gutter) {
+      this.query = '(max-width:' + (contentWidth + sideWidth + (gutter * 2)) + 'px)';
+      this._updateCustomStyles();
+    }
+    _updateCustomStyles() {
+      this.updateStyles({
+        '--content-width': this.contentWidth + 'px',
+        '--side-width': this.sideWidth + 'px',
+        '--gutter-size': this.gutter + 'px'
+      });
+    }
+  }
+  window.customElements.define(TwoColumns.is, TwoColumns);
+  </script>
+</dom-module>

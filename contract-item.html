@@ -1,0 +1,191 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="contract-item">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    .main-wrap {
+      @apply --layout-horizontal;
+    }
+    .showdays{
+      display: none !important;
+    }
+    .item {
+      @apply --layout;
+      @apply --layout-center;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 16px;
+      width: 100%;
+    }
+    .item > .no {
+      width: 40px;
+    }
+    .item > .contract {
+      @apply --layout-flex;
+      padding-right: 10px;
+    }
+    .review {
+      @apply --layout-flex;
+      padding-top: 5px;
+      font-size: 11px;
+      @apply --paper-font-common-nowrap;
+      color: var(--app-orange-color-light);
+    }
+    .item > .contract a {
+      @apply --su-font-subtitle;
+    }
+    .item > .date {
+      width: 116px;
+    }
+    .item > .amount {
+      width: 100px;
+      color: var(--app-green-font);
+      font-weight: 400;
+    }
+    .time {
+      color: var(--app-font-color);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 20px;
+    }
+    .days {
+      color: var(--app-font-color-light);
+      @apply --paper-font-common-nowrap;
+      font-size: 11px;
+      font-weight: 400;
+      line-height: 16px;
+    }
+    .green {
+      background-color: var(--app-aqua-font);
+    }
+    .muted {
+      background-color: var(--app-muted-color);
+    }
+    .pending {
+      background-color: var(--app-little-orange);
+    }
+    @media (max-width: 767px) {
+      .days {
+        font-size: 9px;
+        line-height: 20px;
+      }
+      .review {
+        font-size: 9px;
+        line-height: 20px;
+      }
+      .time {
+        font-size: 12px;
+      }
+      .showdays{
+        display: block !important;
+      }
+      .item > .contract a {
+        @apply --su-font-header;
+      }
+      .item > .contract {
+        padding-right: 0px;
+      }
+      .item > .date {
+        display: none !important;
+        width: 106px;
+      }
+      .item > .no {
+        width: 24px;
+      }
+      .item > .amount {
+        display: none;
+      }
+    }
+    </style>
+    <firebase-document path="/contracts/[[contractKey]]" data="{{contract}}"></firebase-document>
+    <firebase-document path="/jobs/[[contract.jobkey]]/name" data="{{name}}"></firebase-document>
+    <div class="main-wrap">
+      <div class="item">
+        <div class="no">
+          <div class$="circle [[_computeColor(contract.isactive, _leftReview)]]"></div>
+        </div>
+        <div class="date">
+          <div class="time">[[_getPostTime(contract.started)]]</div>
+          <div class="days">[[_getPostDays(contract.started)]]</div>
+        </div>
+        <div class="contract">
+          <a href="contratos/[[contractKey]]/d">[[_contractName]]</a>
+          <dom-if if="[[!contract.isactive]]">
+            <template>
+              <dom-if if="[[!_leftReview]]">
+                <template>
+                  <div class="review">Calificacion pendiente</div>
+                </template>
+              </dom-if>
+            </template>
+          </dom-if>
+          <dom-if if="[[contract.ended]]">
+            <template>
+              <div class="days showdays">Finalizado: [[_getPostDays(contract.ended)]]</div>
+            </template>
+          </dom-if>
+          <dom-if if="[[contract.isactive]]">
+            <template>
+              <div class="days showdays">Iniciado: [[_getPostDays(contract.started)]]</div>
+            </template>
+          </dom-if>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+  class ContractItem extends Polymer.Element {
+    static get is() {
+      return 'contract-item';
+    }
+    static get properties() {
+      return {
+        contractKey: String,
+        uid: String,
+        _leftReview: {
+          Boolean,
+          value: false,
+          computed: '_computeLeftReview(contract.u, uid)'
+        },
+        _contractName: {
+          type: String,
+          computed: '_computeContractName(name)'
+        }
+      };
+    }
+    static get observers() {
+      return []
+    }
+    _computeLeftReview(review, uid) {
+      if (review === undefined || uid === undefined) return;
+      return review[uid];
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('contract-item');
+    }
+    _computeContractName(name) {
+      if (Object.keys(name).length === 0 || name === undefined) return;
+      return name;
+    }
+    _formatAmount(amount) {
+      return Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,");
+    }
+    _getPostTime(timestamp) {
+      return moment(timestamp).format('L');
+    }
+    _getPostDays(timestamp) {
+      return moment(timestamp).fromNow();
+    }
+    _computeColor(isActive, _leftReview) {
+      if (isActive === false && !_leftReview) return 'pending';
+      return isActive ? 'green' : 'muted';
+    }
+  }
+  window.customElements.define(ContractItem.is, ContractItem);
+  </script>
+</dom-module>

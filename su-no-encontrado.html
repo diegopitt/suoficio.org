@@ -1,0 +1,27 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="oficio-styles.html">
+<dom-module id="su-no-encontrado">
+  <template>
+    <style include="oficio-styles">
+    :host {
+      display: block;
+    }
+    </style>
+    <div>pagina no encontrada</div>
+  </template>
+  <script>
+  class SuNoEncontrado extends Polymer.Element {
+    static get is() {
+      return 'su-no-encontrado';
+    }
+    static get properties() {
+      return {};
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('su-no-encontrado.created');
+    }
+  }
+  window.customElements.define(SuNoEncontrado.is, SuNoEncontrado);
+  </script>
+</dom-module>

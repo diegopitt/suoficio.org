@@ -1,0 +1,196 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../oficio-styles.html">
+<dom-module id="chat-messages">
+  <template>
+    <style include="oficio-styles">
+      :host {
+        display: block;
+        @apply --layout-vertical;
+        height:100%;
+        background-color: transparent;
+      }
+      :host([fixed-height]) #scroller {
+        height:200px !important;
+      }
+      #scroller {
+        @apply --layout-self-stretch;
+        height:100%;
+        overflow: auto;
+        border-bottom: 1px solid var(--app-little-grey);
+      }
+      .message {
+        @apply --layout-vertical;
+        font-size: 13px;
+      }
+      .time-title{
+        @apply --layout-flex;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 400;
+        padding:6px;
+        color: var(--app-font-color-light);
+      }
+      .text-container {
+        @apply --layout-horizontal;
+        margin: 0px 14px;
+      }
+      .text-container.me {
+        @apply --layout-horizontal-reverse;
+        @apply --layout-end;
+      }
+      .text-container.not-me {
+        @apply --layout-horizontal;
+      }
+      .text {
+        overflow-wrap: break-word;
+        max-width: 80%;
+        background-color: #f0f0f0;
+        padding: 6px 12px;
+        margin: 14px 0;
+        border-radius: 6px;
+      }
+      .me .text {
+        @apply --layout-self-end;
+        color:#FFF;
+        background-color: #5BBC2E;
+      }
+      .not-me .text {
+        @apply --layout-self-start;
+        background-color: var(--app-muted-color);
+      }
+      .not-me iron-icon {
+        margin-right: 5px;
+      }
+      @media (max-width: 767px) {
+        .message {
+          @apply --layout-vertical;
+          font-size: 11px;
+        }
+      }
+    </style>
+    <firebase-query id="messages" path="/messages/[[roomKey]]" data="{{messages}}"></firebase-query>
+    <div id="scroller">
+      <template is="dom-repeat" items="[[messages]]" as="msg">
+        <div class="message">
+          <div class="time-title" hidden$="[[!_indexesContains(_indexes, index, showAllTimestamps)]]">[[_getTime(msg.created)]]</div>
+          <div class$="[[_classForAuthor(msg.author)]] text-container">
+            <div class="text" title="">
+              <template is="dom-repeat" items="[[_messageLines(msg.text)]]">
+                [[item]]<br/>
+              </template>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+  <script>
+  class ChatMessages extends Polymer.Element {
+    static get is() {
+      return 'chat-messages';
+    }
+    static get properties() {
+      return {
+        autoScroll: {
+          type: Boolean,
+          value: true
+        },
+        senderData: Object,
+        messages: {
+          type: Object
+        },
+        showAllTimestamps: {
+          type: Boolean,
+          value: false
+        },
+        dateFormat: {
+          type: String,
+        },
+        roomKey: String
+      };
+    }
+    static get observers() {
+      return [
+        '_messagesChanged(messages.*, showAllTimestamps)',
+        '_massegesLoaded(messages.*, roomKey)'
+      ]
+    }
+    ready() {
+      super.ready();
+    }
+    _massegesLoaded(messages, roomKey){
+      if (roomKey === undefined) return;
+      this._itemChangeDebouncer = Polymer.Debouncer.debounce(this._itemChangeDebouncer,
+        Polymer.Async.microTask, () => {
+          if (messages && messages.base && messages.base.length > 0) {
+            let promise = firebase.app().database().ref(`/users/${this.uid}/chats/${this.roomKey}/n`).set(false);
+            promise.then( () => {});
+          }
+        }
+      );
+    }
+    constructor() {
+      super();
+      window.performance && performance.mark && performance.mark('chat-messages.created');
+    }
+    _classForAuthor(author) {
+      return author == this.uid ? 'me' : 'not-me';
+    }
+    _messagesChanged(changeData, showAllTimestamps) {
+      this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
+        Polymer.Async.timeOut.after(250), () => { 
+          if (changeData && changeData.base && changeData.base.length > 0) {
+            if (this.autoScroll) {
+              this.scrollToBottom();
+            }
+            if (!showAllTimestamps) this._updateTimestampedIndexes(changeData.base);
+          }
+        }
+      );
+    }
+    _updateTimestampedIndexes(messages) {
+      let indexes = [0];
+      let i, age, between, now = Date.now();
+      for (i = 1; i < messages.length; i++) {
+        age = now - messages[i].created;
+        between = messages[i].created - messages[i - 1].created;
+        // console.log('index', i, 'age', age, 'between', between);
+        if (this._shouldBeTimestamped(age, between)) {
+          indexes.push(i);
+        }
+      }
+      this._indexes = indexes;
+      //console.log('indexes', this._indexes);
+    }
+    _shouldBeTimestamped(age, between) {
+      if (age < 60 * 60 * 1000) {                  // If less than one hour old,
+        return between > 5 * 60 * 1000;            // show every 5 minutes.
+      } else if (age < 24 * 60 * 60 * 1000) {      // If less than one day old,
+        return between > 60 * 60 * 1000;           // show every hour.
+      } else if (age < 7 * 24 * 60 * 60 * 1000) {  // If less than a week old,
+        return between > 4 * 60 * 60 * 1000;       // show every four hours.
+      } else {                                     // If a week or older,
+        return between > 24 * 60 * 60 * 1000;      // show once per day.
+      }
+    }
+    _indexesContains(indexes, index, showAllTimestamps) {
+      return showAllTimestamps || (indexes && indexes.includes(index));
+    }
+    scrollToBottom() {
+      setTimeout(function() {
+        this.$.scroller.scrollTop = this.$.scroller.scrollHeight;
+        //target.scrollTop = target.scrollHeight;
+      }.bind(this), 100);
+    }
+    _messageLines(msg) {
+      if (!msg) return [];
+      return msg.trim().split(/\r?\n/);
+    }
+    _getTime(timestamp){
+      return moment(timestamp).fromNow();
+    }
+  }
+  window.customElements.define(ChatMessages.is, ChatMessages);
+  </script>
+</dom-module>
